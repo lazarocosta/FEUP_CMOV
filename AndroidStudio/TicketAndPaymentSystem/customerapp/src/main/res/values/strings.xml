@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CustomerApp</string>
+    <string name="registration_name">Name:</string>
+    <string name="registration_NIF">NIF:</string>
+    <string name="registration_credit_card_indication">Credit card data:</string>
+    <string name="registration_credit_card_type">Type:</string>
+    <string name="registration_credit_card_number">Number:</string>
+    <string name="registration_credit_card_validity">Validity:</string>
+    <string name="registration_submit">Submit</string>
+</resources>
