@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/cafeteriaapp" />
             <option value="$PROJECT_DIR$/customerapp" />
+            <option value="$PROJECT_DIR$/restservices" />
             <option value="$PROJECT_DIR$/validationapp" />
           </set>
         </option>
