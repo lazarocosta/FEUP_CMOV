@@ -2,7 +2,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const crypto = require('crypto');
-//const UIDGenerator = require('uid-generator');
+const UIDGenerator = require('uid-generator');
 
 admin.initializeApp(functions.config().firebase);
 
