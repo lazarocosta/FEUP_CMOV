@@ -29,39 +29,39 @@ const register = functions.https.onRequest((req, res) => {
         const creditCardValidity = req.body.data.creditCardValidity;
 
         if(!publicKey) {
-            res.status(400).send({ 'id': "Please enter a publicKey."});
+            res.status(400).send({ 'result': "Please enter a publicKey."});
             return;
         }
 
         if(!name) {
-            res.status(400).send({ 'id': "Please enter a name."});
+            res.status(400).send({ 'result': "Please enter a name."});
             return;
         }
 
         if(!nif) {
-            res.status(400).send({ 'id': "Please enter a nif."});
+            res.status(400).send({ 'result': "Please enter a nif."});
             return;
         }
 
         if(!creditCardType) {
-            res.status(400).send({ 'id': "Please enter a creditCardType."});
+            res.status(400).send({ 'result': "Please enter a creditCardType."});
             return;
         }
 
         if(!creditCardNumber) {
-            res.status(400).send({ 'id': "Please enter a creditCardNumber."});
+            res.status(400).send({ 'result': "Please enter a creditCardNumber."});
             return;
         }
 
         if(!creditCardValidity) {
-            res.status(400).send({ 'id': "Please enter a creditCardValidity."});
+            res.status(400).send({ 'result': "Please enter a creditCardValidity."});
             return;
         }
 
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(400).send({ 'id':"nif not is number"});
+            res.status(400).send({ 'result':"nif not is number"});
             console.error("nif not is number: ", error);
             return;
         }
@@ -71,14 +71,15 @@ const register = functions.https.onRequest((req, res) => {
             name: name,
             nif: nifValid,
             id:id,
-            }).then(function(docRef) {
+            })
+            .then(function(docRef) {
                 const number = parseInt(creditCardNumber);
                 const date = Date.parse(creditCardValidity);
 
-                if(isNaN(number)|| is_date(date)) {
+                if(isNaN(number)) {
                     admin.firestore().collection('customer').doc(docRef.id).delete();
-                    res.status(400).send({ 'id':"creditCardNumber not is number or creditCardValidity not is date"});
-                    console.error("creditCardNumber not is number or creditCardValidity not is date: ", error);
+                    res.status(400).send({ 'result':"creditCardNumber not is number"});
+                    console.error("creditCardNumber not is number: ", error);
                     return;
                 }
 
@@ -86,19 +87,20 @@ const register = functions.https.onRequest((req, res) => {
                     type: creditCardType,
                     number: number,
                     validity: date,
-                }).catch(function(error) {
-                    res.status(400).send({ 'id':"Error adding creditCard of the user"});
+                })
+                .catch(function(error) {
+                    res.status(400).send({ 'result':"Error adding creditCard of the user"});
                     console.error("Error adding creditCard of the user ", error);
                 })
             .catch(function(error) {
-                res.status(400).send({ 'id':"Error adding customer"});
+                res.status(400).send({ 'result':"Error adding customer"});
                 console.error("Error adding user", error);
             });
-        res.status(200).send({'id':id});
+        res.status(200).send({'result':id});
         return;
         }).catch(err => {
             console.log(err);
-            res.status(400).send({ 'id':"Could not create user!"});
+            res.status(400).send({ 'result':"Could not create user!"});
             return;
         });
     });
@@ -111,23 +113,24 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/login --data '{"data" : { "username" : "manuel", "password":"TESTE"}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/login --data '{"data" : { "name" : "manuel", "password":"TESTE"}}' -g -H "Content-Type: application/json"
 */
-
 
 const login = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
+        console.log(0)
+
 
         const name = req.body.data.name;
         const password = req.body.data.password;
 
         if(!name){
-            res.status(400).send({ 'data':"Please enter a name."});
+            res.status(400).send({ 'result':"Please enter a name."});
             return;
         }
 
         if(!password){
-            res.status(400).send({ 'data':"Please enter a password."});
+            res.status(400).send({ 'result':"Please enter a password."});
             return;
         }
 
@@ -135,53 +138,52 @@ const login = functions.https.onRequest((req, res) => {
 
         usersRef.where('name', '==', name).get()
             .then(snapshot => {
-            if(snapshot.size > 1){
-            res.status(400).send({ 'data':"Invalid name|password"});
-            return;
-        }
-        if(snapshot.size < 1){
-            res.status(400).send({ 'data':"Invalid name|password"});
-            return;
-        }
-        snapshot.forEach(doc => {
+                if(snapshot.size > 1){
+                    res.status(400).send({ 'result':"Invalid name|password"});
+                    return;
+                }
+                if(snapshot.size < 1){
+                    res.status(400).send({ 'result':"Invalid name|password"});
+                    return;
+                }
+                snapshot.forEach(doc => {
 
-            console.log(doc.id, '=>', doc.data().name);
-        var userPass = doc.data().password;
+                    console.log(doc.id, '=>', doc.data().name);
+                    var userPass = doc.data().password;
 
-        var hash = crypto.createHash('sha256').update(password).digest('base64');
-        console.log(userPass)
-        console.log(hash)
+                    var hash = crypto.createHash('sha256').update(password).digest('base64');
+                    console.log(userPass)
+                    console.log(hash)
 
-        //if password matches, generate token, save it in db and send it
-        if(hash === userPass) {
+                    //if password matches, generate token, save it in db and send it
+                    if(hash === userPass) {
 
-            const uidGen = new UIDGenerator(256, UIDGenerator.BASE62);
-            const token = uidGen.generateSync().toString();
-            const date = new Date().toString();
+                        const uidGen = new UIDGenerator(256, UIDGenerator.BASE62);
+                        const token = uidGen.generateSync().toString();
+                        const date = new Date().toString();
 
-            admin.firestore().collection('sessions').add({
-                name: name,
-                token: token,
-                date: date
+                        admin.firestore().collection('sessions').add({
+                            name: name,
+                            token: token,
+                            date: date
+                        });
+
+                        res.status(200).send({ 'result': token });
+
+                    } else {
+                        res.status(400).send({ 'result':"Invalid name/password."});
+                    }
+                });
+                return;
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).send({ 'result':"Invalid name|password."});
+                return;
             });
-
-            res.status(200).send({ 'data': token });
-
-        }else {
-            res.status(400).send({ 'data':"Invalid name/password."});
-        }
-        });
-        return;
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(400).send({ 'data':"Invalid name|password."});
-            return;
-        });
 
     });
 });
-
 
 module.exports={
     register,
