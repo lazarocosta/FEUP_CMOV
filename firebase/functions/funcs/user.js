@@ -13,7 +13,7 @@ Parameters: publicKey ->
         creditCardType ->
         creditCardNumber ->
         creditCardValidity ->
-Output: JSON with id value 
+Output: JSON with result value 
 Teste:
      curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data '{"data" : { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "October 13, 2014 11:13:00" }}' -g -H "Content-Type: application/json"
 */
@@ -29,39 +29,39 @@ const register = functions.https.onRequest((req, res) => {
         const creditCardValidity = req.body.data.creditCardValidity;
 
         if(!publicKey) {
-            res.status(400).send({ 'result': "Please enter a publicKey."});
+            res.status(400).send({ 'data': "Please enter a publicKey."});
             return;
         }
 
         if(!name) {
-            res.status(400).send({ 'result': "Please enter a name."});
+            res.status(400).send({ 'data': "Please enter a name."});
             return;
         }
 
         if(!nif) {
-            res.status(400).send({ 'result': "Please enter a nif."});
+            res.status(400).send({ 'data': "Please enter a nif."});
             return;
         }
 
         if(!creditCardType) {
-            res.status(400).send({ 'result': "Please enter a creditCardType."});
+            res.status(400).send({ 'data': "Please enter a creditCardType."});
             return;
         }
 
         if(!creditCardNumber) {
-            res.status(400).send({ 'result': "Please enter a creditCardNumber."});
+            res.status(400).send({ 'data': "Please enter a creditCardNumber."});
             return;
         }
 
         if(!creditCardValidity) {
-            res.status(400).send({ 'result': "Please enter a creditCardValidity."});
+            res.status(400).send({ 'data': "Please enter a creditCardValidity."});
             return;
         }
 
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(400).send({ 'result':"nif not is number"});
+            res.status(400).send({ 'data':"nif not is number"});
             console.error("nif not is number: ", error);
             return;
         }
@@ -78,7 +78,7 @@ const register = functions.https.onRequest((req, res) => {
 
                 if(isNaN(number)) {
                     admin.firestore().collection('customer').doc(docRef.id).delete();
-                    res.status(400).send({ 'result':"creditCardNumber not is number"});
+                    res.status(400).send({ 'data':"creditCardNumber not is number"});
                     console.error("creditCardNumber not is number: ", error);
                     return;
                 }
@@ -87,20 +87,23 @@ const register = functions.https.onRequest((req, res) => {
                     type: creditCardType,
                     number: number,
                     validity: date,
+                    value: 100,
+                    amountSpent: 0,
+
                 })
                 .catch(function(error) {
-                    res.status(400).send({ 'result':"Error adding creditCard of the user"});
+                    res.status(400).send({ 'data':"Error adding creditCard of the user"});
                     console.error("Error adding creditCard of the user ", error);
                 })
             .catch(function(error) {
-                res.status(400).send({ 'result':"Error adding customer"});
+                res.status(400).send({ 'data':"Error adding customer"});
                 console.error("Error adding user", error);
             });
-        res.status(200).send({'result':id});
+        res.status(200).send({'data':id});
         return;
         }).catch(err => {
             console.log(err);
-            res.status(400).send({ 'result':"Could not create user!"});
+            res.status(400).send({ 'data':"Could not create user!"});
             return;
         });
     });
@@ -125,12 +128,12 @@ const login = functions.https.onRequest((req, res) => {
         const password = req.body.data.password;
 
         if(!name){
-            res.status(400).send({ 'result':"Please enter a name."});
+            res.status(400).send({ 'data':"Please enter a name."});
             return;
         }
 
         if(!password){
-            res.status(400).send({ 'result':"Please enter a password."});
+            res.status(400).send({ 'data':"Please enter a password."});
             return;
         }
 
@@ -139,11 +142,11 @@ const login = functions.https.onRequest((req, res) => {
         usersRef.where('name', '==', name).get()
             .then(snapshot => {
                 if(snapshot.size > 1){
-                    res.status(400).send({ 'result':"Invalid name|password"});
+                    res.status(400).send({ 'data':"Invalid name|password"});
                     return;
                 }
                 if(snapshot.size < 1){
-                    res.status(400).send({ 'result':"Invalid name|password"});
+                    res.status(400).send({ 'data':"Invalid name|password"});
                     return;
                 }
                 snapshot.forEach(doc => {
@@ -168,17 +171,17 @@ const login = functions.https.onRequest((req, res) => {
                             date: date
                         });
 
-                        res.status(200).send({ 'result': token });
+                        res.status(200).send({ 'data': token });
 
                     } else {
-                        res.status(400).send({ 'result':"Invalid name/password."});
+                        res.status(400).send({ 'data':"Invalid name/password."});
                     }
                 });
                 return;
             })
             .catch(err => {
                 console.log(err);
-                res.status(400).send({ 'result':"Invalid name|password."});
+                res.status(400).send({ 'data':"Invalid name|password."});
                 return;
             });
 
