@@ -11,15 +11,12 @@ import android.widget.EditText;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 /*
-https://stackoverflow.com/questions/12471999/rsa-encryption-decryption-in-android
-https://developer.android.com/reference/java/security/KeyStore
-https://developer.android.com/training/articles/keystore
-https://www.androidauthority.com/use-android-keystore-store-passwords-sensitive-information-623779/
 https://paginas.fe.up.pt/~apm/CM/docs/04Fragments.pdf
- */
+*/
 public class RegistrationActivity extends AppCompatActivity {
 
     @Override
@@ -31,11 +28,11 @@ public class RegistrationActivity extends AppCompatActivity {
         findViewById(R.id.registrationSubmitButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: generate RSA key pair, send public key to database and store private key
                 // TODO: check input data?
                 JSONObject registrationData = new JSONObject();
                 try {
-                    registrationData.put("publicKey", "");
+                    EncryptionManager encryptionManager = new EncryptionManager(packageContext);    // shouldn't be created here
+                    registrationData.put("publicKey", encryptionManager.getPublicKey());
                     registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
                     registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());
                     registrationData.put("creditCardType", ((EditText) findViewById(R.id.registrationCreditCardTypeET)).getText().toString());
@@ -56,6 +53,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 Intent i = new Intent(packageContext, MainActivity.class);
                 startActivity(i);
+                finish();
             }
         });
     }
