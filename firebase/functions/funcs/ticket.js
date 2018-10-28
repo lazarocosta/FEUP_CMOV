@@ -186,7 +186,7 @@ const buyTicket = functions.https.onRequest((req, res) => {
                             const typeOfOfferBoolean = random.boolean();
                             var typeOfOffer;
                             if (typeOfOfferBoolean) {
-                                typeOfOffer = 'free coffe'
+                                typeOfOffer = 'freecoffee'
                             } else typeOfOffer = 'popcorn'
 
                             var voucher = {

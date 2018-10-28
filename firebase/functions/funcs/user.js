@@ -188,7 +188,246 @@ const login = functions.https.onRequest((req, res) => {
     });
 });
 
+
+/**
+Function to login a participant
+Parameters: username -> the USER name
+	    password ->the password of the user
+Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
+TEST: 
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"data" : { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"b8188000-da12-11e8-ab7a-9be16eaadfca", "voucher2":"","product":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }}' -g -H "Content-Type: application/json"
+*/
+const payOrder = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+        const userId = req.body.data.userId;
+        const voucher1 = req.body.data.voucher1;
+        const voucher2 = req.body.data.voucher2;
+        const docProduct = req.body.data.product.docProduct;
+        const quantity = req.body.data.product.quantity;
+
+        let listVoucher = []
+
+        if(!userId){
+            res.status(400).send({ 'data':"Please enter a userId."});
+            return;
+        }
+
+        if(voucher1){
+            listVoucher.push(voucher1);
+        }
+
+        if(voucher2){
+            listVoucher.push(voucher2);
+        }
+
+        var discont=0;
+        var freecoffee = 0;
+        var popcorn = 0;
+        var valueCoffe=0;
+        var valuepopCorn =0;
+        var lisproducts = [];
+        var priceProducts= 0;
+        var numberOfCoffee = 0;
+        var numberOfPopcorn = 0;
+        var insuficiente = false;
+
+
+        /*admin.firestore().collection('product').doc(docProduct).get()
+        .then(doc=> {
+            var nameProduct = doc.data().name;
+            var priceProduct = doc.data().price;
+            priceProducts = priceProducts + priceProduct * quantity;
+
+            var product = {
+                name: nameProduct,
+                price: priceProduct,
+                quantity: quantity
+            }
+
+            if(nameProduct == 'freecoffee') {
+                numberOfCoffee++
+                valueCoffe = priceProduct;
+            }
+
+            if(nameProduct == 'popcorn') {
+                numberOfPopcorn++;
+                valuepopCorn = priceProduct;
+            }
+
+            lisproducts.push(product);
+            console.log(product)
+            console.log('pipocas',numberOfPopcorn )
+
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).send({ 'data':"Not found product"});
+            return;
+        });
+        */
+        
+         
+        var usersRef = admin.firestore().collection('customer');
+        usersRef.where('id', '==', userId).get()
+        .then(snapshot => {
+
+            if(snapshot.size != 1){
+                res.status(400).send({ 'data':"Invalid userId"});
+                return;
+            }
+            snapshot.forEach( userdoc => {   
+                console.log('userid',userdoc.id)
+                listVoucher.forEach(voucher => {
+                    console.log(voucher)
+                    usersRef.doc(userdoc.id).collection('voucher');
+                    usersRef.where('id', '==', voucher).get()
+                    .then(snapshot => {
+                        if(snapshot.size != 1){
+                            res.status(400).send({ 'data':"error"});
+                            return;
+                        }
+                        snapshot.forEach( doc => {
+                            console.log('aqui')
+                            console.log('voucher', doc)
+                            console.log(doc.id)
+                            console.log(doc.data().id)
+
+                           /* var used = false;
+                            console.log(1)
+
+                            if(doc.data().state == "not used") {
+                                if(doc.data().productCode =="5%discountCafeteria") {
+                                    discont = 0.05;
+                                }else if(doc.data().productCode =="freecoffee") {
+                                    if(numberOfCoffee > 0 ){
+                                        freecoffee++
+                                        used = true;
+                                    }
+                                }else if(doc.data().productCode =="popcorn") {
+                                    if( numberOfPopcorn > 0){ 
+                                        popcorn++;
+                                        used = true;
+                                    }
+                                }
+                                console.log(2)
+
+                                if (used){
+                                    console.log('usou')
+                                   await usersRef.doc(userdoc.id).collection('voucher').doc(voucher).update({
+                                        state: 'used',
+                                    },{merge:true})
+                                }
+                            console.log(3)
+                            }*/
+                        })
+                        res.status(200).send({ 'data':"bem"});
+                        return;
+                    }).catch(err => {
+                        console.log(err);
+                        res.status(400).send({ 'data':"Error"});
+                        return;
+                    });
+                })
+                 /*var creditCard = usersRef.doc(userdoc.id).collection('creditCard');
+                creditCard.get()
+                .then(snapshot => {
+                    if(snapshot.size != 1){
+                        res.status(400).send({ 'data':"Credit card not found"});
+                        return;
+                    }
+                    snapshot.forEach(docreditcard => { 
+                        console.log('chegou...')
+
+                        var valueCreditCard = docreditcard.data().value;
+                        var valueSpentMod100 = docreditcard.data().valueSpentMod100;
+                        var voucher = (valueSpentMod100 + priceProducts)/100;
+
+                        var valueSpent =priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
+
+                        if(valueCreditCard < priceProducts) {
+                            insuficiente = true;
+                            res.status(400).send({ 'data':"insufficient funds"});
+                            return;  
+                        } else {
+
+                            creditCard.doc(docreditcard.id).update({
+                                value: valueCreditCard - valueSpent,
+                                valueSpentMod100: (valueSpentMod100 + priceProducts)%100,
+                                },{merge:true})
+
+                            if(voucher>=1) {
+                                const idVoucher = uuidv1();
+    
+                                admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
+                                    id: idVoucher,
+                                    state: 'not used',
+                                    productCode: '5%discountCafeteria'
+                                })      
+                            }
+                            res.status(200).send({ 'data':"bem"});
+                            return;  
+
+                        }
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(400).send({ 'data':"Error"});
+                    return;
+                }); */
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).send({ 'data':"Error"});
+            return;
+        }); 
+    });
+});
+
+/**
+Function to login a participant
+Parameters: username -> the USER name
+	    password ->the password of the user
+Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
+TEST: 
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/teste --data '{"data" : { }}' -g -H "Content-Type: application/json"
+*/
+
+const teste = functions.https.onRequest((req, res) => {
+    // return  cors(req, res, () => {
+        var userId = '58e415e0-d792-11e8-b573-033213b03f30'
+        admin.firestore().collection('customer').where('id', '==', userId).get()
+        .then(snapshot => {
+            const promisse= []
+            if(snapshot.size != 1){
+                res.status(400).send({ 'data':"Invalid userId"});
+                return;
+            }
+            snapshot.forEach( userdoc => { 
+                console.log(userdoc.id)
+                const p =admin.firestore().collection('customer').doc(userdoc.id).get()
+                promisse.push(p)
+            }) 
+            return Promise.all(promisse)
+        })
+        .then (result => {
+            console.log(result)
+            res.status(200).send({ 'data':"bem"});
+
+        })
+        .catch (error=> {
+            console.log(error);
+            res.status(400).send({ 'data':"Error"});
+        })
+
+})
+
+
+
 module.exports={
     register,
     login,
+    payOrder,
+    teste,
 }
