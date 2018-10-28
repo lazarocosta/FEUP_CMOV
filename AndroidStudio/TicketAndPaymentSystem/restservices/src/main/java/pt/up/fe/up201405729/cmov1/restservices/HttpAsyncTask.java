@@ -4,6 +4,9 @@ package pt.up.fe.up201405729.cmov1.restservices;
 
 import android.os.AsyncTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,12 +15,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class HttpAsyncTask extends AsyncTask<String, Void, String> {
+class HttpAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+    private String urlString;
+    private String requestMethod;
+
+    HttpAsyncTask(String url, String method) {
+        this.urlString = url;
+        this.requestMethod = method;
+    }
 
     @Override
-    protected String doInBackground(String[] data) {
-        String urlString = data[0];
-        String requestMethod = data[1];
+    protected JSONObject doInBackground(JSONObject... jsonObjects) {
+        if (jsonObjects.length != 1)
+            throw new IllegalArgumentException("Only one JSONObject is expected");
+
         URL url;
         HttpURLConnection urlConnection = null;
         try {
@@ -29,27 +40,25 @@ class HttpAsyncTask extends AsyncTask<String, Void, String> {
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
-            StringBuilder payload = new StringBuilder();
-            payload.append("\"");
-            for (int i = 2; i < data.length; i++)
-                payload.append(data[i]);
-            payload.append("\"");
-            outputStream.writeBytes(payload.toString());
+            outputStream.writeBytes(jsonObjects[0].toString());
             outputStream.flush();
             outputStream.close();
             int responseCode = urlConnection.getResponseCode();
+            JSONObject response = readStream(urlConnection.getInputStream());
             if (responseCode == 200)
-                return readStream(urlConnection.getInputStream());
+                return response;
+            else
+                System.err.println(response.toString());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (urlConnection != null)
                 urlConnection.disconnect();
         }
-        return null;
+        return new JSONObject();
     }
 
-    private String readStream(InputStream in) {
+    private JSONObject readStream(InputStream in) throws JSONException {
         BufferedReader reader = null;
         String line;
         StringBuilder response = new StringBuilder();
@@ -68,6 +77,6 @@ class HttpAsyncTask extends AsyncTask<String, Void, String> {
                 }
             }
         }
-        return response.toString();
+        return new JSONObject(response.toString());
     }
 }
