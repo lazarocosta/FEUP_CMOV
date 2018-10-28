@@ -7,4 +7,6 @@
     <string name="registration_credit_card_number">Number:</string>
     <string name="registration_credit_card_validity">Validity:</string>
     <string name="registration_submit">Submit</string>
+    <string name="title_activity_checkout">CheckoutActivity</string>
+    <string name="checkout_button">Checkout</string>
 </resources>
