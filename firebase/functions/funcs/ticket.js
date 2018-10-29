@@ -11,13 +11,13 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data '{"data" : { "ticketId" : "239793a0-d9e3-11e8-bdc7-e3808b3e4670", "userId":"58e415e0-d792-11e8-b573-033213b03f30"}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "ticketId" : "239793a0-d9e3-11e8-bdc7-e3808b3e4670", "userId":"58e415e0-d792-11e8-b573-033213b03f30"}' -g -H "Content-Type: application/json"
 */
 const validTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const ticketId = req.body.data.ticketId;
-        const userId = req.body.data.userId;
+        const ticketId = req.body.ticketId;
+        const userId = req.body.userId;
 
         if(!ticketId) {
             res.status(400).send({ 'data': "Please enter a ticketId."});
@@ -83,15 +83,15 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTicket --data '{"data" : { "date" : "22-12-12","numbersTickets":"1", "userId":"58e415e0-d792-11e8-b573-033213b03f30", "priceTicket":"10"}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTicket --data ' { "date" : "22-12-12","numbersTickets":"1", "userId":"58e415e0-d792-11e8-b573-033213b03f30", "priceTicket":"10"}' -g -H "Content-Type: application/json"
 */
 const buyTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const date = req.body.data.date;
-        const numbersTickets = req.body.data.numbersTickets;
-        const userId = req.body.data.userId;
-        const priceTicket = req.body.data.priceTicket;
+        const date = req.body.date;
+        const numbersTickets = req.body.numbersTickets;
+        const userId = req.body.userId;
+        const priceTicket = req.body.priceTicket;
 
 
         if(!numbersTickets) {

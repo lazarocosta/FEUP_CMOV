@@ -15,18 +15,17 @@ Parameters: publicKey ->
         creditCardValidity ->
 Output: JSON with result value 
 Teste:
-     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data '{"data" : { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "October 13, 2014 11:13:00" }}' -g -H "Content-Type: application/json"
+     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "Octobaaer 1as3, 2014 11:13:00" }' -g -H "Content-Type: application/json"
 */
 
 const register = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-
-        const publicKey = req.body.data.publicKey;
-        const name = req.body.data.name;
-        const nif = req.body.data.nif;
-        const creditCardType = req.body.data.creditCardType;
-        const creditCardNumber = req.body.data.creditCardNumber;
-        const creditCardValidity = req.body.data.creditCardValidity;
+        const publicKey = req.body.publicKey;
+        const name = req.body.name;
+        const nif = req.body.nif;
+        const creditCardType = req.body.creditCardType;
+        const creditCardNumber = req.body.creditCardNumber;
+        const creditCardValidity = req.body.creditCardValidity;
 
         if(!publicKey) {
             res.status(400).send({ 'data': "Please enter a publicKey."});
@@ -66,42 +65,55 @@ const register = functions.https.onRequest((req, res) => {
             return;
         }
 
+        var adduser;
+
         admin.firestore().collection('customer').add({
             publicKey: publicKey,
             name: name,
             nif: nifValid,
             id:id,
-            })
-            .then(function(docRef) {
-                const number = parseInt(creditCardNumber);
-                const date = Date.parse(creditCardValidity);
+        })
+        .then(function(docRef) {
+            console.log(docRef)
+            console.log(docRef.id)
 
-                if(isNaN(number)) {
-                    admin.firestore().collection('customer').doc(docRef.id).delete();
-                    res.status(400).send({ 'data':"creditCardNumber not is number"});
-                    console.error("creditCardNumber not is number: ", error);
-                    return;
-                }
+            const number = parseInt(creditCardNumber);
+            const timestamp = Date.parse(creditCardValidity);
+            var myDate = new Date(creditCardValidity);
+            promises = []
 
-                admin.firestore().collection('customer').doc(docRef.id).collection('creditCard').add({
-                    type: creditCardType,
-                    number: number,
-                    validity: date,
-                    value: 100,
-                    amountSpent: 0,
+            if(isNaN(number)) {
+                adduser= false;
+                var p = admin.firestore().collection('customer').doc(docRef.id).delete()
+                promises.push(p)
+                res.status(400).send({ 'data':"creditCardNumber not is number"});
+                console.error("creditCardNumber not is number: ", error);
+                return;
+            }else {
+                const p =  admin.firestore().collection('customer').doc(docRef.id).collection('creditCard').add({
+                        type: creditCardType,
+                        number: number,
+                        validity: myDate,
+                        value: 100,
+                        amountSpent: 0,
 
-                })
-                .catch(function(error) {
-                    res.status(400).send({ 'data':"Error adding creditCard of the user"});
-                    console.error("Error adding creditCard of the user ", error);
-                })
-            .catch(function(error) {
-                res.status(400).send({ 'data':"Error adding customer"});
-                console.error("Error adding user", error);
-            });
-        res.status(200).send({'data':id});
-        return;
-        }).catch(err => {
+                        })
+                    promises.push(p);
+                    adduser= true;
+            }
+            return Promise.all(promises)
+        })
+        .then(snapshot => {
+            console.log(snapshot)
+            if(adduser) {
+                res.status(200).send({ 'data':id});
+                return 
+            }else {
+                res.status(400).send({ 'data':'Could not create user!'});
+                return
+            }
+        })
+        .catch(err => {
             console.log(err);
             res.status(400).send({ 'data':"Could not create user!"});
             return;
@@ -116,7 +128,7 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/login --data '{"data" : { "name" : "manuel", "password":"TESTE"}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/login --data ' { "name" : "manuel", "password":"TESTE"}' -g -H "Content-Type: application/json"
 */
 
 const login = functions.https.onRequest((req, res) => {
@@ -124,8 +136,8 @@ const login = functions.https.onRequest((req, res) => {
         console.log(0)
 
 
-        const name = req.body.data.name;
-        const password = req.body.data.password;
+        const name = req.body.name;
+        const password = req.body.password;
 
         if(!name){
             res.status(400).send({ 'data':"Please enter a name."});
@@ -195,15 +207,15 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"data" : { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"hMZOQoarX5vUyhAHugla","voucher2":"w81YmNZ9NBAXkq1864UJ","product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"hMZOQoarX5vUyhAHugla","voucher2":"w81YmNZ9NBAXkq1864UJ","product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const userId = req.body.data.userId;
-        const voucher1 = req.body.data.voucher1;
-        const voucher2 = req.body.data.voucher2;
-        const product1 = req.body.data.product1;
-        const product2 = req.body.data.product2;
+        const userId = req.body.userId;
+        const voucher1 = req.body.voucher1;
+        const voucher2 = req.body.voucher2;
+        const product1 = req.body.product1;
+        const product2 = req.body.product2;
 
         var docProduct1;
         var quantity1;
@@ -239,8 +251,8 @@ const payOrder = functions.https.onRequest((req, res) => {
         var voucherUsed = []
 
         if(product1) {
-            docProduct1 = req.body.data.product1.docProduct;
-            quantity1 = req.body.data.product1.quantity;
+            docProduct1 = req.body.product1.docProduct;
+            quantity1 = req.body.product1.quantity;
             if(!docProduct1 || !quantity1) {
                 res.status(400).send({ 'data':"Please enter the doc and quantity of product1"});
                 return;  
@@ -279,10 +291,10 @@ const payOrder = functions.https.onRequest((req, res) => {
         }
 
         if(product2) {
-            docProduct2 = req.body.data.product2.docProduct;
-            quantity1 = req.body.data.product2.quantity;
+            docProduct2 = req.body.product2.docProduct;
+            quantity1 = req.body.product2.quantity;
             if(!docProduct2 || !quantity2) {
-                res.status(400).send({ 'data':"Please enter the doc and quantity of product1"});
+                res.status(400).send({ 'data':"Please enter the doc and quantity of product2"});
                 return;  
             }
        
@@ -461,7 +473,7 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/teste --data '{"data" : { }}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/teste --data ' { }' -g -H "Content-Type: application/json"
 */
 
 const teste = functions.https.onRequest((req, res) => {
