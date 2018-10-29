@@ -195,15 +195,20 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"data" : { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"b8188000-da12-11e8-ab7a-9be16eaadfca", "voucher2":"","product":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"data" : { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"hMZOQoarX5vUyhAHugla","voucher2":"w81YmNZ9NBAXkq1864UJ","product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }}' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
         const userId = req.body.data.userId;
         const voucher1 = req.body.data.voucher1;
         const voucher2 = req.body.data.voucher2;
-        const docProduct = req.body.data.product.docProduct;
-        const quantity = req.body.data.product.quantity;
+        const product1 = req.body.data.product1;
+        const product2 = req.body.data.product2;
+
+        var docProduct1;
+        var quantity1;
+        var docProduct2;
+        var quantity2;
 
         let listVoucher = []
 
@@ -230,111 +235,278 @@ const payOrder = functions.https.onRequest((req, res) => {
         var numberOfCoffee = 0;
         var numberOfPopcorn = 0;
         var insuficiente = false;
+        var userdocId;
+        var voucherUsed = []
 
-
-        /*admin.firestore().collection('product').doc(docProduct).get()
-        .then(doc=> {
-            var nameProduct = doc.data().name;
-            var priceProduct = doc.data().price;
-            priceProducts = priceProducts + priceProduct * quantity;
-
-            var product = {
-                name: nameProduct,
-                price: priceProduct,
-                quantity: quantity
+        if(product1) {
+            docProduct1 = req.body.data.product1.docProduct;
+            quantity1 = req.body.data.product1.quantity;
+            if(!docProduct1 || !quantity1) {
+                res.status(400).send({ 'data':"Please enter the doc and quantity of product1"});
+                return;  
             }
+       
+            admin.firestore().collection('product').doc(docProduct1).get()
+            .then(doc=> {
+                var nameProduct = doc.data().name;
+                var priceProduct = doc.data().price;
+                priceProducts = priceProducts + priceProduct * quantity1;
 
-            if(nameProduct == 'freecoffee') {
-                numberOfCoffee++
-                valueCoffe = priceProduct;
+                var product = {
+                    name: nameProduct,
+                    price: priceProduct,
+                    quantity: quantity1
+                }
+
+                if(nameProduct == 'freecoffee') {
+                    numberOfCoffee++
+                    valueCoffe = priceProduct;
+                }
+
+                if(nameProduct == 'popcorn') {
+                    numberOfPopcorn++;
+                    valuepopCorn = priceProduct;
+                }
+
+                lisproducts.push(product);
+
+            }) 
+            .catch(err => {
+                console.log(err);
+                res.status(400).send({ 'data':"Not found product"});
+                return;
+            }); 
+        }
+
+        if(product2) {
+            docProduct2 = req.body.data.product2.docProduct;
+            quantity1 = req.body.data.product2.quantity;
+            if(!docProduct2 || !quantity2) {
+                res.status(400).send({ 'data':"Please enter the doc and quantity of product1"});
+                return;  
             }
+       
+            admin.firestore().collection('product').doc(docProduct2).get()
+            .then(doc=> {
+                var nameProduct = doc.data().name;
+                var priceProduct = doc.data().price;
+                priceProducts = priceProducts + priceProduct * quantity2;
 
-            if(nameProduct == 'popcorn') {
-                numberOfPopcorn++;
-                valuepopCorn = priceProduct;
-            }
+                var product = {
+                    name: nameProduct,
+                    price: priceProduct,
+                    quantity: quantity2
+                }
 
-            lisproducts.push(product);
-            console.log(product)
-            console.log('pipocas',numberOfPopcorn )
+                if(nameProduct == 'freecoffee') {
+                    numberOfCoffee++
+                    valueCoffe = priceProduct;
+                }
 
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(400).send({ 'data':"Not found product"});
-            return;
-        });
-        */
+                if(nameProduct == 'popcorn') {
+                    numberOfPopcorn++;
+                    valuepopCorn = priceProduct;
+                }
+
+                lisproducts.push(product);
+
+            }) 
+            .catch(err => {
+                console.log(err);
+                res.status(400).send({ 'data':"Not found product"});
+                return;
+            }); 
+        }
         
-         
         var usersRef = admin.firestore().collection('customer');
         usersRef.where('id', '==', userId).get()
         .then(snapshot => {
-
+            const promisses = []
             if(snapshot.size != 1){
                 res.status(400).send({ 'data':"Invalid userId"});
                 return;
             }
-            snapshot.forEach( userdoc => {   
-                console.log('userid',userdoc.id)
-                listVoucher.forEach(voucher => {
-                    console.log(voucher)
-                    usersRef.doc(userdoc.id).collection('voucher');
-                    usersRef.where('id', '==', voucher).get()
-                    .then(snapshot => {
-                        if(snapshot.size != 1){
-                            res.status(400).send({ 'data':"error"});
-                            return;
+            snapshot.forEach( userdoc => { 
+                console.log('userdoc', userdoc)
+                const p = usersRef.doc(userdoc.id).get()
+                promisses.push(p)
+            }) 
+            return Promise.all(promisses)
+        })
+        .then(snapshot => {
+            if(snapshot.length != 1){
+                res.status(400).send({ 'data':"error customer"});
+                return;
+            }
+            const promisses = []
+            snapshot.forEach( userdoc => {
+                console.log('user', userdoc.id)
+                userdocId = userdoc.id
+            })
+
+            listVoucher.forEach(voucher => {
+                console.log(voucher)
+                const p = usersRef.doc(userdocId).collection('voucher').doc(voucher).get()
+                promisses.push(p)
+           })
+           return Promise.all(promisses)
+        })
+        .then(snapshot => {
+            console.log(snapshot)
+            const promisses = []
+            snapshot.forEach( doc => {
+                console.log('voucher', doc.id)
+                const p = usersRef.doc(userdocId).collection('voucher').doc(doc.id).get()
+                promisses.push(p)
+            }) 
+            return Promise.all(promisses)
+        })
+        .then(snapshot => {
+            snapshot.forEach( doc => {
+                var used = false;
+                promisses = []
+                if(doc.data().state == "not used") {
+                    if(doc.data().productCode =="5%discountCafeteria") {
+                        if(discont !=0.05){
+                            discont = 0.05;
+                            used = true;
                         }
-                        snapshot.forEach( doc => {
-                            console.log('aqui')
-                            console.log('voucher', doc)
-                            console.log(doc.id)
-                            console.log(doc.data().id)
-
-                           /* var used = false;
-                            console.log(1)
-
-                            if(doc.data().state == "not used") {
-                                if(doc.data().productCode =="5%discountCafeteria") {
-                                    discont = 0.05;
-                                }else if(doc.data().productCode =="freecoffee") {
-                                    if(numberOfCoffee > 0 ){
-                                        freecoffee++
-                                        used = true;
-                                    }
-                                }else if(doc.data().productCode =="popcorn") {
-                                    if( numberOfPopcorn > 0){ 
-                                        popcorn++;
-                                        used = true;
-                                    }
-                                }
-                                console.log(2)
-
-                                if (used){
-                                    console.log('usou')
-                                   await usersRef.doc(userdoc.id).collection('voucher').doc(voucher).update({
-                                        state: 'used',
-                                    },{merge:true})
-                                }
-                            console.log(3)
-                            }*/
-                        })
-                        res.status(200).send({ 'data':"bem"});
-                        return;
-                    }).catch(err => {
-                        console.log(err);
-                        res.status(400).send({ 'data':"Error"});
-                        return;
-                    });
-                })
-                 /*var creditCard = usersRef.doc(userdoc.id).collection('creditCard');
-                creditCard.get()
-                .then(snapshot => {
-                    if(snapshot.size != 1){
-                        res.status(400).send({ 'data':"Credit card not found"});
-                        return;
+                    }else if(doc.data().productCode =="freecoffee") {
+                        if(numberOfCoffee > freecoffee ){
+                            freecoffee++
+                            used = true;
+                        }
+                    }else if(doc.data().productCode =="popcorn") {
+                        if( numberOfPopcorn > numberOfPopcorn){ 
+                            popcorn++;
+                            used = true;
+                        }
                     }
+
+                    if (used){
+                        console.log('usou')
+                        voucherUsed.push(doc.id)
+                    }
+                } else {
+                    console.log('used')
+                }
+            })
+            usersRef.doc(userdocId).collection('creditCard').get()
+            .then(snapshot => { 
+                console.log(snapshot)
+
+                if(snapshot.size != 1){
+                    res.status(400).send({ 'data':"Credit card not found"});
+                    return;
+                }
+    
+                snapshot.forEach(docreditcard => { 
+                    var valueCreditCard = docreditcard.data().value;
+                    var valueSpentMod100 = docreditcard.data().valueSpentMod100;
+                    var voucher = (valueSpentMod100 + priceProducts)/100;
+                    var valueSpent =priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
+    
+                    if(valueCreditCard < valueSpent) {
+                        insuficiente = true;  
+                    } else {
+                        if(valueSpent > 0 ){
+                            usersRef.doc(userdocId).collection('creditCard').doc(docreditcard.id).update({
+                                value: valueCreditCard - valueSpent,
+                                valueSpentMod100: (valueSpentMod100 + valueSpent)%100,
+                            },{merge:true})
+                        }
+    
+                        if(voucher>=1) {
+                            const idVoucher = uuidv1();
+    
+                            admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
+                                id: idVoucher,
+                                state: 'not used',
+                                productCode: '5%discountCafeteria'
+                            })      
+                        }
+                        insuficiente= false;
+                    }
+                })
+                if(insuficiente) {
+                    res.status(400).send({ 'data':"insufficient funds"});
+                    return;
+                } else {
+                    voucherUsed.forEach(voucherId => {
+                        usersRef.doc(userdocId).collection('voucher').doc(voucherId).update({
+                            state: 'used',
+                        },{merge:true})
+                    })
+                    res.status(200).send({ 'data':"bem"});
+                }
+    
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).send({ 'data':"Error"});
+                return;
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(400).send({ 'data':"Error"});
+            return;
+        });
+    });
+});
+
+/**
+Function to login a participant
+Parameters: username -> the USER name
+	    password ->the password of the user
+Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
+TEST: 
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/teste --data '{"data" : { }}' -g -H "Content-Type: application/json"
+*/
+
+const teste = functions.https.onRequest((req, res) => {
+    // return  cors(req, res, () => {
+        var userId = '58e415e0-d792-11e8-b573-033213b03f30'
+        admin.firestore().collection('customer').where('id', '==', userId).get()
+        .then(snapshot => {
+            const promisse= []
+            if(snapshot.size != 1){
+                res.status(400).send({ 'data':"Invalid userId"});
+                return;
+            }
+            snapshot.forEach( userdoc => { 
+                console.log(userdoc.id)
+                const p = admin.firestore().collection('customer').doc(userdoc.id).get()
+                promisse.push(p)
+            }) 
+            return Promise.all(promisse)
+        })
+        .then (result => {
+            console.log(result)
+            res.status(200).send({ 'data':"bem"});
+
+        })
+        .catch (error=> {
+            console.log(error);
+            res.status(400).send({ 'data':"Error"});
+        })
+
+})
+
+
+
+module.exports={
+    register,
+    login,
+    payOrder,
+    teste,
+}
+
+/*
+
+
+
+
                     snapshot.forEach(docreditcard => { 
                         console.log('chegou...')
 
@@ -370,64 +542,6 @@ const payOrder = functions.https.onRequest((req, res) => {
                         }
                     })
                 })
-                .catch(err => {
-                    console.log(err);
-                    res.status(400).send({ 'data':"Error"});
-                    return;
-                }); */
             });
         })
-        .catch(err => {
-            console.log(err);
-            res.status(400).send({ 'data':"Error"});
-            return;
-        }); 
-    });
-});
-
-/**
-Function to login a participant
-Parameters: username -> the USER name
-	    password ->the password of the user
-Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
-TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/teste --data '{"data" : { }}' -g -H "Content-Type: application/json"
 */
-
-const teste = functions.https.onRequest((req, res) => {
-    // return  cors(req, res, () => {
-        var userId = '58e415e0-d792-11e8-b573-033213b03f30'
-        admin.firestore().collection('customer').where('id', '==', userId).get()
-        .then(snapshot => {
-            const promisse= []
-            if(snapshot.size != 1){
-                res.status(400).send({ 'data':"Invalid userId"});
-                return;
-            }
-            snapshot.forEach( userdoc => { 
-                console.log(userdoc.id)
-                const p =admin.firestore().collection('customer').doc(userdoc.id).get()
-                promisse.push(p)
-            }) 
-            return Promise.all(promisse)
-        })
-        .then (result => {
-            console.log(result)
-            res.status(200).send({ 'data':"bem"});
-
-        })
-        .catch (error=> {
-            console.log(error);
-            res.status(400).send({ 'data':"Error"});
-        })
-
-})
-
-
-
-module.exports={
-    register,
-    login,
-    payOrder,
-    teste,
-}
