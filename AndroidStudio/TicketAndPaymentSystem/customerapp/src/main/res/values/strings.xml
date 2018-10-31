@@ -16,4 +16,5 @@
     <string name="buy_string">BUY</string>
     <string name="zero_value">0</string>
     <string name="qr_code_image_view_description">QR code image</string>
+    <string name="qr_code_tv_message">Please, show the QR code to the validator:</string>
 </resources>
