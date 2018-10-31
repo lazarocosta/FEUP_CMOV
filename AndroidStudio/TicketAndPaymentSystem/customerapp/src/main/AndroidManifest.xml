@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".CheckoutActivity" />
         <activity android:name=".ShowQRCodeActivity" />
+        <activity android:name=".QRCodeValidatedActivity" />
     </application>
 
 </manifest>
