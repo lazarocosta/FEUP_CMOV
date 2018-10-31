@@ -1,16 +1,15 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class Performance {
     private String name;
-    private ArrayList<Date> dates;
-    private double price;
+    private Date date;
+    private Double price;
 
-    public Performance(String name, ArrayList<Date> dates, double price) {
+    public Performance(String name, Date date, Double price) {
         this.name = name;
-        this.dates = dates;
+        this.date = date;
         this.price = price;
     }
 
@@ -18,11 +17,11 @@ public class Performance {
         return name;
     }
 
-    public ArrayList<Date> getDates() {
-        return dates;
+    public Date getDate() {
+        return date;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 }
