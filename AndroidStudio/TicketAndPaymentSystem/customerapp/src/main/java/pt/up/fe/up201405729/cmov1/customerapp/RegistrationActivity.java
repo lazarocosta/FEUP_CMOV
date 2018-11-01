@@ -18,9 +18,6 @@ import org.json.JSONObject;
 import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-/*
-https://paginas.fe.up.pt/~apm/CM/docs/04Fragments.pdf
-*/
 public class RegistrationActivity extends AppCompatActivity {
 
     @Override

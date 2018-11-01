@@ -12,17 +12,18 @@ import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
 
 public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Performance> performances;
-    private String[] ticketsQuantities;
+    private ArrayList<Integer> ticketsQuantities;
+    private boolean areQuantitiesEditable;
 
-    public PerformancesRVAdapter(ArrayList<Performance> performances) {
+    public PerformancesRVAdapter(ArrayList<Performance> performances, ArrayList<Integer> ticketsQuantities, boolean areQuantitiesEditable) {
+        if (performances.size() != ticketsQuantities.size())
+            throw new IllegalArgumentException("performances.size() should be equal to ticketsQuantities.size()");
         this.performances = performances;
-        this.ticketsQuantities = new String[performances.size()];
-        Arrays.fill(this.ticketsQuantities, "0");
+        this.ticketsQuantities = ticketsQuantities;
+        this.areQuantitiesEditable = areQuantitiesEditable;
     }
 
     @NonNull
@@ -36,10 +37,15 @@ public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAd
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Performance p = performances.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.performanceName)).setText(p.getName());
-        ((TextView) holder.linearLayout.findViewById(R.id.performanceDate)).setText(p.getDate().toString());
-        ((TextView) holder.linearLayout.findViewById(R.id.performancePrice)).setText(String.format(Locale.US, "€%.2f", p.getPrice()));
-        ((EditText) holder.linearLayout.findViewById(R.id.performanceTicketsQuantityET)).setText(ticketsQuantities[position]);
-        ((EditText) holder.linearLayout.findViewById(R.id.performanceTicketsQuantityET)).addTextChangedListener(new TextWatcher() {
+        ((TextView) holder.linearLayout.findViewById(R.id.performanceDate)).setText(p.getDate().getHumanReadableDate());
+        ((TextView) holder.linearLayout.findViewById(R.id.performancePrice)).setText(StringFormat.formatAsPrice(p.getPrice()));
+        EditText editText = holder.linearLayout.findViewById(R.id.performanceTicketsQuantityET);
+        editText.setText(StringFormat.formatAsInteger(ticketsQuantities.get(position)));
+        if (!areQuantitiesEditable) {
+            editText.setEnabled(false);
+            editText.setBackground(null);
+        }
+        editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -50,8 +56,13 @@ public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAd
 
             @Override
             public void afterTextChanged(Editable s) {
-                ticketsQuantities[holder.getAdapterPosition()] = s.toString();
-                System.out.println(ticketsQuantities[holder.getAdapterPosition()]);
+                Integer value;
+                try {
+                    value = Integer.parseInt(s.toString());
+                } catch (NumberFormatException e) {
+                    value = 0;
+                }
+                ticketsQuantities.set(holder.getAdapterPosition(), value);
             }
         });
     }
@@ -59,6 +70,14 @@ public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAd
     @Override
     public int getItemCount() {
         return performances.size();
+    }
+
+    public ArrayList<Performance> getPerformances() {
+        return performances;
+    }
+
+    public ArrayList<Integer> getTicketsQuantities() {
+        return ticketsQuantities;
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {

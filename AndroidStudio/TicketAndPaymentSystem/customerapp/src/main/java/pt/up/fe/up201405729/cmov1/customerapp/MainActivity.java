@@ -11,9 +11,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
+
+import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class MainActivity extends AppCompatActivity {
     public static final String sharedPreferencesKeyName = "pt.up.fe.up201405729.cmov1.customerapp.prefs";
@@ -41,10 +48,28 @@ public class MainActivity extends AppCompatActivity {
             RecyclerView performancesRV = findViewById(R.id.performancesRV);
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
             performancesRV.setLayoutManager(gridLayoutManager);
-            ArrayList<Performance> performances = new ArrayList<>(); // query database
-            for (int i = 1; i <= 100; i++)
-                performances.add(new Performance("Test performance " + i, new Date(), 1.0));
-            performancesRVAdapter = new PerformancesRVAdapter(performances);
+            ArrayList<Performance> performances = new ArrayList<>();
+            JSONObject response = RestServices.GET("/listTickets", new JSONObject());
+            try {
+                JSONArray jsonArray = response.getJSONArray("data");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Double price = Double.valueOf(jsonObject.getString("price"));
+                    MyDate date = new MyDate(jsonObject.getString("date"));
+                    String name = jsonObject.getString("name");
+                    performances.add(new Performance(name, date, price));
+                }
+                Collections.sort(performances);
+            } catch (JSONException e) {
+                try {
+                    Toast.makeText(packageContext, (String) response.get("error"), Toast.LENGTH_LONG).show();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                    Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+            ArrayList<Integer> ticketsQuantities = new ArrayList<>(Collections.nCopies(performances.size(), 0));
+            performancesRVAdapter = new PerformancesRVAdapter(performances, ticketsQuantities, true);
             performancesRV.setAdapter(performancesRVAdapter);
         }
     }
@@ -58,15 +83,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Context packageContext = this;
         if (item.getItemId() == R.id.mainActivityBuyButton) {
-            ArrayList<Ticket> tickets = new ArrayList<>();
-            // add tickets
-            CheckoutData checkoutData = new CheckoutData(tickets);
-            Context packageContext = this;
-            Intent i = new Intent(packageContext, CheckoutActivity.class);
-            i.putExtra(CheckoutActivity.checkoutDataKeyName, checkoutData);
-            startActivity(i);
-            finish();
+            ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
+            ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
+            ArrayList<Performance> desiredPerformances = new ArrayList<>();
+            ArrayList<Integer> desiredTicketsQuantities = new ArrayList<>();
+            for (int i = 0; i < allPerformances.size(); i++) {
+                Integer quantity = ticketsQuantities.get(i);
+                if (quantity > 0) {
+                    desiredPerformances.add(allPerformances.get(i));
+                    desiredTicketsQuantities.add(quantity);
+                }
+            }
+            if(desiredPerformances.isEmpty())
+                Toast.makeText(packageContext, "You should select at least one performance.", Toast.LENGTH_LONG).show();
+            else {
+                CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
+                Intent i = new Intent(packageContext, CheckoutActivity.class);
+                i.putExtra(CheckoutActivity.checkoutDataKeyName, checkoutData);
+                startActivity(i);
+                finish();
+            }
         }
         return (super.onOptionsItemSelected(item));
     }

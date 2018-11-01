@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textPersonName" />
 
         </TableRow>
@@ -45,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="number" />
         </TableRow>
 
@@ -77,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="text" />
         </TableRow>
 
@@ -96,6 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="number" />
         </TableRow>
 
@@ -115,6 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="date" />
 
         </TableRow>
