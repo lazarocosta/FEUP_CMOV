@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(performances);
             } catch (JSONException e) {
                 try {
-                    Toast.makeText(packageContext, (String) response.get("error"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                     Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     desiredTicketsQuantities.add(quantity);
                 }
             }
-            if(desiredPerformances.isEmpty())
+            if (desiredPerformances.isEmpty())
                 Toast.makeText(packageContext, "You should select at least one performance.", Toast.LENGTH_LONG).show();
             else {
                 CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);

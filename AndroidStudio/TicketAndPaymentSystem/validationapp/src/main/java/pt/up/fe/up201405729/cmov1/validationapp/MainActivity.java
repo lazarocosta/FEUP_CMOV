@@ -1,9 +1,19 @@
 package pt.up.fe.up201405729.cmov1.validationapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +48,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processQRCode(String contents) {
+        final Context packageContext = this;
+        String[] uuids = contents.split(qrCodeContentDelimiter);
+        if (uuids.length == 0)
+            return;
 
+        JSONObject validationData = new JSONObject();
+        try {
+            JSONObject ticketsIds = new JSONObject();
+            for (int i = 1; i < uuids.length; i++)
+                ticketsIds.put("ticketId" + i, uuids[i]);
+            validationData.put("tickets", ticketsIds);
+            validationData.put("userId", uuids[0]);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        JSONObject response = RestServices.GET("/validTicket", validationData);
+        try {
+            JSONArray data = response.getJSONArray("data");
+            for (int i = 0; i < data.length(); i++) {
+                JSONObject jsonObject = data.getJSONObject(i);
+                String id = jsonObject.getString("id");
+                String state = jsonObject.getString("state");
+            }
+        } catch (JSONException e) {
+            try {
+                Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+                Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

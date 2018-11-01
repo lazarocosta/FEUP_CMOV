@@ -18,4 +18,5 @@
     <string name="qr_code_tv_message">Please, show the QR code to the validator:</string>
     <string name="checkout_total_price_string">Total price: </string>
     <string name="checkout_total_price_example_string">€0</string>
+    <string name="finish_string">FINISH</string>
 </resources>

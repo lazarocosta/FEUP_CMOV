@@ -79,10 +79,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
                 JSONObject response = RestServices.PUT("/buyTicket ", ticketData);  // not working
                 try {
-                    response.get("data");
+                    response.getJSONObject("data");
                 } catch (JSONException e) {
                     try {
-                        Toast.makeText(packageContext, (String) response.get("error"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
                     } catch (JSONException e1) {
                         e1.printStackTrace();
                         Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();

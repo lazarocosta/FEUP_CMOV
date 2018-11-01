@@ -60,10 +60,10 @@ public class RegistrationActivity extends AppCompatActivity {
             SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             try {
-                editor.putString("uuid", (String) response.get("data"));
+                editor.putString("uuid", response.getString("data"));
             } catch (JSONException e) {
                 try {
-                    Toast.makeText(packageContext, (String) response.get("error"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                     Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
