@@ -17,6 +17,8 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     public static final String sharedPreferencesKeyName = "pt.up.fe.up201405729.cmov1.customerapp.prefs";
+    private static final String performancesRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.performancesRVAdapter";
+    private PerformancesRVAdapter performancesRVAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<Performance> performances = new ArrayList<>(); // query database
             for (int i = 1; i <= 100; i++)
                 performances.add(new Performance("Test performance " + i, new Date(), 1.0));
-            PerformancesRVAdapter performancesRVAdapter = new PerformancesRVAdapter(performances);
+            performancesRVAdapter = new PerformancesRVAdapter(performances);
             performancesRV.setAdapter(performancesRVAdapter);
         }
     }
@@ -67,5 +69,18 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
         return (super.onOptionsItemSelected(item));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(performancesRVAdapterKeyName, performancesRVAdapter);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        performancesRVAdapter = (PerformancesRVAdapter) savedInstanceState.get(performancesRVAdapterKeyName);
+        ((RecyclerView) findViewById(R.id.performancesRV)).setAdapter(performancesRVAdapter);
     }
 }

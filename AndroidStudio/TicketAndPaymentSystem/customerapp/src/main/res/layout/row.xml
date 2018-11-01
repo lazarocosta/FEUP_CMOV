@@ -55,7 +55,7 @@
             android:textAlignment="textEnd" />
 
         <EditText
-            android:id="@+id/dashboardQuantityET"
+            android:id="@+id/performanceTicketsQuantityET"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
