@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,6 +57,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 registrationData.put("creditCardValidity", ((EditText) findViewById(R.id.registrationCreditCardValidityET)).getText().toString());
             } catch (JSONException e) {
                 e.printStackTrace();
+                Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
             }
             JSONObject response = RestServices.PUT("/register", registrationData);
             SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
@@ -63,7 +65,12 @@ public class RegistrationActivity extends AppCompatActivity {
             try {
                 editor.putString("uuid", (String) response.get("data"));
             } catch (JSONException e) {
-                e.printStackTrace();
+                try {
+                    Toast.makeText(packageContext, (String) response.get("error"), Toast.LENGTH_LONG).show();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                    Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
             editor.apply();
 
