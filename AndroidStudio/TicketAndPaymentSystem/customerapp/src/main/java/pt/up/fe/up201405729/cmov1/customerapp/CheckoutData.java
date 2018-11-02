@@ -4,20 +4,28 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class CheckoutData implements Serializable {
-    private ArrayList<Ticket> tickets;
+    private ArrayList<Performance> performances;
+    private ArrayList<Integer> ticketsQuantities;
 
-    public CheckoutData(ArrayList<Ticket> tickets) {
-        this.tickets = tickets;
+    public CheckoutData(ArrayList<Performance> performances, ArrayList<Integer> ticketsQuantities) {
+        if (performances.size() != ticketsQuantities.size())
+            throw new IllegalArgumentException("performances.size() should be equal to ticketsQuantities.size()");
+        this.performances = performances;
+        this.ticketsQuantities = ticketsQuantities;
     }
 
-    public ArrayList<Ticket> getTickets() {
-        return tickets;
+    public ArrayList<Performance> getPerformances() {
+        return performances;
     }
 
-    public double getTotalPrice() {
-        double totalPrice = 0;
-        for (Ticket t : tickets)
-            totalPrice += t.getPrice();
+    public ArrayList<Integer> getTicketsQuantities() {
+        return ticketsQuantities;
+    }
+
+    public Double getTotalPrice() {
+        Double totalPrice = 0.0;
+        for (int i = 0; i < performances.size(); i++)
+            totalPrice += performances.get(i).getPrice() * ticketsQuantities.get(i);
         return totalPrice;
     }
 }

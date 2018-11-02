@@ -16,14 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegistrationActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".CheckoutActivity"></activity>
+        <activity android:name=".RegistrationActivity" />
+        <activity android:name=".CheckoutActivity" />
+        <activity android:name=".ShowQRCodeActivity" />
+        <activity android:name=".QRCodeValidatedActivity" />
+        <activity android:name=".SelectTicketsActivity"></activity>
     </application>
 
 </manifest>

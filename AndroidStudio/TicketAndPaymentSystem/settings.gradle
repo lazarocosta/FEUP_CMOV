@@ -1,1 +1,1 @@
-include ':customerapp', ':validationapp', ':cafeteriaapp', ':restservices'
+include ':customerapp', ':validationapp', ':cafeteriaapp', ':restservices', ':sharedlibrary'

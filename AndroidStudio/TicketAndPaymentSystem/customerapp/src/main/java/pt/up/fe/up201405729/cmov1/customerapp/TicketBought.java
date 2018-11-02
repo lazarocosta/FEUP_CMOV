@@ -1,11 +1,9 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
-import java.util.Date;
-
 public class TicketBought {
     private String showName;
     private String uuid;
-    private Date date;
+    private MyDate date;
     private String place;
 
     public String getShowName() {
@@ -16,7 +14,7 @@ public class TicketBought {
         return uuid;
     }
 
-    public Date getDate() {
+    public MyDate getDate() {
         return date;
     }
 
