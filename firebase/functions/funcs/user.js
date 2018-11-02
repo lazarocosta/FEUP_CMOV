@@ -15,7 +15,7 @@ Parameters: publicKey ->
         creditCardValidity ->
 Output: JSON with result value 
 Teste:
-     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "Octobaaer 1as3, 2014 11:13:00" }' -g -H "Content-Type: application/json"
+     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "October 13, 2014 11:13:00" }' -g -H "Content-Type: application/json"
 */
 
 const register = functions.https.onRequest((req, res) => {
@@ -27,75 +27,74 @@ const register = functions.https.onRequest((req, res) => {
         const creditCardNumber = req.body.creditCardNumber;
         const creditCardValidity = req.body.creditCardValidity;
 
+
         if(!publicKey) {
-            res.status(400).send({ 'data': "Please enter a publicKey."});
+            res.status(400).send({ 'error': "Please enter a publicKey."});
             return;
         }
 
         if(!name) {
-            res.status(400).send({ 'data': "Please enter a name."});
+            res.status(400).send({ 'error': "Please enter a name."});
             return;
         }
 
         if(!nif) {
-            res.status(400).send({ 'data': "Please enter a nif."});
+            res.status(400).send({ 'error': "Please enter a nif."});
             return;
         }
 
         if(!creditCardType) {
-            res.status(400).send({ 'data': "Please enter a creditCardType."});
+            res.status(400).send({ 'error': "Please enter a creditCardType."});
             return;
         }
 
         if(!creditCardNumber) {
-            res.status(400).send({ 'data': "Please enter a creditCardNumber."});
+            res.status(400).send({ 'error': "Please enter a creditCardNumber."});
             return;
         }
 
         if(!creditCardValidity) {
-            res.status(400).send({ 'data': "Please enter a creditCardValidity."});
+            res.status(400).send({ 'error': "Please enter a creditCardValidity."});
             return;
         }
 
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(400).send({ 'data':"nif not is number"});
-            console.error("nif not is number: ", error);
+            res.status(400).send({ 'error':"nif not is a number"});
+            console.error("nif not is a number: ", error);
             return;
         }
 
-        var adduser;
-
-        admin.firestore().collection('customer').add({
+        var user = {
             publicKey: publicKey,
             name: name,
             nif: nifValid,
             id:id,
-        })
-        .then(function(docRef) {
-            console.log(docRef)
-            console.log(docRef.id)
+        };
+        var adduser;
+        admin.firestore().collection('customer').doc(id).set(user)
+        .then(function() {
+            console.log(id)
 
             const number = parseInt(creditCardNumber);
-            const timestamp = Date.parse(creditCardValidity);
             var myDate = new Date(creditCardValidity);
             promises = []
 
-            if(isNaN(number)) {
+            if(isNaN(number)|| isNaN(myDate.getMonth())) {
                 adduser= false;
-                var p = admin.firestore().collection('customer').doc(docRef.id).delete()
+                var p = admin.firestore().collection('customer').doc(id).delete()
                 promises.push(p)
-                res.status(400).send({ 'data':"creditCardNumber not is number"});
-                console.error("creditCardNumber not is number: ", error);
+                res.status(400).send({ 'error':"creditCardNumber not is number or the validity is not a date"});
+                console.error("creditCardNumber not is number or the validity is not a date: ");
                 return;
             }else {
-                const p =  admin.firestore().collection('customer').doc(docRef.id).collection('creditCard').add({
+                const p =  admin.firestore().collection('customer').doc(id).collection('creditCard').add({
                         type: creditCardType,
                         number: number,
                         validity: myDate,
                         value: 100,
-                        amountSpent: 0,
+                        valueSpentMod100: 0,
 
                         })
                     promises.push(p);
@@ -109,13 +108,13 @@ const register = functions.https.onRequest((req, res) => {
                 res.status(200).send({ 'data':id});
                 return 
             }else {
-                res.status(400).send({ 'data':'Could not create user!'});
+                res.status(400).send({ 'error':'Could not create user!'});
                 return
             }
         })
         .catch(err => {
             console.log(err);
-            res.status(400).send({ 'data':"Could not create user!"});
+            res.status(400).send({ 'error':"Could not create user!"});
             return;
         });
     });
@@ -207,20 +206,13 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"58e415e0-d792-11e8-b573-033213b03f30","voucher1":"hMZOQoarX5vUyhAHugla","voucher2":"w81YmNZ9NBAXkq1864UJ","product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" } }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2","vouchers":{"voucher1":"26feb681-dde0-11e8-83c6-09fd741136c7","voucher2":"ba9fe020-dde1-11e8-9205-4f7286452f10"},"products": {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" }} }' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
         const userId = req.body.userId;
-        const voucher1 = req.body.voucher1;
-        const voucher2 = req.body.voucher2;
-        const product1 = req.body.product1;
-        const product2 = req.body.product2;
-
-        var docProduct1;
-        var quantity1;
-        var docProduct2;
-        var quantity2;
+        const vouchers = req.body.vouchers;
+        const products = req.body.products;
 
         let listVoucher = []
 
@@ -229,12 +221,8 @@ const payOrder = functions.https.onRequest((req, res) => {
             return;
         }
 
-        if(voucher1){
-            listVoucher.push(voucher1);
-        }
-
-        if(voucher2){
-            listVoucher.push(voucher2);
+        if(!products){
+            res.status(400).send({ 'data':"Please enter a products."});
         }
 
         var discont=0;
@@ -247,27 +235,38 @@ const payOrder = functions.https.onRequest((req, res) => {
         var numberOfCoffee = 0;
         var numberOfPopcorn = 0;
         var insuficiente = false;
-        var userdocId;
         var voucherUsed = []
 
-        if(product1) {
-            docProduct1 = req.body.product1.docProduct;
-            quantity1 = req.body.product1.quantity;
-            if(!docProduct1 || !quantity1) {
-                res.status(400).send({ 'data':"Please enter the doc and quantity of product1"});
+        for(key in vouchers){
+            listVoucher.push(vouchers[key])
+        }
+
+        for(key in products){
+            var product = {
+                docProduct:products[key].docProduct,
+                quantity: products[key].quantity
+            }
+            lisproducts.push(product)
+        }
+
+        lisproducts.forEach(product =>{
+            var docProduct =  product.docProduct;
+            var quantity = product.quantity;
+            if(!docProduct || !quantity) {
+                res.status(400).send({ 'error':"Please enter the doc and quantity of product1"});
                 return;  
             }
        
-            admin.firestore().collection('product').doc(docProduct1).get()
+            admin.firestore().collection('product').doc(docProduct).get()
             .then(doc=> {
                 var nameProduct = doc.data().name;
                 var priceProduct = doc.data().price;
-                priceProducts = priceProducts + priceProduct * quantity1;
+                priceProducts = priceProducts + priceProduct * quantity;
 
                 var product = {
                     name: nameProduct,
                     price: priceProduct,
-                    quantity: quantity1
+                    quantity: quantity
                 }
 
                 if(nameProduct == 'freecoffee') {
@@ -279,101 +278,27 @@ const payOrder = functions.https.onRequest((req, res) => {
                     numberOfPopcorn++;
                     valuepopCorn = priceProduct;
                 }
-
                 lisproducts.push(product);
-
             }) 
             .catch(err => {
                 console.log(err);
                 res.status(400).send({ 'data':"Not found product"});
                 return;
             }); 
-        }
+        })
 
-        if(product2) {
-            docProduct2 = req.body.product2.docProduct;
-            quantity1 = req.body.product2.quantity;
-            if(!docProduct2 || !quantity2) {
-                res.status(400).send({ 'data':"Please enter the doc and quantity of product2"});
-                return;  
-            }
-       
-            admin.firestore().collection('product').doc(docProduct2).get()
-            .then(doc=> {
-                var nameProduct = doc.data().name;
-                var priceProduct = doc.data().price;
-                priceProducts = priceProducts + priceProduct * quantity2;
-
-                var product = {
-                    name: nameProduct,
-                    price: priceProduct,
-                    quantity: quantity2
-                }
-
-                if(nameProduct == 'freecoffee') {
-                    numberOfCoffee++
-                    valueCoffe = priceProduct;
-                }
-
-                if(nameProduct == 'popcorn') {
-                    numberOfPopcorn++;
-                    valuepopCorn = priceProduct;
-                }
-
-                lisproducts.push(product);
-
-            }) 
-            .catch(err => {
-                console.log(err);
-                res.status(400).send({ 'data':"Not found product"});
-                return;
-            }); 
-        }
-        
+        console.log(lisproducts)
+        const promises = []
         var usersRef = admin.firestore().collection('customer');
-        usersRef.where('id', '==', userId).get()
-        .then(snapshot => {
-            const promisses = []
-            if(snapshot.size != 1){
-                res.status(400).send({ 'data':"Invalid userId"});
-                return;
-            }
-            snapshot.forEach( userdoc => { 
-                console.log('userdoc', userdoc)
-                const p = usersRef.doc(userdoc.id).get()
-                promisses.push(p)
-            }) 
-            return Promise.all(promisses)
-        })
-        .then(snapshot => {
-            if(snapshot.length != 1){
-                res.status(400).send({ 'data':"error customer"});
-                return;
-            }
-            const promisses = []
-            snapshot.forEach( userdoc => {
-                console.log('user', userdoc.id)
-                userdocId = userdoc.id
-            })
 
-            listVoucher.forEach(voucher => {
-                console.log(voucher)
-                const p = usersRef.doc(userdocId).collection('voucher').doc(voucher).get()
-                promisses.push(p)
-           })
-           return Promise.all(promisses)
+        listVoucher.forEach(voucher => {
+            console.log(voucher)
+            const p = usersRef.doc(userId).collection('voucher').doc(voucher).get()
+            promises.push(p)
         })
+        return Promise.all(promises)
         .then(snapshot => {
             console.log(snapshot)
-            const promisses = []
-            snapshot.forEach( doc => {
-                console.log('voucher', doc.id)
-                const p = usersRef.doc(userdocId).collection('voucher').doc(doc.id).get()
-                promisses.push(p)
-            }) 
-            return Promise.all(promisses)
-        })
-        .then(snapshot => {
             snapshot.forEach( doc => {
                 var used = false;
                 promisses = []
@@ -403,7 +328,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                     console.log('used')
                 }
             })
-            usersRef.doc(userdocId).collection('creditCard').get()
+            usersRef.doc(userId).collection('creditCard').get()
             .then(snapshot => { 
                 console.log(snapshot)
 
@@ -422,7 +347,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                         insuficiente = true;  
                     } else {
                         if(valueSpent > 0 ){
-                            usersRef.doc(userdocId).collection('creditCard').doc(docreditcard.id).update({
+                            usersRef.doc(userId).collection('creditCard').doc(docreditcard.id).update({
                                 value: valueCreditCard - valueSpent,
                                 valueSpentMod100: (valueSpentMod100 + valueSpent)%100,
                             },{merge:true})
@@ -431,7 +356,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                         if(voucher>=1) {
                             const idVoucher = uuidv1();
     
-                            admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
+                            admin.firestore().collection('customer').doc(userId).collection('voucher').add({
                                 id: idVoucher,
                                 state: 'not used',
                                 productCode: '5%discountCafeteria'
@@ -505,55 +430,9 @@ const teste = functions.https.onRequest((req, res) => {
 
 })
 
-
-
 module.exports={
     register,
     login,
     payOrder,
     teste,
 }
-
-/*
-
-
-
-
-                    snapshot.forEach(docreditcard => { 
-                        console.log('chegou...')
-
-                        var valueCreditCard = docreditcard.data().value;
-                        var valueSpentMod100 = docreditcard.data().valueSpentMod100;
-                        var voucher = (valueSpentMod100 + priceProducts)/100;
-
-                        var valueSpent =priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
-
-                        if(valueCreditCard < priceProducts) {
-                            insuficiente = true;
-                            res.status(400).send({ 'data':"insufficient funds"});
-                            return;  
-                        } else {
-
-                            creditCard.doc(docreditcard.id).update({
-                                value: valueCreditCard - valueSpent,
-                                valueSpentMod100: (valueSpentMod100 + priceProducts)%100,
-                                },{merge:true})
-
-                            if(voucher>=1) {
-                                const idVoucher = uuidv1();
-    
-                                admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
-                                    id: idVoucher,
-                                    state: 'not used',
-                                    productCode: '5%discountCafeteria'
-                                })      
-                            }
-                            res.status(200).send({ 'data':"bem"});
-                            return;  
-
-                        }
-                    })
-                })
-            });
-        })
-*/

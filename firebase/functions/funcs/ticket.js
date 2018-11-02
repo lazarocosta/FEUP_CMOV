@@ -11,231 +11,265 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "ticketId" : "239793a0-d9e3-11e8-bdc7-e3808b3e4670", "userId":"58e415e0-d792-11e8-b573-033213b03f30"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "d007fcb0-dddf-11e8-83c6-09fd741136c7", "ticketId2": "26feb680-dde0-11e8-83c6-09fd741136c7"}, "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2"}' -g -H "Content-Type: application/json"
 */
 const validTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const ticketId = req.body.ticketId;
+        const tickets = req.body.tickets;
         const userId = req.body.userId;
 
-        if(!ticketId) {
-            res.status(400).send({ 'data': "Please enter a ticketId."});
+        if(!tickets) {
+            res.status(400).send({ 'error': "Please enter a tickets."});
             return;
         }
 
         if(!userId) {
-            res.status(400).send({ 'data': "Please enter a userId."});
+            res.status(400).send({ 'error': "Please enter a userId."});
             return;
         }
+        var listTickets = [];
+        var resultTickets = []
 
+        for (ticket in tickets) {
+            console.log(ticket, tickets[ticket])
+            listTickets.push(tickets[ticket])
+        }
+
+        var promises = []
         var usersRef = admin.firestore().collection('customer');
-        usersRef.where('id', '==', userId).get()
+        listTickets.forEach(ticket => {
+
+            console.log(ticket)
+            const p=usersRef.doc(userId).collection('ticket').doc(ticket).get()
+            promises.push(p)
+        })
+        return Promise.all(promises)
         .then(snapshot => {
-
-            if(snapshot.size != 1){
-                res.status(400).send({ 'data':"Invalid userId"});
-                return;
-            }
-
-            snapshot.forEach(userdoc => {
-                var ticketsUserRef = admin.firestore().collection('customer').doc(userdoc.id).collection('ticket');
-
-                ticketsUserRef.where('id', '==', ticketId).get()
-                .then(snapshot2 => {
-         
-                    if(snapshot2.size != 1){
-                        res.status(400).send({ 'data':"Invalid ticketId"});
-                        return;
+            snapshot.forEach(ticketdoc => {
+                console.log(ticketdoc)
+                console.log(ticketdoc.data())
+                const state = ticketdoc.data().state;
+                if(state == "not used") {
+                    const ticketref = usersRef.doc(userId).collection('ticket').doc(ticketdoc.id);
+                    ticketref.update({
+                    state: 'used',
+                    },{merge:true}) 
+                    
+                    var resultTicket = {
+                        id:ticketdoc.id,
+                        state:'validaded'
                     }
-                    snapshot2.forEach(ticketdoc => {
-                        const state = ticketdoc.data().state;
-                        if(state == "not used") {
-                            const ticketref = admin.firestore().collection('customer').doc(userdoc.id).collection('ticket').doc(ticketdoc.id);
-                            ticketref.update({
-                            state: 'used',
-                            },{merge:true})  
-                            res.status(200).send({'data':'validated'});
-                        } 
-                        else if(state == "used") {
-                            res.status(200).send({'data':'was already used'});
-                        }    
-
-                    });
-                })
-                .catch(error => {
-                    res.status(400).send({ 'data':"Error"});
-                    console.error("Error", error);
-                });
-            });
-        }).catch(error =>  {
-            res.status(400).send({ 'data':"Error"});
+                    resultTickets.push(resultTicket);
+                } 
+                else if(state == "used") {
+                    var resultTicket = {
+                        id:ticketdoc.id,
+                        state:'already been validaded'
+                    }
+                    resultTickets.push(resultTicket);
+                }    
+            })
+            res.status(200).send({ 'data':resultTickets});
+            return;
+        })
+        .catch(error =>  {
             console.error("Error: ", error);
+            res.status(400).send({ 'error':'Invalid userId or Invalid ticketsId'});
+            return;
         });
-        return;
     });
 });
 
 
 /**
-Function to validateticket the icket
-Parameters: ticketId -> 
+Function to buyTicket the icket
+Parameters: Id -> id of ticket
         userId ->
+        numbersTickets->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTicket --data ' { "date" : "22-12-12","numbersTickets":"1", "userId":"58e415e0-d792-11e8-b573-033213b03f30", "priceTicket":"10"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTicket --data ' { "id":"4YMjcrIXgaZmIzNH8BDF","numbersTickets":"1", "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2"}' -g -H "Content-Type: application/json"
 */
 const buyTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const date = req.body.date;
+        const ticketId = req.body.id;
         const numbersTickets = req.body.numbersTickets;
         const userId = req.body.userId;
-        const priceTicket = req.body.priceTicket;
-
 
         if(!numbersTickets) {
-            res.status(400).send({ 'data': "Please enter a number of tickets."});
+            res.status(400).send({ 'error': "Please enter a number of tickets."});
             return;
         }
 
         if(!userId) {
-            res.status(400).send({ 'data': "Please enter a userId."});
+            res.status(400).send({ 'error': "Please enter a userId."});
             return;
         }
 
-        if(!date) {
-            res.status(400).send({ 'data': "Please enter a date."});
+        if(!ticketId) {
+            res.status(400).send({ 'error': "Please enter a ticketId."});
             return;
         }
 
-        if(!priceTicket) {
-            res.status(400).send({ 'data': "Please enter a price of the ticket."});
-            return;
-        }
         var tickets = [];
         var vouchers = [];
+        var ticketDefault;
+        var result='a'
 
-        var usersRef = admin.firestore().collection('customer');
-        usersRef.where('id', '==', userId).get()
-        .then(snapshot => {
+        admin.firestore().collection('ticket').doc(ticketId).get()
+        .then(doc=>{
+            promises= []
+            ticketDefault = {
+                date: doc.data().date,
+                local:doc.data().local,
+                price:doc.data().price,
+                name:doc.data().name
+            }
+        })
 
+        admin.firestore().collection('customer').doc(userId).collection('creditCard').get()
+        .then(snapshot =>{
+            console.log(snapshot)
             if(snapshot.size != 1){
-                res.status(400).send({ 'data':"Invalid userId"});
+                res.status(400).send({ 'error':"Invalid userId"});
                 return;
             }
-            snapshot.forEach(userdoc => {
-                var creditCardRef = usersRef.doc(userdoc.id).collection('creditCard')
-                creditCardRef.get()
-                .then(snapshot2 =>{
-                    snapshot2.forEach(creditCardDoc => { 
-                        var cardValue = creditCardDoc.data().value
-                        var valueSpentMod100 = creditCardDoc.data().valueSpentMod100
-                        var priceOfTickets = priceTicket * numbersTickets
-                        var valueSpend = valueSpentMod100 + priceOfTickets
-                
-                        console.log(priceOfTickets)
-                        console.log(valueSpend)
-                        console.log(valueSpend % 100)
+            snapshot.forEach(creditCardDoc => { 
+                console.log(creditCardDoc.data())
+                var cardValue = creditCardDoc.data().value
+                var valueSpentMod100 = creditCardDoc.data().valueSpentMod100
+                var priceOfTickets = ticketDefault.price * numbersTickets
+                var valueSpend = valueSpentMod100 + priceOfTickets
+                console.log(priceOfTickets)
+                console.log(valueSpend)
+                console.log(valueSpend % 100)
 
-                        if(priceOfTickets > cardValue){
-                            res.status(400).send({ 'data':"insufficient funds"});
-                            return;
-                        }
+                 if(priceOfTickets > cardValue){
+                    res.status(400).send({ 'error':"insufficient funds"});
+                    return;
+                }
 
-                        if( Math.floor(valueSpend/100) != 0 ) {
-                            const idVoucher = uuidv1();
-                            var voucher = {
-                                id: idVoucher,
-                                productCode : '5%discountCafeteria'
-                            };
-                            vouchers.push(voucher);
+                if( Math.floor(valueSpend/100) != 0 ) {
+                    const idVoucher = uuidv1();
+                    var voucher = {
+                        id: idVoucher,
+                        productCode : '5%discountCafeteria',
+                        state:'not used' 
+                    };
+                    vouchers.push(voucher);
 
-                            admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
-                                id: idVoucher,
-                                state: 'not used',
-                                productCode: voucher.productCode
-                            }) 
-                        }
+                    admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher); 
+                }
 
-                        creditCardRef.doc(creditCardDoc.id).update({
-                            value: cardValue - priceOfTickets,
-                            valueSpentMod100: valueSpend % 100, 
-                        },{merge:true})
+                admin.firestore().collection('customer').doc(userId).collection('creditCard').doc(creditCardDoc.id).update({
+                    value: cardValue - priceOfTickets,
+                    valueSpentMod100: valueSpend % 100, 
+                },{merge:true})
 
 
-                        /*adicionar vouchers*/
-                        for(i=1; i<=numbersTickets; i++){
-                            const idTicket = uuidv1();
-                            const state = 'not used'
+                //adicionar vouchers
+                for(i=1; i<=numbersTickets; i++){
+                    const idTicket = uuidv1();
+                    const state = 'not used'
 
-                            var ticket = {
-                                id: idTicket ,
-                                date: date
-                            };
-                           tickets.push(ticket);
-                            
-                            admin.firestore().collection('customer').doc(userdoc.id).collection('ticket').add({
-                                id: idTicket ,
-                                date: date,
-                                state: state,
-                            })
+                    var ticket = {
+                        id: idTicket ,
+                        date: ticketDefault.date,
+                        state: state,
+                        name:ticketDefault.name,
+                        local:ticketDefault.local
+
+                    };
+                    tickets.push(ticket);
+                    
+                    admin.firestore().collection('customer').doc(userId).collection('ticket').doc(idTicket).set(ticket)
+
+                    const idVoucher = uuidv1();
+                    const typeOfOfferBoolean = random.boolean();
+                    var typeOfOffer;
+                    if (typeOfOfferBoolean) {
+                        typeOfOffer = 'freecoffee'
+                    } else typeOfOffer = 'popcorn'
+
+                    var voucher = {
+                        id: idVoucher,
+                        productCode : typeOfOffer,
+                        state: state
+                    };
+                    vouchers.push(voucher);
+
+                    admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher);
+                }
+                var indexVouchers=1;
+                result=" 'vouchers': ["
+                vouchers.forEach( voucher =>{
+                    result = result +"{'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'}";
+                    if(indexVouchers < vouchers.length) {
+                        result = result + ',';
+                        indexVouchers++
+                    }else result = result + "],"
+                })
+
+                result = result + "'tickets': [";
+                var indexTicket = 1;
+                tickets.forEach( ticket =>{
+                    result = result +"{'id':'" + ticket.id + "'," + "'date': '" + ticket.date + "'}";
+                    if(indexTicket < tickets.length) {
+                        result = result + ',';
+                        indexTicket++
+                    }else result = result + "]"
+                })
 
 
-                            const idVoucher = uuidv1();
-                            const typeOfOfferBoolean = random.boolean();
-                            var typeOfOffer;
-                            if (typeOfOfferBoolean) {
-                                typeOfOffer = 'freecoffee'
-                            } else typeOfOffer = 'popcorn'
-
-                            var voucher = {
-                                id: idVoucher,
-                                productCode : typeOfOffer,
-                            };
-                            vouchers.push(voucher);
-
-                            admin.firestore().collection('customer').doc(userdoc.id).collection('voucher').add({
-                                id: idVoucher,
-                                state: state,
-                                productCode: typeOfOffer
-                            })
-
-                        }
-                        var result="{ 'vouchersNumber': '" + vouchers.length + "',";
-                        vouchers.forEach( voucher =>{
-                            result = result +"'voucher': {  'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'},";
-
-                        })
-
-                        result = result + "'ticketsNumber': '" + tickets.length + "',";
-                        var indexTicket=1;
-                        tickets.forEach( ticket =>{
-                            result = result +"'ticket': {" + "'id':'" + ticket.id + "'," + "'date': '" + ticket.date + "'}";
-                            if(indexTicket < tickets.length) {
-                                result = result + ',';
-                                indexTicket++
-                            }
-                        })
-                        res.status(200).send({'data':result});
-                        return;
-
-                    })
-                }).catch(error =>{
-                    res.status(400).send({ 'data':"Error"});
-                    console.error("Error: ", error);
-                });
             })
-
-        }).catch(error =>{
-            res.status(400).send({ 'data':"Error"});
-            console.error("Error: ", error);
+            res.status(200).send({'data':result});
+            return;
+        })
+        .catch(error =>{
+            res.status(400).send({ 'error':error});
+            return;
         });
-        return;
     });
 });
 
+/**
+Function to 
+Parameters:
+
+Output: JSON with result value 
+Teste:
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTickets --data '{}' -g -H "Content-Type: application/json"
+*/
+const listTickets = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+        var result = []
+        admin.firestore().collection('ticket').get()
+        .then( snapshot => {
+            snapshot.forEach(elemTicket => {
+                console.log(elemTicket.data())
+                var ticket = {
+                    price:elemTicket.data().price,
+                    date: elemTicket.data().date,
+                    name: elemTicket.data().name,
+                    local: elemTicket.data().local,
+                    id: elemTicket.id 
+                }
+                result.push(ticket)
+            })
+            res.status(200).send({ 'data':result});
+            return; 
+        })
+        .catch(error =>{
+        res.status(400).send({ 'error':error});
+        return;
+        });
+    });
+})
+
 module.exports = {
     validTicket,
-    buyTicket
+    buyTicket,
+    listTickets,
 }

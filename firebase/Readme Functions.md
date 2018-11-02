@@ -12,16 +12,26 @@ or
 { "data": {error that caused the failure} }
 
 ----------------------------------------------
-Function to validTicket the icket
+Function to validTicket the ticket
 Parameters: 
-        ticketId -> 
+        tickets -> {"ticketId1" : "d007fcb0-dddf-11e8-83c6-09fd741136c7", "ticketId2": "26feb680-dde0-11e8-83c6-09fd741136c7", ...}
         userId ->
 Output: JSON with result value 
 {"data":"validated"}
 or 
-{"data":"was already used"}
+{"data":[
+			{
+				"id":"d007fcb0-dddf-11e8-83c6-09fd741136c7",
+				"state":"already been validaded"},
+			{
+				"id":"26feb680-dde0-11e8-83c6-09fd741136c7",
+				"state":"validaded"
+			}
+		]
+}
+
 or
-{ "data": {error that caused the failure} }
+{ "error": {error that caused the failure} }
 
 
 
@@ -34,19 +44,28 @@ Parameters
         priceTicket ->
 
 output: 
-{"data":"{ 
-        'vouchersNumber': '1',
-        'voucher': {  
-                'id':'130e0690-d9e3-11e8-bdc7-e3808b3e4670',
-                'productCode': 'popcorn'
-        },
-        'ticketsNumber': '1',
-        'ticket': {
-                'id':'130db870-d9e3-11e8-bdc7-e3808b3e4670',
-                'date': '22-12-12'
-        }"
+{"data":
+	" 'vouchers': 
+		[
+			'voucher':{  
+				'id':'734b5d70-dddd-11e8-978f-8b8c735d318b',
+				'productCode': '5%discountCafeteria'
+			},
+			'voucher':{ 
+				'id':'734d0b20-dddd-11e8-978f-8b8c735d318b',
+				'productCode': 'freecoffee'
+			}
+		],
+	'tickets': 
+		[
+			'ticket': {
+				'id':'734ce410-dddd-11e8-978f-8b8c735d318b',
+				'date': 'Mon Dec 12 2022 00:00:00 GMT+0000 (UTC)'
+			}
+		]
+	"
 }
 or 
-{ "data": {error that caused the failure} }
+{ "error": {error that caused the failure} }
 
 ---------------------------------------
