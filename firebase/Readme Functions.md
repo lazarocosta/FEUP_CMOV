@@ -11,6 +11,19 @@ Output: JSON with result value
 or
 { "data": {error that caused the failure} }
 
+
+function to payOrder
+Parameters:
+	userId->
+	produsts-> {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"2" }...}
+	vouchers -> {"voucher":"e0593540-de9b-11e8-8169-cfeb6c1d7363",...} (opcional)
+Output: JSON with result value 
+{"data":"{ 'valueSpend': '2', 'voucher':['e0593540-de9b-11e8-8169-cfeb6c1d7363'],'number':'0008'}"}
+or
+{ "error": {error that caused the failure} }
+
+
+
 ----------------------------------------------
 Function to validTicket the ticket
 Parameters: 
@@ -32,8 +45,6 @@ or
 
 or
 { "error": {error that caused the failure} }
-
-
 
 --------------------------------------------------------
 function buyTicket
