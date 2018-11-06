@@ -29,39 +29,39 @@ const register = functions.https.onRequest((req, res) => {
 
 
         if(!publicKey) {
-            res.status(400).send({ 'error': "Please enter a publicKey."});
+            res.status(200).send({ 'error': "Please enter a publicKey."});
             return;
         }
 
         if(!name) {
-            res.status(400).send({ 'error': "Please enter a name."});
+            res.status(200).send({ 'error': "Please enter a name."});
             return;
         }
 
         if(!nif) {
-            res.status(400).send({ 'error': "Please enter a nif."});
+            res.status(200).send({ 'error': "Please enter a nif."});
             return;
         }
 
         if(!creditCardType) {
-            res.status(400).send({ 'error': "Please enter a creditCardType."});
+            res.status(200).send({ 'error': "Please enter a creditCardType."});
             return;
         }
 
         if(!creditCardNumber) {
-            res.status(400).send({ 'error': "Please enter a creditCardNumber."});
+            res.status(200).send({ 'error': "Please enter a creditCardNumber."});
             return;
         }
 
         if(!creditCardValidity) {
-            res.status(400).send({ 'error': "Please enter a creditCardValidity."});
+            res.status(200).send({ 'error': "Please enter a creditCardValidity."});
             return;
         }
 
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(400).send({ 'error':"nif not is a number"});
+            res.status(200).send({ 'error':"nif not is a number"});
             console.error("nif not is a number: ", error);
             return;
         }
@@ -85,7 +85,7 @@ const register = functions.https.onRequest((req, res) => {
                 adduser= false;
                 var p = admin.firestore().collection('customer').doc(id).delete()
                 promises.push(p)
-                res.status(400).send({ 'error':"creditCardNumber not is number or the validity is not a date"});
+                res.status(200).send({ 'error':"creditCardNumber not is number or the validity is not a date"});
                 console.error("creditCardNumber not is number or the validity is not a date: ");
                 return;
             }else {
@@ -108,13 +108,13 @@ const register = functions.https.onRequest((req, res) => {
                 res.status(200).send({ 'data':id});
                 return 
             }else {
-                res.status(400).send({ 'error':'Could not create user!'});
+                res.status(200).send({ 'error':'Could not create user!'});
                 return
             }
         })
         .catch(err => {
             console.log(err);
-            res.status(400).send({ 'error':"Could not create user!"});
+            res.status(200).send({ 'error':"Could not create user!"});
             return;
         });
     });
@@ -139,12 +139,12 @@ const login = functions.https.onRequest((req, res) => {
         const password = req.body.password;
 
         if(!name){
-            res.status(400).send({ 'error':"Please enter a name."});
+            res.status(200).send({ 'error':"Please enter a name."});
             return;
         }
 
         if(!password){
-            res.status(400).send({ 'error':"Please enter a password."});
+            res.status(200).send({ 'error':"Please enter a password."});
             return;
         }
 
@@ -153,11 +153,11 @@ const login = functions.https.onRequest((req, res) => {
         usersRef.where('name', '==', name).get()
             .then(snapshot => {
                 if(snapshot.size > 1){
-                    res.status(400).send({ 'error':"Invalid name|password"});
+                    res.status(200).send({ 'error':"Invalid name|password"});
                     return;
                 }
                 if(snapshot.size < 1){
-                    res.status(400).send({ 'error':"Invalid name|password"});
+                    res.status(200).send({ 'error':"Invalid name|password"});
                     return;
                 }
                 snapshot.forEach(doc => {
@@ -185,14 +185,14 @@ const login = functions.https.onRequest((req, res) => {
                         res.status(200).send({ 'data': token });
 
                     } else {
-                        res.status(400).send({ 'error':"Invalid name/password."});
+                        res.status(200).send({ 'error':"Invalid name/password."});
                     }
                 });
                 return;
             })
             .catch(err => {
                 console.log(err);
-                res.status(400).send({ 'error':"Invalid name|password."});
+                res.status(200).send({ 'error':"Invalid name|password."});
                 return;
             });
 
@@ -206,7 +206,7 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2","products": {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"2" }} }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"c2345b70-e14e-11e8-b90b-6368751702e3","products": {"product1":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }} }' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -215,16 +215,16 @@ const payOrder = functions.https.onRequest((req, res) => {
         const products = req.body.products;
 
         if(!userId){
-            res.status(400).send({ 'error':"Please enter a userId."});
+            res.status(200).send({ 'error':"Please enter a userId."});
             return;
         }
 
         if(!products){
-            res.status(400).send({ 'error':"Please enter a products."});
+            res.status(200).send({ 'error':"Please enter a products."});
         }
         if(vouchers){
             if(vouchers.length >2){
-                res.status(400).send({ 'error':"It is not allowed to enter more than 2 voucher."});
+                res.status(200).send({ 'error':"It is not allowed to enter more than 2 voucher."});
             }
         }
 
@@ -258,13 +258,14 @@ const payOrder = functions.https.onRequest((req, res) => {
         var usersRef= admin.firestore().collection('customer');
 
         var index1=0
+        var productsPurchased = []
         lisproducts.forEach(product =>{
             index1++
 
             var docProduct =  product.docProduct;
             var quantity = product.quantity;
             if(!docProduct || !quantity) {
-                res.status(400).send({ 'error':"Please enter the doc and quantity of product1"});
+                res.status(200).send({ 'error':"Please enter the doc and quantity of product1"});
                 return;  
             }
        
@@ -273,6 +274,13 @@ const payOrder = functions.https.onRequest((req, res) => {
                 var nameProduct = doc.data().name;
                 var priceProduct = doc.data().price;
                 priceProducts = priceProducts + priceProduct * quantity;
+
+                var purchase = {
+                    nameProduct:nameProduct,
+                    priceProduct:priceProduct,
+                    quantity:quantity
+                }
+                productsPurchased.push(purchase);
 
                 if(nameProduct == 'freecoffee') {
                     numberOfCoffee++
@@ -344,7 +352,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                 usersRef.doc(userId).collection('creditCard').get()
                 .then(snapshot => {
                     if(snapshot.size != 1){
-                        res.status(400).send({ 'error':"Credit card not found"});
+                        res.status(200).send({ 'error':"Credit card not found"});
                         return;
                     }
                     console.log('creditCard1', snapshot)
@@ -396,7 +404,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                         }
                     })
                     if(insuficiente) {
-                        res.status(400).send({ 'error':"insufficient funds"});
+                        res.status(200).send({ 'error':"insufficient funds"});
                         return;
                     } else {
                         responseValues = "{ 'valueSpend': '" +valueSpent +"', 'voucher':[";
@@ -413,28 +421,34 @@ const payOrder = functions.https.onRequest((req, res) => {
                         }) 
                         responseValues= responseValues + "],"
                     }
+                    addProductUser(userId, productsPurchased)
                     
-                    admin.firestore().collection('order').doc('9WV3XMOLfQ6qrn4hPHll').get()
-                    .then(result=>{
-                        var number= result.data().number+1
-                        admin.firestore().collection('order').doc('9WV3XMOLfQ6qrn4hPHll').update({
-                            number:number
-                        },{merge:true})
-                        number = "0000" + number
-                        number = number.slice(-4);
-                        responseValues = responseValues + "'number':'"+ number + "'}" 
-                        res.status(200).send({ 'data':responseValues});
+                    getNumberOrder().then(number=>{
+                        if(number!=null){
+                            responseValues = responseValues + "'number':'"+ number + "'}" 
+                            res.status(200).send({ 'data':responseValues});
+                            return;
+                        }else {
+                            res.status(200).send({ 'error':'error'});
+                            return;
+                        }
                     })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(200).send({ 'error':"Error"});
+                        return;
+                    });
+
                 })
                 .catch(err => {
                     console.log(err);
-                    res.status(400).send({ 'error':"Error"});
+                    res.status(200).send({ 'error':"Error"});
                     return;
                 });
             })
             .catch(err => {
                 console.log(err);
-                res.status(400).send({ 'error':"Not found product"});
+                res.status(200).send({ 'error':"Not found product"});
                 return;
             });
         })
@@ -446,7 +460,7 @@ Function to list Tickets Of User
 Parameters: username -> the USER name
 Output: JSON with 
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTicketsNotUsed --data ' {"userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2" }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTicketsNotUsed --data ' {"userId":"c2345b70-e14e-11e8-b90b-6368751702e3" }' -g -H "Content-Type: application/json"
 */
 
 const listTicketsNotUsed = functions.https.onRequest((req, res) => {
@@ -462,7 +476,7 @@ const listTicketsNotUsed = functions.https.onRequest((req, res) => {
                         id: ticketdoc.id,
                         name: ticketdoc.data().name,
                         date: ticketdoc.data().date,
-                        local: ticketdoc.data().local,
+                        place: ticketdoc.data().place,
                     }
                     result.push(ticket);
                 }   
@@ -472,7 +486,7 @@ const listTicketsNotUsed = functions.https.onRequest((req, res) => {
         })
         .catch (error=> {
             console.log(error);
-            res.status(400).send({ 'error':"Error"});
+            res.status(200).send({ 'error':"Error"});
             return;
         })
     })
@@ -484,16 +498,16 @@ Function to list Tickets Of User
 Parameters: username -> the USER name
 Output: JSON with 
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTicketsAndVouchersNotUsed --data ' {"userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2" }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTransactionsUser --data ' {"userId":"c2345b70-e14e-11e8-b90b-6368751702e3" }' -g -H "Content-Type: application/json"
 */
 
-const listTicketsAndVouchersNotUsed = functions.https.onRequest((req, res) => {
+const listTransactionsUser = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
         const userId = req.body.userId;
         var ticketsResult = [];
         var vouchersResult = [];
+        var productsResult = [];
         var result;
-
 
         admin.firestore().collection('customer').doc(userId).collection('ticket').get()
         .then(snapshot => {
@@ -503,14 +517,14 @@ const listTicketsAndVouchersNotUsed = functions.https.onRequest((req, res) => {
                         id: ticketdoc.id,
                         name: ticketdoc.data().name,
                         date: ticketdoc.data().date,
-                        local: ticketdoc.data().local,
+                        place: ticketdoc.data().place,
                     }
                     ticketsResult.push(ticket);
                 }   
             })
             admin.firestore().collection('customer').doc(userId).collection('voucher').get()
-            .then(snapshot2 => {
-                snapshot2.forEach(voucherdoc => {
+            .then(snapshot => {
+                snapshot.forEach(voucherdoc => {
                     if(voucherdoc.data().state =="not used") {
                         var voucher = {
                             id: voucherdoc.id,
@@ -519,43 +533,131 @@ const listTicketsAndVouchersNotUsed = functions.https.onRequest((req, res) => {
                         vouchersResult.push(voucher);
                     }   
                 })
+                admin.firestore().collection('customer').doc(userId).collection('products').get()
+                .then(snapshot => {
+                    snapshot.forEach(productdoc => {
+                        var product = {
+                            nameProduct: productdoc.data().nameProduct,
+                            priceProduct: productdoc.data().priceProduct,
+                            quantity: productdoc.data().quantity,
 
-                var indexVouchers=1;
-                result=" 'vouchers': ["
-                vouchersResult.forEach( voucher =>{
-                    result = result +"{'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'}";
-                    if(indexVouchers < vouchersResult.length) {
-                        result = result + ',';
-                        indexVouchers++
-                    }else result = result + "],"
+                        }
+                        productsResult.push(product);
+                    })
+
+                    var indexVouchers=1;
+                    result=" 'vouchers': ["
+                    vouchersResult.forEach( voucher =>{
+                        result = result +"{'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'}";
+                        if(indexVouchers < vouchersResult.length) {
+                            result = result + ',';
+                            indexVouchers++
+                        }else result = result + "],"
+                    })
+
+                    result = result + "'tickets': [";
+                    var indexTicket = 1;
+                    ticketsResult.forEach( ticket =>{
+                        result = result +"{'id':'" + ticket.id + "'," + "'date': '" + ticket.date + "'}";
+                        if(indexTicket < ticketsResult.length) {
+                            result = result + ',';
+                            indexTicket++
+                        }else result = result + "],"
+                    })
+
+                    result = result + "'product': [";
+                    var indexProducts = 1;
+                    productsResult.forEach( product =>{
+                        result = result +"{'nameProduct':'" + product.nameProduct + "'," + "'priceProduct': '" + product.priceProduct + "',"+ "'quantity': '" + product.quantity + "'}";
+                        if(indexProducts < productsResult.length) {
+                            result = result + ',';
+                            indexProducts++
+                        }else result = result + "]"
+                    })
+
+                    res.status(200).send({ 'data':result});
+                    return;
                 })
-
-                result = result + "'tickets': [";
-                var indexTicket = 1;
-                ticketsResult.forEach( ticket =>{
-                    result = result +"{'id':'" + ticket.id + "'," + "'date': '" + ticket.date + "'}";
-                    if(indexTicket < ticketsResult.length) {
-                        result = result + ',';
-                        indexTicket++
-                    }else result = result + "]"
-                })
-
-            res.status(200).send({ 'data':result});
-            return;
             })
         })
         .catch (error=> {
             console.log(error);
-            res.status(400).send({ 'error':"Error"});
+            res.status(200).send({ 'error':"Error"});
             return;
         })
     })
 })
+
+
+/**
+Function to list vouchers Of User
+Parameters: 
+        userId  
+Output: JSON with 
+TEST: 
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listVouchersUser --data ' {"userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2" }' -g -H "Content-Type: application/json"
+*/
+const listVouchersUser = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+        const userId = req.body.userId;
+        var vouchersResult = [];
+
+        admin.firestore().collection('customer').doc(userId).collection('voucher').get()
+        .then(snapshot => {
+            snapshot.forEach(voucherdoc => {
+                if(voucherdoc.data().state =="not used") {
+                    var voucher = {
+                        id: voucherdoc.id,
+                        productCode: voucherdoc.data().productCode,
+                    }
+                    vouchersResult.push(voucher);
+                }   
+            })
+
+
+            res.status(200).send({ 'data':vouchersResult});
+            return;
+        })
+        .catch (error=> {
+            console.log(error);
+            res.status(200).send({ 'error':error});
+            return;
+        })
+    })
+})
+
+function getNumberOrder() {
+    return admin.firestore().collection('order').doc('9WV3XMOLfQ6qrn4hPHll').get()
+    .then(result=>{
+        var number= result.data().number+1
+        admin.firestore().collection('order').doc('9WV3XMOLfQ6qrn4hPHll').update({
+            number:number
+        },{merge:true})
+        number = "0000" + number
+        number = number.slice(-4);
+        return number;
+    })
+    .catch(error=>{
+        return null;
+    })
+}
+
+function addProductUser(userId, lisproducts){
+
+    lisproducts.forEach(product=>{
+        admin.firestore().collection('customer').doc(userId).collection('products').add({
+            nameProduct:product.nameProduct,
+            priceProduct:product.priceProduct,
+            quantity:product.quantity
+        })
+    })
+}
 
 module.exports={
     register,
     login,
     payOrder,
     listTicketsNotUsed,
-    listTicketsAndVouchersNotUsed
+    listTransactionsUser,
+    listVouchersUser
 }

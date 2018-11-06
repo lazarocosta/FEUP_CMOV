@@ -11,7 +11,7 @@ Output: JSON with result value
 or
 { "data": {error that caused the failure} }
 
-
+-----------------------------------------------------------------------------
 function to payOrder
 Parameters:
 	userId->
@@ -47,12 +47,10 @@ or
 { "error": {error that caused the failure} }
 
 --------------------------------------------------------
-function buyTicket
+function buyTickets
 Parameters
-        date ->
-        numbersTickets ->
         userId ->  
-        priceTicket ->
+        tickets ->{"ticket1":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}...}
 
 output: 
 {"data":
@@ -79,4 +77,63 @@ output:
 or 
 { "error": {error that caused the failure} }
 
+
 ---------------------------------------
+function listProducts
+Parameters:
+
+output:
+{"data":[
+			{"name":"popcorn","price":2},
+			{"name":"coffee","price":1}
+		]
+}
+
+--------------------------------------
+function listVouchersUser
+Parameters:
+	userId
+
+output:
+{"data":
+	[
+		{"id":"44aa3030-e144-11e8-a6a5-a77c973b71e1","productCode":"freecoffee"},
+		... ,
+	]
+}
+
+--------------------------------------
+function listTransactionsUser
+Parameters:
+	userId
+
+output:
+{"data":" 
+	'vouchers': [
+		{'id':'5eb625c0-e157-11e8-8655-17cfd52fdeef','productCode': 'freecoffee'},
+		...
+	],
+	'tickets': [
+		{'id':'51f51260-e157-11e8-8655-17cfd52fdeef','date': 'Wed Nov 21 2018 00:00:00 GMT+0000 (UTC)'},
+		...
+	],
+	'product': [
+		{'nameProduct':'coffee','priceProduct': '1','quantity': '2'},
+		...
+	]"
+}
+
+--------------------------------------
+function listTicketsNotUsed
+Parameters:
+	userId
+
+output:
+{"data":" 
+	'tickets': [
+		{'id':'51f51260-e157-11e8-8655-17cfd52fdeef','date': 'Wed Nov 21 2018 00:00:00 GMT+0000 (UTC)'},
+		...
+	]
+}
+
+
