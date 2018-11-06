@@ -242,6 +242,8 @@ const payOrder = functions.https.onRequest((req, res) => {
         var listVoucher = [];
         var creditCardUser;
         var responseValues;
+        var productsPurchased = []
+        var usersRef= admin.firestore().collection('customer');
 
 
         for(key in vouchers){
@@ -255,10 +257,8 @@ const payOrder = functions.https.onRequest((req, res) => {
             }
             lisproducts.push(product)
         }
-        var usersRef= admin.firestore().collection('customer');
 
         var index1=0
-        var productsPurchased = []
         lisproducts.forEach(product =>{
             index1++
 
@@ -285,7 +285,6 @@ const payOrder = functions.https.onRequest((req, res) => {
                 if(nameProduct == 'freecoffee') {
                     numberOfCoffee++
                     valueCoffe = priceProduct;
-
                 }
 
                 if(nameProduct == 'popcorn') {
@@ -364,7 +363,6 @@ const payOrder = functions.https.onRequest((req, res) => {
 
                         const p = usersRef.doc(userId).collection('creditCard').doc(creditCardUser).get()
                         promises.push(p);
-                        
                     })
                     return Promise.all(promises);
 
@@ -398,7 +396,6 @@ const payOrder = functions.https.onRequest((req, res) => {
                                 }
 
                                 admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(newVoucher); 
-
                             }
                             insuficiente= false;
                         }
@@ -533,7 +530,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                         vouchersResult.push(voucher);
                     }   
                 })
-                admin.firestore().collection('customer').doc(userId).collection('products').get()
+                admin.firestore().collection('customer').doc(userId).collection('productsPurchased').get()
                 .then(snapshot => {
                     snapshot.forEach(productdoc => {
                         var product = {
@@ -614,7 +611,6 @@ const listVouchersUser = functions.https.onRequest((req, res) => {
                 }   
             })
 
-
             res.status(200).send({ 'data':vouchersResult});
             return;
         })
@@ -626,6 +622,14 @@ const listVouchersUser = functions.https.onRequest((req, res) => {
     })
 })
 
+
+
+/*
+*
+*    auxiliary functions
+*
+*
+*/
 function getNumberOrder() {
     return admin.firestore().collection('order').doc('9WV3XMOLfQ6qrn4hPHll').get()
     .then(result=>{
@@ -643,9 +647,8 @@ function getNumberOrder() {
 }
 
 function addProductUser(userId, lisproducts){
-
     lisproducts.forEach(product=>{
-        admin.firestore().collection('customer').doc(userId).collection('products').add({
+        admin.firestore().collection('customer').doc(userId).collection('productsPurchased').add({
             nameProduct:product.nameProduct,
             priceProduct:product.priceProduct,
             quantity:product.quantity

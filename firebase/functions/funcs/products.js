@@ -17,7 +17,6 @@ const listProducts = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
         var products = [];
-
         admin.firestore().collection('product').get()
         .then(result =>{
             result.forEach(doc=>{

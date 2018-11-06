@@ -32,7 +32,6 @@ const validTicket = functions.https.onRequest((req, res) => {
         var resultTickets = []
 
         for (ticket in tickets) {
-            console.log(ticket, tickets[ticket])
             listTickets.push(tickets[ticket])
         }
 
@@ -40,14 +39,12 @@ const validTicket = functions.https.onRequest((req, res) => {
         var usersRef = admin.firestore().collection('customer');
         listTickets.forEach(ticket => {
 
-            console.log(ticket)
             const p=usersRef.doc(userId).collection('ticket').doc(ticket).get()
             promises.push(p)
         })
         return Promise.all(promises)
         .then(snapshot => {
             snapshot.forEach(ticketdoc => {
-                console.log(ticketdoc)
                 console.log(ticketdoc.data())
                 const state = ticketdoc.data().state;
                 if(state == "not used") {
@@ -97,7 +94,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
         const tickets = req.body.tickets;
         const userId = req.body.userId;
 
-
         if(!userId) {
             res.status(200).send({ 'error': "Please enter a userId."});
             return;
@@ -128,8 +124,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
         listTickets.forEach(elem=>{
             admin.firestore().collection('ticket').doc(elem.id).get()
             .then(doc=>{
-                console.log('numero tickets', elem.numberTickets)
-                console.log('firs',doc.data().sold )
                 var ticket = {
                     id:elem.id,
                     date: doc.data().date,
@@ -157,7 +151,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
                 var amountSpend = valueSpentMod100 + priceOfTickets
                 console.log(priceOfTickets)
                 console.log(amountSpend)
-                console.log(amountSpend % 100)
 
                  if(priceOfTickets > cardValue){
                     res.status(200).send({ 'error':"insufficient funds"});
@@ -245,7 +238,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
                         indexTicket++
                     }else result = result + "]"
                 })
-
 
             })
             res.status(200).send({'data':result});
