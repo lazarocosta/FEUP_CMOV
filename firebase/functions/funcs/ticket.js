@@ -11,7 +11,8 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "d007fcb0-dddf-11e8-83c6-09fd741136c7"}, "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2"}' -g -H "Content-Type: application/json"
+//"ticketId1" : "45d2cb30-e2c4-11e8-ae33-a914b344eca7",
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "45d2cb30-e2c4-11e8-ae33-a914b344eca7", "ticket2":"45d25600-e2c4-11e8-ae33-a914b344eca7"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
 */
 const validTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -30,6 +31,8 @@ const validTicket = functions.https.onRequest((req, res) => {
         }
         var listTickets = [];
         var resultTickets = []
+        var performaceIdGeral="";
+        var allValidated= true;
 
         for (ticket in tickets) {
             listTickets.push(tickets[ticket])
@@ -38,41 +41,50 @@ const validTicket = functions.https.onRequest((req, res) => {
         var promises = []
         var usersRef = admin.firestore().collection('customer');
         listTickets.forEach(ticket => {
-
             const p=usersRef.doc(userId).collection('ticket').doc(ticket).get()
             promises.push(p)
         })
         return Promise.all(promises)
         .then(snapshot => {
             snapshot.forEach(ticketdoc => {
-                console.log(ticketdoc.data())
                 const state = ticketdoc.data().state;
-                if(state == "not used") {
-                    const ticketref = usersRef.doc(userId).collection('ticket').doc(ticketdoc.id);
-                    ticketref.update({
+                const performaceId = ticketdoc.data().performaceId;
+                if(performaceIdGeral==""){
+                    performaceIdGeral= performaceId
+                    console.log('primeiro')
+                }
+                else{
+                    if(performaceIdGeral!= performaceId){
+                    allValidated= false;
+                        res.status(200).send({ 'error':'tickets not of the same performance'});
+                        return;
+                    }
+                }
+                if(state == "used") {
+                    allValidated= false;
+
+                    res.status(200).send({ 'error':'already validated ticket'});
+                    return; 
+                }
+                console.log('adicinou')
+                resultTickets.push(ticketdoc.id)
+            })
+
+            if(allValidated){
+                console.log('aqui')
+                resultTickets.forEach(ticketdoc=>{
+                    usersRef.doc(userId).collection('ticket').doc(ticketdoc).update({
                     state: 'used',
                     },{merge:true}) 
-                    
-                    var resultTicket = {
-                        id:ticketdoc.id,
-                        state:'validaded'
-                    }
-                    resultTickets.push(resultTicket);
-                } 
-                else if(state == "used") {
-                    var resultTicket = {
-                        id:ticketdoc.id,
-                        state:'already been validaded'
-                    }
-                    resultTickets.push(resultTicket);
-                }    
-            })
-            res.status(200).send({ 'data':resultTickets});
+                })
+            }
+            console.log("aqui2")
+            res.status(200).send({ 'data':true});
             return;
         })
         .catch(error =>  {
             console.error("Error: ", error);
-            res.status(200).send({ 'error':'Invalid userId or Invalid ticketsId'});
+            res.status(200).send({ 'error':"error"});
             return;
         });
     });
@@ -86,7 +98,9 @@ Parameters: Id -> id of ticket
         numbersTickets->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+//5QQ3bv9JkuiskIqn35x5
+//4YMjcrIXgaZmIzNH8BDF
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -138,26 +152,16 @@ const buyTickets = functions.https.onRequest((req, res) => {
                 listTicketsDefault.push(ticket)
             })
         })
-
         admin.firestore().collection('customer').doc(userId).collection('creditCard').get()
         .then(snapshot =>{
-            console.log(snapshot)
             if(snapshot.size != 1){
                 res.status(200).send({ 'error':"Invalid userId"});
                 return;
             }
             snapshot.forEach(creditCardDoc => { 
-                console.log(creditCardDoc.data())
-                var cardValue = creditCardDoc.data().value
                 var valueSpentMod100 = creditCardDoc.data().valueSpentMod100
                 var amountSpend = valueSpentMod100 + priceOfTickets
-                console.log(priceOfTickets)
-                console.log(amountSpend)
 
-                 if(priceOfTickets > cardValue){
-                    res.status(200).send({ 'error':"insufficient funds"});
-                    return;
-                }
 
                 var numberOfVouchers= Math.floor(amountSpend/100);
                 if( numberOfVouchers != 0 ) {
@@ -174,31 +178,31 @@ const buyTickets = functions.https.onRequest((req, res) => {
                 }
 
                 admin.firestore().collection('customer').doc(userId).collection('creditCard').doc(creditCardDoc.id).update({
-                    value: cardValue - priceOfTickets,
                     valueSpentMod100: amountSpend % 100, 
                 },{merge:true})
 
                 //adicionar vouchers
-                listTicketsDefault.forEach(ticket=> {
-                    admin.firestore().collection('ticket').doc(ticket.id).update({
-                        sold: ticket.numberTickets + ticket.numberOfFirstTicket
+                listTicketsDefault.forEach(ticketGeral=> {
+                    admin.firestore().collection('ticket').doc(ticketGeral.id).update({
+                        sold: ticketGeral.numberTickets + ticketGeral.numberOfFirstTicket
                     },{merge:true})
    
-                    var place = ticket.numberOfFirstTicket - 1;
+                    var place = ticketGeral.numberOfFirstTicket - 1;
                     
-                    var max = Number(ticket.numberTickets);
+                    var max = Number(ticketGeral.numberTickets);
                     for(let j=0; j<max; j++){
                         place++
                         const idTicket = uuidv1();
                         const state = 'not used'
 
+                        console.log('aqui')
                         var ticket = {
                             id: idTicket ,
-                            date: ticket.date,
+                            date: ticketGeral.date,
                             state: state,
-                            name:ticket.name,
-                            place:place
-
+                            name:ticketGeral.name,
+                            place:place,
+                            performaceId:ticketGeral.id
                         };
                         resultTickets.push(ticket);
                         
@@ -252,7 +256,6 @@ const listTickets = functions.https.onRequest((req, res) => {
         admin.firestore().collection('ticket').get()
         .then( snapshot => {
             snapshot.forEach(elemTicket => {
-                console.log(elemTicket.data())
                 var ticket = {
                     price:elemTicket.data().price,
                     date: elemTicket.data().date,

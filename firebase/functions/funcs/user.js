@@ -75,7 +75,6 @@ const register = functions.https.onRequest((req, res) => {
         var adduser;
         admin.firestore().collection('customer').doc(id).set(user)
         .then(function() {
-            console.log(id)
 
             const number = parseInt(creditCardNumber);
             var myDate = new Date(creditCardValidity);
@@ -93,7 +92,6 @@ const register = functions.https.onRequest((req, res) => {
                         type: creditCardType,
                         number: number,
                         validity: myDate,
-                        value: 100,
                         valueSpentMod100: 0,
 
                         })
@@ -103,7 +101,6 @@ const register = functions.https.onRequest((req, res) => {
             return Promise.all(promises)
         })
         .then(snapshot => {
-            console.log(snapshot)
             if(adduser) {
                 res.status(200).send({ 'data':id});
                 return 
@@ -113,7 +110,6 @@ const register = functions.https.onRequest((req, res) => {
             }
         })
         .catch(err => {
-            console.log(err);
             res.status(200).send({ 'error':"Could not create user!"});
             return;
         });
@@ -132,8 +128,6 @@ TEST:
 
 const login = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        console.log(0)
-
 
         const name = req.body.name;
         const password = req.body.password;
@@ -162,12 +156,9 @@ const login = functions.https.onRequest((req, res) => {
                 }
                 snapshot.forEach(doc => {
 
-                    console.log(doc.id, '=>', doc.data().name);
                     var userPass = doc.data().password;
 
                     var hash = crypto.createHash('sha256').update(password).digest('base64');
-                    console.log(userPass)
-                    console.log(hash)
 
                     //if password matches, generate token, save it in db and send it
                     if(hash === userPass) {
@@ -237,14 +228,12 @@ const payOrder = functions.https.onRequest((req, res) => {
         var priceProducts= 0;
         var numberOfCoffee = 0;
         var numberOfPopcorn = 0;
-        var insuficiente = false;
         var voucherUsed = [];
         var listVoucher = [];
         var creditCardUser;
-        var responseValues;
         var productsPurchased = []
-        var usersRef= admin.firestore().collection('customer');
         var obj = {}
+        var usersRef= admin.firestore().collection('customer');
 
 
         for(key in vouchers){
@@ -296,7 +285,6 @@ const payOrder = functions.https.onRequest((req, res) => {
                 if(index1==lisproducts.length){
                     const promises = []
                     listVoucher.forEach(voucher => {
-                        console.log(voucher)
                         const p = usersRef.doc(userId).collection('voucher').doc(voucher).get()
                         promises.push(p)
                     })
@@ -304,20 +292,13 @@ const payOrder = functions.https.onRequest((req, res) => {
                 }
             })
             .then(snapshot => {
-                console.log('voucher',snapshot)
                 var index2=0
                 const promises = []
 
                 snapshot.forEach( doc => {
                     index2++
-                    console.log('voucher data',doc.data())
-                    
                     var used = false;
                     if(doc.data().state == "not used") {
-                        console.log('aqui not used')
-                        console.log('coffee',numberOfCoffee)
-                        console.log('popcorn',numberOfPopcorn)
-
                         if(doc.data().productCode =="5%discountCafeteria") {
                             if(discont !=0.05){
                                 discont = 0.05;
@@ -336,14 +317,12 @@ const payOrder = functions.https.onRequest((req, res) => {
                         }
     
                         if (used){
-                            console.log('usou')
                             voucherUsed.push(doc.id)
                         }
                     } else {
                         console.log('used')
                     }
                     if(index2==snapshot.length){
-                        console.log('fim vouchers')
                         return Promise.all(promises)
                     }
                 })
@@ -355,11 +334,9 @@ const payOrder = functions.https.onRequest((req, res) => {
                         res.status(200).send({ 'error':"Credit card not found"});
                         return;
                     }
-                    console.log('creditCard1', snapshot)
                     const promises = []
                     
                     snapshot.forEach(creditCard =>{
-                        console.log('creditCard.id', creditCard.id)
                         creditCardUser = creditCard.id
 
                         const p = usersRef.doc(userId).collection('creditCard').doc(creditCardUser).get()
@@ -369,21 +346,15 @@ const payOrder = functions.https.onRequest((req, res) => {
 
                 })
                 .then(snapshot => { 
-                    console.log('creditcard', snapshot)
                     var valueSpent;
                     snapshot.forEach(docreditcard => { 
-                        console.log('creditcard-value', docreditcard.data())
-                        var valueCreditCard = docreditcard.data().value;
                         var valueSpentMod100 = docreditcard.data().valueSpentMod100;
                         var voucher = (valueSpentMod100 + priceProducts)/100;
                         valueSpent =priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
         
-                        if(valueCreditCard < valueSpent) {
-                            insuficiente = true;  
-                        } else {
+   
                             if(valueSpent > 0 ){
                                 usersRef.doc(userId).collection('creditCard').doc(creditCardUser).update({
-                                    value: valueCreditCard - valueSpent,
                                     valueSpentMod100: (valueSpentMod100 + valueSpent)%100,
                                 },{merge:true})
                             }
@@ -398,26 +369,19 @@ const payOrder = functions.https.onRequest((req, res) => {
 
                                 admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(newVoucher); 
                             }
-                            insuficiente= false;
-                        }
                     })
-                    if(insuficiente) {
-                        res.status(200).send({ 'error':"insufficient funds"});
-                        return;
-                    } else {
 
-                        voucherUsed.forEach(voucherId => {
-                            usersRef.doc(userId).collection('voucher').doc(voucherId).update({
-                                state: 'used',
-                            },{merge:true})
-                        }) 
+                    voucherUsed.forEach(voucherId => {
+                        usersRef.doc(userId).collection('voucher').doc(voucherId).update({
+                            state: 'used',
+                        },{merge:true})
+                    }) 
 
-                        var valueSpendkey = "valueSpend";
-                        obj[valueSpendkey] = valueSpent;
+                    var valueSpendkey = "valueSpend";
+                    obj[valueSpendkey] = valueSpent;
 
-                        var vouvherKey = 'vouchers'
-                        obj[vouvherKey] = voucherUsed;
-                    }
+                    var vouvherKey = 'vouchers'
+                    obj[vouvherKey] = voucherUsed;
                     addProductUser(userId, productsPurchased)
                     
                     getNumberOrder().then(number=>{
