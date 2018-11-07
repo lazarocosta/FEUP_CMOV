@@ -1,0 +1,84 @@
+package pt.up.fe.up201405729.cmov1.customerapp;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+
+public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRVAdapter.MyViewHolder> {
+    private ArrayList<Ticket> tickets;
+    private HashSet<Ticket> selectedTickets;
+    private Context packageContext;
+
+    public SelectTicketsRVAdapter(ArrayList<Ticket> tickets, Context context) {
+        this.tickets = tickets;
+        this.selectedTickets = new HashSet<>();
+        this.packageContext = context;
+    }
+
+    @NonNull
+    @Override
+    public SelectTicketsRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.row_select_tickets_rv, parent, false);
+        return new MyViewHolder(linearLayout);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
+        Ticket t = tickets.get(position);
+        ((TextView) holder.linearLayout.findViewById(R.id.selectTicketsShowName)).setText(t.getShowName());
+        ((TextView) holder.linearLayout.findViewById(R.id.selectTicketsShowDate)).setText(t.getDate().getHumanReadableDate());
+        ((TextView) holder.linearLayout.findViewById(R.id.selectTicketsRoomPlace)).setText(t.getRoomPlace());
+        CheckBox checkBox = holder.linearLayout.findViewById(R.id.selectTicketsCheckBox);
+        checkBox.setActivated(false);
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Ticket selectedTicket = tickets.get(holder.getAdapterPosition());
+                if (v.isActivated()) {
+                    if (selectedTickets.size() >= 4) {
+                        Toast.makeText(packageContext, "Maximum number of tickets reached.", Toast.LENGTH_LONG).show();
+                        v.setActivated(false);
+                    } else {
+                        for (Ticket t : selectedTickets) {
+                            if (!t.getPerformanceId().equals(selectedTicket.getPerformanceId())) {
+                                Toast.makeText(packageContext, "All tickets must be for the same performance.", Toast.LENGTH_LONG).show();
+                                v.setActivated(false);
+                                return;
+                            }
+                        }
+                        selectedTickets.add(selectedTicket);
+                    }
+                } else
+                    selectedTickets.remove(selectedTicket);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return tickets.size();
+    }
+
+    public HashSet<Ticket> getSelectedTickets() {
+        return selectedTickets;
+    }
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+        public LinearLayout linearLayout;
+
+        public MyViewHolder(LinearLayout linearLayout) {
+            super(linearLayout);
+            this.linearLayout = linearLayout;
+        }
+    }
+}
