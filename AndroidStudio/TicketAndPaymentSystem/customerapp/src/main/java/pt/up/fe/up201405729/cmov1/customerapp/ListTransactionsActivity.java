@@ -1,6 +1,7 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -22,6 +23,9 @@ public class ListTransactionsActivity extends AppCompatActivity {
     private ArrayList<Ticket> listTickets;
     private ArrayList<Voucher> listVouchers;
     private ArrayList<Product> listProducts;
+    private TicketRVAdapter ticketsRVAdapter;
+    private CustomerApp app;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,9 @@ public class ListTransactionsActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         final Context packageContext = this;
+        this.app = (CustomerApp) getApplicationContext();
+
+
 
         JSONObject transactions = new JSONObject();
         try {
@@ -90,8 +97,10 @@ public class ListTransactionsActivity extends AppCompatActivity {
             }
         }
 
-        RecyclerView tickets = findViewById(R.id.ticketsRecyclerView);
+        RecyclerView ticketsRV = findViewById(R.id.ticketsRecyclerView);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
-        tickets.setLayoutManager(gridLayoutManager);
+        ticketsRV.setLayoutManager(gridLayoutManager);
+        ticketsRVAdapter = new TicketRVAdapter(listTickets);
+        ticketsRV.setAdapter(ticketsRVAdapter);
     }
 }

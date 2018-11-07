@@ -26,6 +26,8 @@ public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAd
         this.areQuantitiesEditable = areQuantitiesEditable;
     }
 
+
+
     @NonNull
     @Override
     public PerformancesRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

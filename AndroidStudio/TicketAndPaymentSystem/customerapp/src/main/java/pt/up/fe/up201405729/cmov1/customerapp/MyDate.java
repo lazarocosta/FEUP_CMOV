@@ -33,8 +33,11 @@ public class MyDate implements Comparable<MyDate>, Serializable {
             if(m.find() && m2.find() ) {
                 this.resultDate= m.group() + " " + m2.group();
                 System.out.println(this.resultDate);
-            }else
-                this.resultDate="";
+            }else {
+                this.resultDate = "";
+                System.out.println("data mal");
+            }
+
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }

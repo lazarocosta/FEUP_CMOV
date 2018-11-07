@@ -86,7 +86,7 @@ Parameters: Id -> id of ticket
         numbersTickets->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}}, "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
