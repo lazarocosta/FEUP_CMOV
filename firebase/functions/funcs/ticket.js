@@ -11,7 +11,7 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "d007fcb0-dddf-11e8-83c6-09fd741136c7", "ticketId2": "26feb680-dde0-11e8-83c6-09fd741136c7"}, "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "d007fcb0-dddf-11e8-83c6-09fd741136c7"}, "userId":"9a9432a0-dddb-11e8-bb3a-112a346d95e2"}' -g -H "Content-Type: application/json"
 */
 const validTicket = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -86,13 +86,15 @@ Parameters: Id -> id of ticket
         numbersTickets->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"4YMjcrIXgaZmIzNH8BDF","numberTickets":"1"}}, "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f"}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
         const tickets = req.body.tickets;
         const userId = req.body.userId;
+
+        var obj = {}
 
         if(!userId) {
             res.status(200).send({ 'error': "Please enter a userId."});
@@ -219,28 +221,14 @@ const buyTickets = functions.https.onRequest((req, res) => {
                         admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher);
                     }
                 })
-                var indexVouchers=1;
-                result=" 'vouchers': ["
-                vouchers.forEach( voucher =>{
-                    result = result +"{'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'}";
-                    if(indexVouchers < vouchers.length) {
-                        result = result + ',';
-                        indexVouchers++
-                    }else result = result + "],"
-                })
-
-                result = result + "'tickets': [";
-                var indexTicket = 1;
-                resultTickets.forEach( ticket =>{
-                    result = result +"{'id':'" + ticket.id + "'," + "'place':'"+ticket.place + "'," + "'date': '" + ticket.date + "'}";
-                    if(indexTicket < resultTickets.length) {
-                        result = result + ',';
-                        indexTicket++
-                    }else result = result + "]"
-                })
+                var vou = "vouchers";
+                obj[vou] = vouchers;
+      
+                var tickets = "tickets";
+                obj[tickets] = resultTickets;
 
             })
-            res.status(200).send({'data':result});
+            res.status(200).send({'data':obj});
             return;
         })
         .catch(error =>{
@@ -269,6 +257,8 @@ const listTickets = functions.https.onRequest((req, res) => {
                     price:elemTicket.data().price,
                     date: elemTicket.data().date,
                     name: elemTicket.data().name,
+                    name: elemTicket.data().name,
+
                     id: elemTicket.id,
                 }
                 result.push(ticket)

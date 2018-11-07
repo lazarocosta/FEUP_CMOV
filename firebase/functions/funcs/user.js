@@ -206,7 +206,7 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"c2345b70-e14e-11e8-b90b-6368751702e3","products": {"product1":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }} }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f","products": {"product1":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }} }' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -244,6 +244,7 @@ const payOrder = functions.https.onRequest((req, res) => {
         var responseValues;
         var productsPurchased = []
         var usersRef= admin.firestore().collection('customer');
+        var obj = {}
 
 
         for(key in vouchers){
@@ -404,26 +405,27 @@ const payOrder = functions.https.onRequest((req, res) => {
                         res.status(200).send({ 'error':"insufficient funds"});
                         return;
                     } else {
-                        responseValues = "{ 'valueSpend': '" +valueSpent +"', 'voucher':[";
-                        var indexVoucher=1;
+
                         voucherUsed.forEach(voucherId => {
                             usersRef.doc(userId).collection('voucher').doc(voucherId).update({
                                 state: 'used',
                             },{merge:true})
-                            responseValues = responseValues+ "'" +voucherId + "'";
-                            if(indexVoucher<voucherUsed.length){
-                                indexVoucher++
-                                responseValues = responseValues + ","
-                            }
                         }) 
-                        responseValues= responseValues + "],"
+
+                        var valueSpendkey = "valueSpend";
+                        obj[valueSpendkey] = valueSpent;
+
+                        var vouvherKey = 'vouchers'
+                        obj[vouvherKey] = voucherUsed;
                     }
                     addProductUser(userId, productsPurchased)
                     
                     getNumberOrder().then(number=>{
                         if(number!=null){
-                            responseValues = responseValues + "'number':'"+ number + "'}" 
-                            res.status(200).send({ 'data':responseValues});
+                            var numberKey = "number"; 
+                            obj[numberKey] = number;
+
+                            res.status(200).send({ 'data':obj});
                             return;
                         }else {
                             res.status(200).send({ 'error':'error'});
@@ -504,7 +506,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
         var ticketsResult = [];
         var vouchersResult = [];
         var productsResult = [];
-        var result;
+        var obj = {};
 
         admin.firestore().collection('customer').doc(userId).collection('ticket').get()
         .then(snapshot => {
@@ -541,38 +543,17 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                         }
                         productsResult.push(product);
                     })
+                    var vouchers = "vouchers";
+                    obj[vouchers] = vouchersResult;
+          
+                    var tickets = "tickets";
+                    obj[tickets] = ticketsResult;
 
-                    var indexVouchers=1;
-                    result=" 'vouchers': ["
-                    vouchersResult.forEach( voucher =>{
-                        result = result +"{'id':'" + voucher.id +  "'," + "'productCode': '" + voucher.productCode + "'}";
-                        if(indexVouchers < vouchersResult.length) {
-                            result = result + ',';
-                            indexVouchers++
-                        }else result = result + "],"
-                    })
+                    var products = "products";
+                    obj[products] = productsResult;
 
-                    result = result + "'tickets': [";
-                    var indexTicket = 1;
-                    ticketsResult.forEach( ticket =>{
-                        result = result +"{'id':'" + ticket.id + "'," + "'date': '" + ticket.date + "'}";
-                        if(indexTicket < ticketsResult.length) {
-                            result = result + ',';
-                            indexTicket++
-                        }else result = result + "],"
-                    })
 
-                    result = result + "'product': [";
-                    var indexProducts = 1;
-                    productsResult.forEach( product =>{
-                        result = result +"{'nameProduct':'" + product.nameProduct + "'," + "'priceProduct': '" + product.priceProduct + "',"+ "'quantity': '" + product.quantity + "'}";
-                        if(indexProducts < productsResult.length) {
-                            result = result + ',';
-                            indexProducts++
-                        }else result = result + "]"
-                    })
-
-                    res.status(200).send({ 'data':result});
+                    res.status(200).send({ 'data':obj});
                     return;
                 })
             })

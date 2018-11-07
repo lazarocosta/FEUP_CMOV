@@ -83,6 +83,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Context packageContext = this;
+        if (item.getItemId() == R.id.mainActivityListTransactionButton) {
+            Intent i = new Intent(packageContext, ListTransactionsActivity.class);
+            System.out.println("inicia");
+
+            startActivity(i);
+            finish();
+        }
         if (item.getItemId() == R.id.mainActivityBuyButton) {
             ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
             ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
