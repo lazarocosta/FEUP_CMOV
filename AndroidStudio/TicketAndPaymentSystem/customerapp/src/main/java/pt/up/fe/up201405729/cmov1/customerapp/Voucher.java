@@ -1,6 +1,8 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
-public class Voucher {
+import java.io.Serializable;
+
+public class Voucher implements Serializable {
     private enum ProductCode {FreeCoffee, Popcorn, Discount}
     private String uuid;
     private ProductCode productCode;

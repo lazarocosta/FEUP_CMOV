@@ -1,6 +1,8 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
-public class Ticket {
+import java.io.Serializable;
+
+public class Ticket implements Serializable {
     private String uuid;
     private String showName;
     private MyDate date;

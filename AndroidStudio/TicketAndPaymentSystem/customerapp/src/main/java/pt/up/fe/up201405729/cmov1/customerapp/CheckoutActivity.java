@@ -25,7 +25,6 @@ import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.SHA256;
 
 public class CheckoutActivity extends AppCompatActivity {
-    public static final String checkoutDataKeyName = "pt.up.fe.up201405729.cmov1.customerapp.CheckoutActivity.checkoutData";
     private CustomerApp app;
     private PerformancesRVAdapter performancesRVAdapter;
 
@@ -41,7 +40,7 @@ public class CheckoutActivity extends AppCompatActivity {
         this.app = (CustomerApp) getApplicationContext();
 
         Intent i = getIntent();
-        CheckoutData checkoutData = (CheckoutData) i.getSerializableExtra(checkoutDataKeyName);
+        CheckoutData checkoutData = (CheckoutData) i.getSerializableExtra(CustomerApp.checkoutDataKeyName);
 
         String totalPrice = StringFormat.formatAsPrice(checkoutData.getTotalPrice());
         ((TextView) findViewById(R.id.checkoutTotalPriceValueTV)).setText(totalPrice);
@@ -66,7 +65,7 @@ public class CheckoutActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.checkoutActivityBuyButton) {
             ArrayList<Performance> performances = performancesRVAdapter.getPerformances();
             ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
-            SharedPreferences preferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
+            SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             String uuid = preferences.getString("uuid", null);
 
             JSONObject buyTicketsData = new JSONObject();
@@ -94,23 +93,24 @@ public class CheckoutActivity extends AppCompatActivity {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");
                 ArrayList<Voucher> vouchers = new ArrayList<>();
-                for (int i = 0; i < jsonVouchers.length(); i++){
+                for (int i = 0; i < jsonVouchers.length(); i++) {
                     JSONObject jsonVoucher = jsonVouchers.getJSONObject(i);
                     Voucher v = new Voucher(jsonVoucher.getString("id"), jsonVoucher.getString("productCode"));
                     vouchers.add(v);
                 }
                 JSONArray jsonTickets = jsonData.getJSONArray("tickets");
                 ArrayList<Ticket> tickets = new ArrayList<>();
-                for (int i = 0; i < jsonTickets.length(); i++){
+                for (int i = 0; i < jsonTickets.length(); i++) {
                     JSONObject jsonTicket = jsonTickets.getJSONObject(i);
                     String id = jsonTicket.getString("id");
-                    String showName = jsonTicket.getString("showName");
+                    String showName = jsonTicket.getString("name");
                     MyDate date = new MyDate(jsonTicket.getString("date"));
                     String roomPlace = jsonTicket.getString("place");
                     Ticket t = new Ticket(id, showName, date, roomPlace);
                     tickets.add(t);
                 }
-                // TODO: store vouchers and tickets
+                FileManager.writeFile(packageContext, CustomerApp.vouchersFilename, vouchers);
+                FileManager.writeFile(packageContext, CustomerApp.ticketsFilename, tickets);
             } catch (JSONException e) {
                 try {
                     Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();

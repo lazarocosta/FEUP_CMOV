@@ -58,7 +58,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
             }
             JSONObject response = RestServices.PUT("/register", registrationData);
-            SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             try {
                 editor.putString("uuid", response.getString("data"));
