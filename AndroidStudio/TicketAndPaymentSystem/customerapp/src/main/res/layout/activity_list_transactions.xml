@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_weight="2"
-            android:text="@string/list_transactions_product_name" />
+            android:text="@string/list_transactions_ticket_name" />
 
         <TextView
             android:id="@+id/listTransactionsTicketPrice"
