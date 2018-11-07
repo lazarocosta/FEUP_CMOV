@@ -19,11 +19,9 @@ import java.util.Collections;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class ListTransactionsActivity extends AppCompatActivity {
-    private ArrayList<TicketBought> ticketsBought;
-    private ArrayList<Voucher> vouchers;
-    private ArrayList<Product> products;
-
-
+    private ArrayList<Ticket> listTickets;
+    private ArrayList<Voucher> listVouchers;
+    private ArrayList<Product> listProducts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +37,6 @@ public class ListTransactionsActivity extends AppCompatActivity {
         String uuid = preferences.getString("uuid", null);
         final Context packageContext = this;
 
-
         JSONObject transactions = new JSONObject();
         try {
             transactions.put("userId", uuid);
@@ -48,14 +45,15 @@ public class ListTransactionsActivity extends AppCompatActivity {
             Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
         }
         JSONObject response = RestServices.PUT("/listTransactionsUser ", transactions);
-        ticketsBought = new ArrayList<>();
+        listTickets = new ArrayList<>();
+        listProducts = new ArrayList<>();
+        listVouchers = new ArrayList<>();
         System.out.println(response);
         try {
-            System.out.println("aqui");
             JSONObject data = response.getJSONObject("data");
-            JSONArray vouchers=  data.getJSONArray("vouchers");
-            JSONArray tickets=  data.getJSONArray("tickets");
-            JSONArray products=  data.getJSONArray("products");
+            JSONArray vouchers = data.getJSONArray("vouchers");
+            JSONArray tickets = data.getJSONArray("tickets");
+            JSONArray products = data.getJSONArray("products");
             System.out.println(products);
             System.out.println(tickets);
             System.out.println(vouchers);
@@ -64,9 +62,23 @@ public class ListTransactionsActivity extends AppCompatActivity {
                 String id = jsonObject.getString("id");
                 String name = jsonObject.getString("name");
                 MyDate date = new MyDate(jsonObject.getString("date"));
-                String showName = jsonObject.getString("place");
-                System.out.println(showName);
-                ticketsBought.add(new TicketBought());
+                String roomPlace = jsonObject.getString("place");
+                listTickets.add(new Ticket(id, name, date, roomPlace));
+            }
+
+            for (int i = 0; i < products.length(); i++) {
+                JSONObject jsonObject = products.getJSONObject(i);
+                String name = jsonObject.getString("nameProduct");
+                int price = jsonObject.getInt("priceProduct");
+                int quantity = jsonObject.getInt("quantity");
+                listProducts.add(new Product(name, price, quantity));
+            }
+
+            for (int i = 0; i < vouchers.length(); i++) {
+                JSONObject jsonObject = vouchers.getJSONObject(i);
+                String productCode = jsonObject.getString("productCode");
+                String id = jsonObject.getString("id");
+                listVouchers.add(new Voucher(id,productCode));
             }
         }catch (JSONException e) {
             System.out.println("erro");
