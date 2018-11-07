@@ -33,7 +33,7 @@ public class ListTransactionsActivity extends AppCompatActivity {
             bar.setTitle("Transactions");
         }
 
-        SharedPreferences preferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         final Context packageContext = this;
 
