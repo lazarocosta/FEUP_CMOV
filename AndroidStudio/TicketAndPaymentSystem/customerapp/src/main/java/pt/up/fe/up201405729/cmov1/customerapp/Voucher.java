@@ -11,7 +11,7 @@ public class Voucher {
             myProductCode = ProductCode.FreeCoffee;
         else if (productCode.equals("popcorn"))
             myProductCode = ProductCode.Popcorn;
-        else if (productCode.equals(""))
+        else if (productCode.equals("5%discountCafeteria"))
             myProductCode = ProductCode.Discount;
         else
             throw new IllegalArgumentException("Invalid product code: " + productCode);
