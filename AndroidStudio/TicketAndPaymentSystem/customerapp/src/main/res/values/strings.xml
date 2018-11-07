@@ -13,7 +13,6 @@
     <string name="performance_price">Price</string>
     <string name="performance_tickets_quantity">Qty:</string>
     <string name="buy_string">BUY</string>
-    <string name="list_transactions_string">Transaction</string>
     <string name="list_transactions_ticket_name">Tickets</string>
     <string name="list_transactions_ticket_price">Price</string>
     <string name="ticketName">name</string>
