@@ -23,21 +23,16 @@ public class TicketRVAdapter  extends RecyclerView.Adapter<TicketRVAdapter.MyVie
     @NonNull
     @Override
     public TicketRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.row,parent,false );
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.row_ticket,parent,false );
         return new MyViewHolder(linearLayout);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Ticket p = tickets.get(position);
-        ((TextView) holder.linearLayout.findViewById(R.id.performanceName)).setText(p.getShowName());
-        ((TextView) holder.linearLayout.findViewById(R.id.performanceDate)).setText(p.getDate().getHumanReadableDate());
-        ((TextView) holder.linearLayout.findViewById(R.id.performancePrice)).setText(p.getRoomPlace());
-        EditText editText = holder.linearLayout.findViewById(R.id.performanceTicketsQuantityET);
-        editText.setText(StringFormat.formatAsInteger(1));
-        editText.setEnabled(false);
-        editText.setBackground(null);
-
+        ((TextView) holder.linearLayout.findViewById(R.id.ticketName)).setText(p.getShowName());
+        ((TextView) holder.linearLayout.findViewById(R.id.ticketDate)).setText(p.getDate().getHumanReadableDate());
+        ((TextView) holder.linearLayout.findViewById(R.id.ticketPrice)).setText(p.getRoomPlace());
     }
 
     @Override
