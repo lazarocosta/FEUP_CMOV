@@ -23,8 +23,6 @@ import java.util.Collections;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String sharedPreferencesKeyName = "pt.up.fe.up201405729.cmov1.customerapp.prefs";
-    private static final String performancesRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.performancesRVAdapter";
     private PerformancesRVAdapter performancesRVAdapter;
 
     @Override
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             bar.setTitle("Dashboard");
         }
 
-        SharedPreferences preferences = getSharedPreferences(sharedPreferencesKeyName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         final Context packageContext = this;
         if (uuid == null) {
@@ -109,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
                 Intent i = new Intent(packageContext, CheckoutActivity.class);
-                i.putExtra(CheckoutActivity.checkoutDataKeyName, checkoutData);
+                i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
                 startActivity(i);
                 finish();
             }
@@ -120,13 +118,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(performancesRVAdapterKeyName, performancesRVAdapter);
+        outState.putSerializable(CustomerApp.performancesRVAdapterKeyName, performancesRVAdapter);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        performancesRVAdapter = (PerformancesRVAdapter) savedInstanceState.get(performancesRVAdapterKeyName);
+        performancesRVAdapter = (PerformancesRVAdapter) savedInstanceState.get(CustomerApp.performancesRVAdapterKeyName);
         ((RecyclerView) findViewById(R.id.performancesRV)).setAdapter(performancesRVAdapter);
     }
 }

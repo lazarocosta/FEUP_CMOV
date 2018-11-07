@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 public class SelectTicketsActivity extends AppCompatActivity {
-    private ArrayList<Ticket> ticketsBought;
+    private ArrayList<Ticket> tickets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +28,8 @@ public class SelectTicketsActivity extends AppCompatActivity {
             bar.setTitle("Select tickets");
         }
 
-        ticketsBought = new ArrayList<>();
-        // Get tickets bought from the database
+        tickets = new ArrayList<>();
+        // Get tickets bought from the device storage
     }
 
 
@@ -46,7 +46,7 @@ public class SelectTicketsActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.selectTicketsActivityFinishButton) {
             String qrCodeContent = generateQRCodeContent();
             Intent i = new Intent(packageContext, ShowQRCodeActivity.class);
-            i.putExtra(ShowQRCodeActivity.qrCodeContentKeyName, qrCodeContent);
+            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
             startActivity(i);
             finish();
         }
@@ -54,11 +54,11 @@ public class SelectTicketsActivity extends AppCompatActivity {
     }
 
     private String generateQRCodeContent() {
-        SharedPreferences preferences = getSharedPreferences(MainActivity.sharedPreferencesKeyName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
         sb.append(uuid);
-        for (Ticket t : ticketsBought)
+        for (Ticket t : tickets)
             sb.append(qrCodeContentDelimiter).append(t.getUuid());
         return sb.toString();
     }

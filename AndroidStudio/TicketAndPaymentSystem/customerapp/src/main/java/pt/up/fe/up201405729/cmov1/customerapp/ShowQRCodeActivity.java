@@ -17,7 +17,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
 public class ShowQRCodeActivity extends AppCompatActivity {
-    public static final String qrCodeContentKeyName = "pt.up.fe.up201405729.cmov1.customerapp.qrCodeContent";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +30,7 @@ public class ShowQRCodeActivity extends AppCompatActivity {
         }
 
         Intent i = getIntent();
-        final String qrCodeContent = i.getStringExtra(qrCodeContentKeyName);
+        final String qrCodeContent = i.getStringExtra(CustomerApp.qrCodeContentKeyName);
         final Context packageContext = this;
         new Thread(new Runnable() {
             @Override

@@ -6,6 +6,12 @@ import android.content.Context;
 import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 
 public class CustomerApp extends Application {
+    public static final String sharedPreferencesKeyName = "pt.up.fe.up201405729.cmov1.customerapp.prefs";
+    public static final String performancesRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.performancesRVAdapter";
+    public static final String qrCodeContentKeyName = "pt.up.fe.up201405729.cmov1.customerapp.qrCodeContent";
+    public static final String checkoutDataKeyName = "pt.up.fe.up201405729.cmov1.customerapp.CheckoutActivity.checkoutData";
+    public static final String vouchersFilename = "pt.up.fe.up201405729.cmov1.customerapp.vouchersFile";
+    public static final String ticketsFilename = "pt.up.fe.up201405729.cmov1.customerapp.ticketsFile";
     private EncryptionManager encryptionManager;
 
     @Override
