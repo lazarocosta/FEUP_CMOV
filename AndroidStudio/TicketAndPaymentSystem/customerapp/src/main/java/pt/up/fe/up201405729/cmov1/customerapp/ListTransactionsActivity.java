@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-public class ListTransactionsActivity extends AppCompatActivity {
+public class ListTransactionsActivity extends NavigableActivity {
     private ArrayList<Ticket> listTickets;
     private ArrayList<Voucher> listVouchers;
     private ArrayList<Product> listProducts;
@@ -32,7 +31,7 @@ public class ListTransactionsActivity extends AppCompatActivity {
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle("Transactions");
+            bar.setTitle(R.string.list_transactions_activity_title);
         }
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);

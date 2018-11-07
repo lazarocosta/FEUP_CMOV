@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -22,7 +21,7 @@ import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends NavigableActivity {
     private PerformancesRVAdapter performancesRVAdapter;
 
     @Override
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle("Dashboard");
+            bar.setTitle(R.string.main_activity_title);
         }
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
@@ -85,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
         Context packageContext = this;
         if (item.getItemId() == R.id.mainActivityListTransactionButton) {
             Intent i = new Intent(packageContext, ListTransactionsActivity.class);
-            System.out.println("inicia");
-
             startActivity(i);
             finish();
         }

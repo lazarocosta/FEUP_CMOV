@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 // TODO: better interface specially for landscape
-public class SelectTicketsActivity extends AppCompatActivity {
+public class SelectTicketsActivity extends NavigableActivity {
     private SelectTicketsRVAdapter selectTicketsRVAdapter;
 
     @Override
@@ -27,7 +26,7 @@ public class SelectTicketsActivity extends AppCompatActivity {
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle("Select tickets");
+            bar.setTitle(R.string.select_tickets_activity_title);
         }
 
         ArrayList<Ticket> tickets = FileManager.readTickets(this);
