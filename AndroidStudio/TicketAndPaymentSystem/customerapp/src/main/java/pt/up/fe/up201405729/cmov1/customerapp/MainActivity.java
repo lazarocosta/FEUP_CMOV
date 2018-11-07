@@ -82,11 +82,6 @@ public class MainActivity extends NavigableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Context packageContext = this;
-        if (item.getItemId() == R.id.mainActivityListTransactionButton) {
-            Intent i = new Intent(packageContext, ListTransactionsActivity.class);
-            startActivity(i);
-            finish();
-        }
         if (item.getItemId() == R.id.mainActivityBuyButton) {
             ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
             ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
