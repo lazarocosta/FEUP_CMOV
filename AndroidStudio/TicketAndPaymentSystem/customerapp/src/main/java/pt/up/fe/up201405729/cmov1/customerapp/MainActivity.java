@@ -54,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
                 JSONArray jsonArray = response.getJSONArray("data");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    Double price = Double.valueOf(jsonObject.getString("price"));
-                    MyDate date = new MyDate(jsonObject.getString("date"));
+                    String id = jsonObject.getString("id");
                     String name = jsonObject.getString("name");
-                    performances.add(new Performance(name, date, price));
+                    MyDate date = new MyDate(jsonObject.getString("date"));
+                    Double price = Double.valueOf(jsonObject.getString("price"));
+                    performances.add(new Performance(id, name, date, price));
                 }
                 Collections.sort(performances);
             } catch (JSONException e) {

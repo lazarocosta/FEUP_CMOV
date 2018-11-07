@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 public class SelectTicketsActivity extends AppCompatActivity {
-    private ArrayList<TicketBought> ticketsBought;
+    private ArrayList<Ticket> ticketsBought;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class SelectTicketsActivity extends AppCompatActivity {
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
         sb.append(uuid);
-        for (TicketBought t : ticketsBought)
+        for (Ticket t : ticketsBought)
             sb.append(qrCodeContentDelimiter).append(t.getUuid());
         return sb.toString();
     }

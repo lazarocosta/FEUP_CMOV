@@ -3,6 +3,7 @@
     package="pt.up.fe.up201405729.cmov1.customerapp">
 
     <application
+        android:name=".CustomerApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

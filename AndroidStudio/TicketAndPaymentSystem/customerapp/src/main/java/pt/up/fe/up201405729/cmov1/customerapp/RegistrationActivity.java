@@ -19,6 +19,7 @@ import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class RegistrationActivity extends AppCompatActivity {
+    private CustomerApp app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,7 @@ public class RegistrationActivity extends AppCompatActivity {
         if (bar != null) {
             bar.setTitle("New user");
         }
+        this.app = (CustomerApp) getApplicationContext();
     }
 
     @Override
@@ -45,8 +47,7 @@ public class RegistrationActivity extends AppCompatActivity {
             // TODO: check input data?
             JSONObject registrationData = new JSONObject();
             try {
-                EncryptionManager encryptionManager = new EncryptionManager(packageContext);    // shouldn't be created here
-                registrationData.put("publicKey", encryptionManager.getPublicKey());
+                registrationData.put("publicKey", app.getEncryptionManager().getPublicKey());
                 registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
                 registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());
                 registrationData.put("creditCardType", ((EditText) findViewById(R.id.registrationCreditCardTypeET)).getText().toString());
