@@ -26,12 +26,10 @@ public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAd
         this.areQuantitiesEditable = areQuantitiesEditable;
     }
 
-
-
     @NonNull
     @Override
     public PerformancesRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.row, parent, false);
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.row_performances_rv, parent, false);
         return new MyViewHolder(linearLayout);
     }
 

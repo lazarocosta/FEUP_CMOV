@@ -1,11 +1,9 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
@@ -15,11 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-public class ListTransactionsActivity extends AppCompatActivity {
+public class ListTransactionsActivity extends NavigableActivity {
     private ArrayList<Ticket> listTickets;
     private ArrayList<Voucher> listVouchers;
     private ArrayList<Product> listProducts;
@@ -34,7 +31,7 @@ public class ListTransactionsActivity extends AppCompatActivity {
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
-            bar.setTitle("Transactions");
+            bar.setTitle(R.string.list_transactions_activity_title);
         }
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
@@ -67,10 +64,11 @@ public class ListTransactionsActivity extends AppCompatActivity {
             for (int i = 0; i < tickets.length(); i++) {
                 JSONObject jsonObject = tickets.getJSONObject(i);
                 String id = jsonObject.getString("id");
+                String performanceId = jsonObject.getString("performanceId");
                 String name = jsonObject.getString("name");
                 MyDate date = new MyDate(jsonObject.getString("date"));
                 String roomPlace = jsonObject.getString("place");
-                listTickets.add(new Ticket(id, name, date, roomPlace));
+                listTickets.add(new Ticket(id, performanceId, name, date, roomPlace));
             }
 
             for (int i = 0; i < products.length(); i++) {

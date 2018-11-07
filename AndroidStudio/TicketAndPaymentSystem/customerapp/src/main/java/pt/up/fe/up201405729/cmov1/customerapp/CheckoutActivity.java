@@ -92,25 +92,26 @@ public class CheckoutActivity extends AppCompatActivity {
             try {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");
-                ArrayList<Voucher> vouchers = new ArrayList<>();
+                ArrayList<Voucher> vouchers = FileManager.readVouchers(packageContext);
                 for (int i = 0; i < jsonVouchers.length(); i++) {
                     JSONObject jsonVoucher = jsonVouchers.getJSONObject(i);
                     Voucher v = new Voucher(jsonVoucher.getString("id"), jsonVoucher.getString("productCode"));
                     vouchers.add(v);
                 }
                 JSONArray jsonTickets = jsonData.getJSONArray("tickets");
-                ArrayList<Ticket> tickets = new ArrayList<>();
+                ArrayList<Ticket> tickets = FileManager.readTickets(packageContext);
                 for (int i = 0; i < jsonTickets.length(); i++) {
                     JSONObject jsonTicket = jsonTickets.getJSONObject(i);
                     String id = jsonTicket.getString("id");
+                    String performanceId = jsonTicket.getString("performanceId");
                     String showName = jsonTicket.getString("name");
                     MyDate date = new MyDate(jsonTicket.getString("date"));
                     String roomPlace = jsonTicket.getString("place");
-                    Ticket t = new Ticket(id, showName, date, roomPlace);
+                    Ticket t = new Ticket(id, performanceId, showName, date, roomPlace);
                     tickets.add(t);
                 }
-                FileManager.writeFile(packageContext, CustomerApp.vouchersFilename, vouchers);
-                FileManager.writeFile(packageContext, CustomerApp.ticketsFilename, tickets);
+                FileManager.writeVouchers(packageContext, vouchers);
+                FileManager.writeTickets(packageContext, tickets);
             } catch (JSONException e) {
                 try {
                     Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();

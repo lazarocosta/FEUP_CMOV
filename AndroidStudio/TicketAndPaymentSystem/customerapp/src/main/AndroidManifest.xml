@@ -22,7 +22,8 @@
         <activity android:name=".ShowQRCodeActivity" />
         <activity android:name=".QRCodeValidatedActivity" />
         <activity android:name=".ListTransactionsActivity" />
-        <activity android:name=".SelectTicketsActivity"></activity>
+        <activity android:name=".SelectTicketsActivity" />
+        <activity android:name=".NavigableActivity" />
     </application>
 
 </manifest>

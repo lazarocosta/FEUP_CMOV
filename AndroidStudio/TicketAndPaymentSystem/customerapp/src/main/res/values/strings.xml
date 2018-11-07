@@ -30,4 +30,11 @@
     <string name="checkout_total_price_string">Total price: </string>
     <string name="checkout_total_price_example_string">€0</string>
     <string name="finish_string">FINISH</string>
+    <string name="select_tickets_show_name">Show name</string>
+    <string name="select_tickets_show_date">Show date</string>
+    <string name="select_tickets_room_place">Room place</string>
+    <string name="select_tickets_room_place_msg">Room place: </string>
+    <string name="main_activity_title">Dashboard</string>
+    <string name="select_tickets_activity_title">Select tickets</string>
+    <string name="list_transactions_activity_title">Transactions</string>
 </resources>

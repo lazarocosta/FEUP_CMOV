@@ -4,12 +4,14 @@ import java.io.Serializable;
 
 public class Ticket implements Serializable {
     private String uuid;
+    private String performanceId;
     private String showName;
     private MyDate date;
     private String roomPlace;
 
-    public Ticket(String uuid, String showName, MyDate date, String roomPlace) {
+    public Ticket(String uuid, String performanceId, String showName, MyDate date, String roomPlace) {
         this.uuid = uuid;
+        this.performanceId = performanceId;
         this.showName = showName;
         this.date = date;
         this.roomPlace = roomPlace;
@@ -17,6 +19,10 @@ public class Ticket implements Serializable {
 
     public String getUuid() {
         return uuid;
+    }
+
+    public String getPerformanceId() {
+        return performanceId;
     }
 
     public String getShowName() {
