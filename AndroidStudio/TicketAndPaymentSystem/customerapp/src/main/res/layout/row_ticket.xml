@@ -6,24 +6,41 @@
     android:layout_height="wrap_content"
     android:padding="4dp">
 
-    <TextView
-        android:id="@+id/ticketName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/ticketName" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/ticketPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/ticketPrice" />
+        <TextView
+            android:id="@+id/ticketName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/ticketName"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/ticketQuantity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/ticketQuantity" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/ticketDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/ticketDate" />
+
+            <TextView
+                android:id="@+id/ticketPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:singleLine="true"
+                android:text="@string/ticketPrice"
+                android:textAlignment="textEnd" />
+        </TableRow>
+
+    </LinearLayout>
+
 </LinearLayout>
