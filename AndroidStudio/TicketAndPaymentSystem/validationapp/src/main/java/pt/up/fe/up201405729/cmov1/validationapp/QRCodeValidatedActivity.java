@@ -1,4 +1,4 @@
-package pt.up.fe.up201405729.cmov1.customerapp;
+package pt.up.fe.up201405729.cmov1.validationapp;
 
 import android.content.Context;
 import android.content.Intent;

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,14 +63,12 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
         }
-        JSONObject response = RestServices.GET("/validTicket", validationData);
+        JSONObject response = RestServices.GET("/validTickets", validationData);
         try {
-            JSONArray data = response.getJSONArray("data");
-            for (int i = 0; i < data.length(); i++) {
-                JSONObject jsonObject = data.getJSONObject(i);
-                String id = jsonObject.getString("id");
-                String state = jsonObject.getString("state");
-            }
+            response.getString("data");   // If no exception is thrown, the returned value should be "true".
+            Intent i = new Intent(packageContext, QRCodeValidatedActivity.class);
+            startActivity(i);
+            finish();
         } catch (JSONException e) {
             try {
                 Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
@@ -79,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
                 e1.printStackTrace();
                 Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
             }
+            Intent i = new Intent(packageContext, MainActivity.class);
+            startActivity(i);
+            finish();
         }
     }
 }
