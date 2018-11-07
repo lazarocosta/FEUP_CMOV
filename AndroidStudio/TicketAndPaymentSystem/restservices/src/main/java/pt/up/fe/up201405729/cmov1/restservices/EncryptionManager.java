@@ -23,7 +23,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -74,8 +73,7 @@ public class EncryptionManager {
 
     public String encryptString(String decryptedString) {
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(keyAlias, null);
-            PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
+            PublicKey publicKey = keyStore.getCertificate(keyAlias).getPublicKey();
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -93,7 +91,7 @@ public class EncryptionManager {
     public String decryptString(String encryptedString) {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(keyAlias, null);
-            PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, null);
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             CipherInputStream cipherInputStream = new CipherInputStream(new ByteArrayInputStream(Base64.decode(encryptedString, Base64.DEFAULT)), cipher);
@@ -119,10 +117,9 @@ public class EncryptionManager {
 
     public String getPublicKey() {
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(keyAlias, null);
-            PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
+            PublicKey publicKey = keyStore.getCertificate(keyAlias).getPublicKey();
             return publicKey.toString();
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
+        } catch (KeyStoreException e) {
             e.printStackTrace();
             return null;
         }
