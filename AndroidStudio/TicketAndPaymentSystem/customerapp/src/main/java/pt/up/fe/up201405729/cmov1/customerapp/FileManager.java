@@ -45,9 +45,8 @@ public class FileManager {
             FileInputStream fis = context.openFileInput(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Ticket> tickets = new ArrayList<>();
-            Ticket t;
-            while ((t = (Ticket) ois.readObject()) != null)
-                tickets.add(t);
+            while (ois.available() > 0)
+                tickets.add((Ticket) ois.readObject());
             ois.close();
             fis.close();
             return tickets;
@@ -63,9 +62,8 @@ public class FileManager {
             FileInputStream fis = context.openFileInput(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Voucher> vouchers = new ArrayList<>();
-            Voucher v;
-            while ((v = (Voucher) ois.readObject()) != null)
-                vouchers.add(v);
+            while (ois.available() > 0)
+                vouchers.add((Voucher) ois.readObject());
             ois.close();
             fis.close();
             return vouchers;
