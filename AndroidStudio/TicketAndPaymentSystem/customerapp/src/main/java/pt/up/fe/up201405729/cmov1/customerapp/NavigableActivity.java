@@ -6,17 +6,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 public class NavigableActivity extends AppCompatActivity {
     private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setHomeButtonEnabled(true);
+            bar.setDisplayShowHomeEnabled(true);
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
         final Context packageContext = this;
         navigationView = findViewById(R.id.navigationView);
+        drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -48,5 +58,22 @@ public class NavigableActivity extends AppCompatActivity {
             navigationView.setCheckedItem(R.id.listTransactionsActivityNavButton);
         else
             System.err.println("This statement should not be reached.");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (drawerLayout.isDrawerOpen(navigationView))
+                drawerLayout.closeDrawer(navigationView);
+            else
+                drawerLayout.openDrawer(navigationView);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        drawerLayout.closeDrawer(navigationView);
     }
 }
