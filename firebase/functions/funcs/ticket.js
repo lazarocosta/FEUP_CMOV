@@ -11,10 +11,11 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-//"ticketId1" : "45d2cb30-e2c4-11e8-ae33-a914b344eca7",
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTicket --data ' { "tickets":{"ticketId1" : "45d2cb30-e2c4-11e8-ae33-a914b344eca7", "ticket2":"45d25600-e2c4-11e8-ae33-a914b344eca7"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e2c9-11e8-8f21-b3cacf712523"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
 */
-const validTicket = functions.https.onRequest((req, res) => {
+const validTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
         const tickets = req.body.tickets;
@@ -24,6 +25,10 @@ const validTicket = functions.https.onRequest((req, res) => {
             res.status(200).send({ 'error': "Please enter a tickets."});
             return;
         }
+        if (tickets.length==0){
+            res.status(200).send({ 'error': "Empty tickets array."});
+            return;
+        }
 
         if(!userId) {
             res.status(200).send({ 'error': "Please enter a userId."});
@@ -31,7 +36,7 @@ const validTicket = functions.https.onRequest((req, res) => {
         }
         var listTickets = [];
         var resultTickets = []
-        var performaceIdGeral="";
+        var performanceIdGeral="";
         var allValidated= true;
 
         for (ticket in tickets) {
@@ -46,15 +51,18 @@ const validTicket = functions.https.onRequest((req, res) => {
         })
         return Promise.all(promises)
         .then(snapshot => {
+            if(snapshot.length==0){
+                res.status(200).send({ 'error': "User or tickets not found."});
+                return;
+            }
             snapshot.forEach(ticketdoc => {
                 const state = ticketdoc.data().state;
-                const performaceId = ticketdoc.data().performaceId;
-                if(performaceIdGeral==""){
-                    performaceIdGeral= performaceId
-                    console.log('primeiro')
+                const performanceId = ticketdoc.data().performanceId;
+                if(performanceIdGeral==""){
+                    performanceIdGeral= performanceId
                 }
                 else{
-                    if(performaceIdGeral!= performaceId){
+                    if(performanceIdGeral!= performanceId){
                     allValidated= false;
                         res.status(200).send({ 'error':'tickets not of the same performance'});
                         return;
@@ -78,7 +86,6 @@ const validTicket = functions.https.onRequest((req, res) => {
                     },{merge:true}) 
                 })
             }
-            console.log("aqui2")
             res.status(200).send({ 'data':true});
             return;
         })
@@ -100,7 +107,7 @@ Output: JSON with result value
 Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f"}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -202,7 +209,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
                             state: state,
                             name:ticketGeral.name,
                             place:place,
-                            performaceId:ticketGeral.id
+                            performanceId:ticketGeral.id
                         };
                         resultTickets.push(ticket);
                         
@@ -277,7 +284,7 @@ const listTickets = functions.https.onRequest((req, res) => {
 })
 
 module.exports = {
-    validTicket,
+    validTickets,
     buyTickets,
     listTickets,
 }

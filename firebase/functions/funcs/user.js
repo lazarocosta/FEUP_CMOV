@@ -423,7 +423,7 @@ Function to list Tickets Of User
 Parameters: username -> the USER name
 Output: JSON with 
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTicketsNotUsed --data ' {"userId":"c2345b70-e14e-11e8-b90b-6368751702e3" }' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTicketsNotUsed --data ' {"userId":"57900f70-e1d6-11e8-a855-57782ab5d15f" }' -g -H "Content-Type: application/json"
 */
 
 const listTicketsNotUsed = functions.https.onRequest((req, res) => {
@@ -440,6 +440,7 @@ const listTicketsNotUsed = functions.https.onRequest((req, res) => {
                         name: ticketdoc.data().name,
                         date: ticketdoc.data().date,
                         place: ticketdoc.data().place,
+                        performanceId: ticketdoc.data().performanceId,performaceId
                     }
                     result.push(ticket);
                 }   
@@ -481,6 +482,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                         name: ticketdoc.data().name,
                         date: ticketdoc.data().date,
                         place: ticketdoc.data().place,
+                        performanceId: ticketdoc.data().performanceId,
                     }
                     ticketsResult.push(ticket);
                 }   

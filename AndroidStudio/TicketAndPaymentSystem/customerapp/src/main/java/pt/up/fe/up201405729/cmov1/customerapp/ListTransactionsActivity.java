@@ -20,7 +20,10 @@ public class ListTransactionsActivity extends NavigableActivity {
     private ArrayList<Ticket> listTickets;
     private ArrayList<Voucher> listVouchers;
     private ArrayList<Product> listProducts;
-    private TicketRVAdapter ticketsRVAdapter;
+    private TicketsRVAdapter ticketsRVAdapter;
+    private ProductsRVAdapter productsRVAdapter;
+    private VouchersRVAdapter vouchersRVAdapter;
+
     private CustomerApp app;
 
 
@@ -61,6 +64,7 @@ public class ListTransactionsActivity extends NavigableActivity {
             System.out.println(products);
             System.out.println(tickets);
             System.out.println(vouchers);
+
             for (int i = 0; i < tickets.length(); i++) {
                 JSONObject jsonObject = tickets.getJSONObject(i);
                 String id = jsonObject.getString("id");
@@ -70,7 +74,7 @@ public class ListTransactionsActivity extends NavigableActivity {
                 String roomPlace = jsonObject.getString("place");
                 listTickets.add(new Ticket(id, performanceId, name, date, roomPlace));
             }
-
+            System.out.println("aqui");
             for (int i = 0; i < products.length(); i++) {
                 JSONObject jsonObject = products.getJSONObject(i);
                 String name = jsonObject.getString("nameProduct");
@@ -78,6 +82,7 @@ public class ListTransactionsActivity extends NavigableActivity {
                 int quantity = jsonObject.getInt("quantity");
                 listProducts.add(new Product(name, price, quantity));
             }
+
 
             for (int i = 0; i < vouchers.length(); i++) {
                 JSONObject jsonObject = vouchers.getJSONObject(i);
@@ -96,9 +101,21 @@ public class ListTransactionsActivity extends NavigableActivity {
         }
 
         RecyclerView ticketsRV = findViewById(R.id.ticketsRecyclerView);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
-        ticketsRV.setLayoutManager(gridLayoutManager);
-        ticketsRVAdapter = new TicketRVAdapter(listTickets);
+        GridLayoutManager gridLayoutManagerTickets = new GridLayoutManager(this, 1);
+        ticketsRV.setLayoutManager(gridLayoutManagerTickets);
+        ticketsRVAdapter = new TicketsRVAdapter(listTickets);
         ticketsRV.setAdapter(ticketsRVAdapter);
+
+        RecyclerView productRV = findViewById(R.id.productsRecyclerView);
+        GridLayoutManager gridLayoutManagerProduct = new GridLayoutManager(this, 1);
+        productRV.setLayoutManager(gridLayoutManagerProduct);
+        productsRVAdapter = new ProductsRVAdapter(listProducts);
+        productRV.setAdapter(productsRVAdapter);
+
+        RecyclerView voucherRV = findViewById(R.id.vouchersRecyclerView);
+        GridLayoutManager gridLayoutManagerVouchers = new GridLayoutManager(this, 1);
+        voucherRV.setLayoutManager(gridLayoutManagerVouchers);
+        vouchersRVAdapter = new VouchersRVAdapter(listVouchers);
+        voucherRV.setAdapter(vouchersRVAdapter);
     }
 }

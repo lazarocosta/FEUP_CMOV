@@ -28,4 +28,8 @@ public class Voucher implements Serializable {
     public ProductCode getProductCode() {
         return productCode;
     }
+
+    public String productCodeToString(){
+        return this.productCode.toString();
+    }
 }

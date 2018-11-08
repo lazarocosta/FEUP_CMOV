@@ -18,11 +18,14 @@
     <string name="ticketName">name</string>
     <string name="ticketPrice">price</string>
     <string name="ticketDate">date</string>
-
     <string name="list_transactions_voucher">Product Code of Vouchers </string>
+    <string name="voucher">Voucher</string>
     <string name="list_transactions_product_name">Products</string>
     <string name="list_transactions_product_price">Price</string>
     <string name="list_transactions_product_quantity">Quantity</string>
+    <string name="productName">Product</string>
+    <string name="productPrice">Price</string>
+    <string name="productQuantity">Quantity</string>
     <string name="zero_value">0</string>
     <string name="qr_code_image_view_description">QR code image</string>
     <string name="qr_code_tv_message">Please, show the QR code to the validator:</string>

@@ -30,13 +30,7 @@ public class MyDate implements Comparable<MyDate>, Serializable {
             Matcher m = r.matcher(date.toString());
             Matcher m2 = r2.matcher(date.toString());
 
-            if(m.find() && m2.find() ) {
-                this.resultDate= m.group() + " " + m2.group();
-                System.out.println(this.resultDate);
-            }else {
-                this.resultDate = "";
-                System.out.println("data mal");
-            }
+            this.resultDate= m.group() + " " + m2.group();
 
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
@@ -55,9 +49,6 @@ public class MyDate implements Comparable<MyDate>, Serializable {
     }
 
     public String getHumanReadableDate() {
-     if(!this.resultDate.equals("")){
-            return this.resultDate;
-        } else 
-            return date.toString();
+        return this.resultDate;
     }
 }
