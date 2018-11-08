@@ -1,5 +1,6 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,13 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import java.util.Calendar;
+
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class RegistrationActivity extends AppCompatActivity {
@@ -31,6 +35,31 @@ public class RegistrationActivity extends AppCompatActivity {
             bar.setTitle("New user");
         }
         this.app = (CustomerApp) getApplicationContext();
+
+        final EditText creditCardValidity = findViewById(R.id.registrationCreditCardValidityET);
+        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                creditCardValidity.setText(StringFormat.formatAsDate(year, month, dayOfMonth));
+            }
+        };
+        Calendar calendar = Calendar.getInstance();
+        final DatePickerDialog datePicker = new DatePickerDialog(this, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        creditCardValidity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus)
+                    datePicker.show();
+                else
+                    datePicker.hide();
+            }
+        });
+        creditCardValidity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePicker.show();
+            }
+        });
     }
 
     @Override
