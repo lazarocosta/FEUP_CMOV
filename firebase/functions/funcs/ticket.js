@@ -91,7 +91,7 @@ const validTickets = functions.https.onRequest((req, res) => {
         })
         .catch(error =>  {
             console.error("Error: ", error);
-            res.status(200).send({ 'error':"error"});
+            res.status(200).send({ 'error':"An error occurred."});
             return;
         });
     });

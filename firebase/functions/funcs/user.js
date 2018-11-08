@@ -27,7 +27,6 @@ const register = functions.https.onRequest((req, res) => {
         const creditCardNumber = req.body.creditCardNumber;
         const creditCardValidity = req.body.creditCardValidity;
 
-
         if(!publicKey) {
             res.status(200).send({ 'error': "Please enter a publicKey."});
             return;
@@ -73,21 +72,29 @@ const register = functions.https.onRequest((req, res) => {
             id:id,
         };
         var adduser;
+        var errorOccurred= "Could not create user!"
         admin.firestore().collection('customer').doc(id).set(user)
         .then(function() {
 
             const number = parseInt(creditCardNumber);
             var myDate = new Date(creditCardValidity);
-            promises = []
+            promises = [];
+            var datenow =  Date.now();
+
 
             if(isNaN(number)|| isNaN(myDate.getMonth())) {
                 adduser= false;
-                var p = admin.firestore().collection('customer').doc(id).delete()
-                promises.push(p)
-                res.status(200).send({ 'error':"creditCardNumber not is number or the validity is not a date"});
-                console.error("creditCardNumber not is number or the validity is not a date: ");
+                admin.firestore().collection('customer').doc(id).delete()
+                errorOccurred ="creditCardNumber not is number or the validity is not a date";
                 return;
-            }else {
+            }
+            if(datenow - myDate > 0) {
+                adduser= false;
+                admin.firestore().collection('customer').doc(id).delete()
+                errorOccurred ="Expired card validity.";
+                return;
+            }
+            else {
                 const p =  admin.firestore().collection('customer').doc(id).collection('creditCard').add({
                         type: creditCardType,
                         number: number,
@@ -95,8 +102,8 @@ const register = functions.https.onRequest((req, res) => {
                         valueSpentMod100: 0,
 
                         })
-                    promises.push(p);
-                    adduser= true;
+                promises.push(p);
+                adduser= true;
             }
             return Promise.all(promises)
         })
@@ -105,7 +112,7 @@ const register = functions.https.onRequest((req, res) => {
                 res.status(200).send({ 'data':id});
                 return 
             }else {
-                res.status(200).send({ 'error':'Could not create user!'});
+                res.status(200).send({ 'error':errorOccurred});
                 return
             }
         })
@@ -116,79 +123,6 @@ const register = functions.https.onRequest((req, res) => {
     });
 });
 
-
-/**
-Function to login a participant
-Parameters: username -> the USER name
-	    password ->the password of the user
-Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
-TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/login --data ' { "name" : "manuel", "password":"TESTE"}' -g -H "Content-Type: application/json"
-*/
-
-const login = functions.https.onRequest((req, res) => {
-    return  cors(req, res, () => {
-
-        const name = req.body.name;
-        const password = req.body.password;
-
-        if(!name){
-            res.status(200).send({ 'error':"Please enter a name."});
-            return;
-        }
-
-        if(!password){
-            res.status(200).send({ 'error':"Please enter a password."});
-            return;
-        }
-
-        var usersRef = admin.firestore().collection('customer');
-
-        usersRef.where('name', '==', name).get()
-            .then(snapshot => {
-                if(snapshot.size > 1){
-                    res.status(200).send({ 'error':"Invalid name|password"});
-                    return;
-                }
-                if(snapshot.size < 1){
-                    res.status(200).send({ 'error':"Invalid name|password"});
-                    return;
-                }
-                snapshot.forEach(doc => {
-
-                    var userPass = doc.data().password;
-
-                    var hash = crypto.createHash('sha256').update(password).digest('base64');
-
-                    //if password matches, generate token, save it in db and send it
-                    if(hash === userPass) {
-
-                        const uidGen = new UIDGenerator(256, UIDGenerator.BASE62);
-                        const token = uidGen.generateSync().toString();
-                        const date = new Date().toString();
-
-                        admin.firestore().collection('sessions').add({
-                            name: name,
-                            token: token,
-                            date: date
-                        });
-
-                        res.status(200).send({ 'data': token });
-
-                    } else {
-                        res.status(200).send({ 'error':"Invalid name/password."});
-                    }
-                });
-                return;
-            })
-            .catch(err => {
-                console.log(err);
-                res.status(200).send({ 'error':"Invalid name|password."});
-                return;
-            });
-
-    });
-});
 
 
 /**
@@ -605,7 +539,6 @@ function addProductUser(userId, lisproducts){
 
 module.exports={
     register,
-    login,
     payOrder,
     listTicketsNotUsed,
     listTransactionsUser,
