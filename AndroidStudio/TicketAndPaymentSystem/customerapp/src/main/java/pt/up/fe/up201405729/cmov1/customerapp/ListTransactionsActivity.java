@@ -51,7 +51,7 @@ public class ListTransactionsActivity extends NavigableActivity {
             e.printStackTrace();
             Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
         }
-        JSONObject response = RestServices.PUT("/listTransactionsUser ", transactions);
+        JSONObject response = RestServices.PUT("/listTransactionsUser", transactions);
         listTickets = new ArrayList<>();
         listProducts = new ArrayList<>();
         listVouchers = new ArrayList<>();
@@ -72,7 +72,8 @@ public class ListTransactionsActivity extends NavigableActivity {
                 String name = jsonObject.getString("name");
                 MyDate date = new MyDate(jsonObject.getString("date"));
                 String roomPlace = jsonObject.getString("place");
-                listTickets.add(new Ticket(id, performanceId, name, date, roomPlace));
+                String state = jsonObject.getString("state");
+                listTickets.add(new Ticket(id, performanceId, name, date, roomPlace, state));
             }
             System.out.println("aqui");
             for (int i = 0; i < products.length(); i++) {
@@ -88,7 +89,8 @@ public class ListTransactionsActivity extends NavigableActivity {
                 JSONObject jsonObject = vouchers.getJSONObject(i);
                 String productCode = jsonObject.getString("productCode");
                 String id = jsonObject.getString("id");
-                listVouchers.add(new Voucher(id,productCode));
+                String state = jsonObject.getString("state");
+                listVouchers.add(new Voucher(id,productCode,state));
             }
         }catch (JSONException e) {
             System.out.println("erro");

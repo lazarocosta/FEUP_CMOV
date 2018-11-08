@@ -12,11 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 // TODO: better interface specially for landscape
 public class SelectTicketsActivity extends NavigableActivity {
+    private ArrayList<Ticket> allTickets;
     private SelectTicketsRVAdapter selectTicketsRVAdapter;
 
     @Override
@@ -29,11 +31,16 @@ public class SelectTicketsActivity extends NavigableActivity {
             bar.setTitle(R.string.select_tickets_activity_title);
         }
 
-        ArrayList<Ticket> tickets = FileManager.readTickets(this);
+        allTickets = FileManager.readTickets(this);
+        ArrayList<Ticket> selectableTickets = new ArrayList<>();
+        for (Ticket t : allTickets)
+            if (t.getState() == Ticket.State.notUsed)
+                selectableTickets.add(t);
+
         RecyclerView selectTicketsRV = findViewById(R.id.selectTicketsRV);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
         selectTicketsRV.setLayoutManager(gridLayoutManager);
-        selectTicketsRVAdapter = new SelectTicketsRVAdapter(tickets, this);
+        selectTicketsRVAdapter = new SelectTicketsRVAdapter(selectableTickets, this);
         selectTicketsRV.setAdapter(selectTicketsRVAdapter);
     }
 
@@ -48,6 +55,7 @@ public class SelectTicketsActivity extends NavigableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.selectTicketsActivityFinishButton) {
             String qrCodeContent = generateQRCodeContent();
+            markSelectedTicketsAsUsed();
             Intent i = new Intent(this, ShowQRCodeActivity.class);
             i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
             startActivity(i);
@@ -64,5 +72,13 @@ public class SelectTicketsActivity extends NavigableActivity {
         for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
             sb.append(qrCodeContentDelimiter).append(t.getUuid());
         return sb.toString();
+    }
+
+    private void markSelectedTicketsAsUsed() {
+        HashSet<Ticket> selectedTickets = selectTicketsRVAdapter.getSelectedTickets();
+        for (Ticket t : allTickets)
+            if (selectedTickets.contains(t))
+                t.setState(Ticket.State.used);
+        FileManager.writeTickets(this, allTickets);
     }
 }

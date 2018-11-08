@@ -95,7 +95,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 ArrayList<Voucher> vouchers = FileManager.readVouchers(packageContext);
                 for (int i = 0; i < jsonVouchers.length(); i++) {
                     JSONObject jsonVoucher = jsonVouchers.getJSONObject(i);
-                    Voucher v = new Voucher(jsonVoucher.getString("id"), jsonVoucher.getString("productCode"));
+                    String id = jsonVoucher.getString("id");
+                    String productCode = jsonVoucher.getString("productCode");
+                    String state = jsonVoucher.getString("state");
+                    Voucher v = new Voucher(id, productCode, state);
                     vouchers.add(v);
                 }
                 JSONArray jsonTickets = jsonData.getJSONArray("tickets");
@@ -107,7 +110,8 @@ public class CheckoutActivity extends AppCompatActivity {
                     String showName = jsonTicket.getString("name");
                     MyDate date = new MyDate(jsonTicket.getString("date"));
                     String roomPlace = jsonTicket.getString("place");
-                    Ticket t = new Ticket(id, performanceId, showName, date, roomPlace);
+                    String state = jsonTicket.getString("state");
+                    Ticket t = new Ticket(id, performanceId, showName, date, roomPlace, state);
                     tickets.add(t);
                 }
                 FileManager.writeVouchers(packageContext, vouchers);
