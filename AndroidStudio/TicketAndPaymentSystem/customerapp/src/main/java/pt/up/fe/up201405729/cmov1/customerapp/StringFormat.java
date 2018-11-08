@@ -1,5 +1,6 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 public class StringFormat {
@@ -15,5 +16,14 @@ public class StringFormat {
 
     public static String formatAsDate(int year, int month, int day){
         return String.format(locale, "%04d-%02d-%02d", year, month, day);
+    }
+
+    public static String formatAsDateHourMinute(Calendar calendar){
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int hour = calendar.get(Calendar.HOUR);
+        final int minute = calendar.get(Calendar.MINUTE);
+        return String.format(locale, "%04d-%02d-%02d %02d:%02d", year, month, day, hour, minute);
     }
 }
