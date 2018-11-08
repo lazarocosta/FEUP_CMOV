@@ -12,4 +12,8 @@ public class StringFormat {
     public static String formatAsInteger(Integer value){
         return String.format(locale, "%d", value);
     }
+
+    public static String formatAsDate(int year, int month, int day){
+        return String.format(locale, "%04d-%02d-%02d", year, month, day);
+    }
 }
