@@ -59,4 +59,8 @@ public class QRCodeValidatedActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+    @Override
+    public void onBackPressed() {
+    }
 }

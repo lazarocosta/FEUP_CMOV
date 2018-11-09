@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -21,6 +22,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setTitle("Validator");
+            bar.hide();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         try {
             Intent i = new Intent("com.google.zxing.client.android.SCAN");
             i.putExtra("SCAN_MODE", "QR_CODE_MODE");

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ValidationApp</string>
+    <string name="start_qr_code_reader_msg">Starting QR code reader&#8230;</string>
 </resources>
