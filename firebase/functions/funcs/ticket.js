@@ -1,7 +1,5 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
-const UIDGenerator = require('uid-generator');
 const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
 const random = require('random')
@@ -11,9 +9,9 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "c53151b0-e415-11e8-82ca-35782305cc78", "tick":"349bcf80-e416-11e8-82ca-35782305cc78", "ticket3":"08c7ded0-e416-11e8-82ca-35782305cc78"}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e2c9-11e8-8f21-b3cacf712523"}, "userId":"c2345b70-e14e-11e8-b90b-6368751702e3"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e2c9-11e8-8f21-b3cacf712523"}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
 */
 const validTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -22,10 +20,10 @@ const validTickets = functions.https.onRequest((req, res) => {
         const userId = req.body.userId;
 
         if(!tickets) {
-            res.status(200).send({ 'error': "Please enter a tickets."});
+            res.status(200).send({'error': "Please enter a tickets."});
             return;
         }
-        if (tickets.length==0){
+        if (tickets.length == 0){
             res.status(200).send({ 'error': "Empty tickets array."});
             return;
         }
@@ -36,61 +34,43 @@ const validTickets = functions.https.onRequest((req, res) => {
         }
         var listTickets = [];
         var resultTickets = []
-        var performanceIdGeral="";
-        var allValidated= true;
+        var performanceIdGeral;
+        var usersRef = admin.firestore().collection('customer');
 
         for (ticket in tickets) {
             listTickets.push(tickets[ticket])
         }
+        if(listTickets.length>4){
+            res.status(200).send({ 'error':"Can only validate 4 tickets"});
+            return; 
+        }
 
-        var promises = []
-        var usersRef = admin.firestore().collection('customer');
-        listTickets.forEach(ticket => {
-            const p=usersRef.doc(userId).collection('ticket').doc(ticket).get()
-            promises.push(p)
-        })
-        return Promise.all(promises)
-        .then(snapshot => {
-            if(snapshot.length==0){
-                res.status(200).send({ 'error': "User or tickets not found."});
+        validTicketsAuxiliary(listTickets, userId).then(result=>{
+            console.log(result)
+           if(result.performanceIdGeral==undefined){
+                res.status(200).send({ 'error':result});
                 return;
-            }
-            snapshot.forEach(ticketdoc => {
-                const state = ticketdoc.data().state;
-                const performanceId = ticketdoc.data().performanceId;
-                if(performanceIdGeral==""){
-                    performanceIdGeral= performanceId
+           }
+           performanceIdGeral =  result.performanceIdGeral;
+           resultTickets = result.resultTickets;
+           pastEvent(performanceIdGeral).then(result=>{
+               console.log(result)
+               if(!result){
+                    resultTickets.forEach(ticketdoc=>{
+                        usersRef.doc(userId).collection('ticket').doc(ticketdoc).update({
+                        state: 'used',
+                        },{merge:true}) 
+                    })
+                    res.status(200).send({ 'data':true});
+                    return;
                 }
-                else{
-                    if(performanceIdGeral!= performanceId){
-                    allValidated= false;
-                        res.status(200).send({ 'error':'tickets not of the same performance'});
-                        return;
-                    }
+                else {
+                    res.status(200).send({ 'error':"Event already held"});
+                    return;
                 }
-                if(state == "used") {
-                    allValidated= false;
-
-                    res.status(200).send({ 'error':'already validated ticket'});
-                    return; 
-                }
-                console.log('adicinou')
-                resultTickets.push(ticketdoc.id)
             })
-
-            if(allValidated){
-                console.log('aqui')
-                resultTickets.forEach(ticketdoc=>{
-                    usersRef.doc(userId).collection('ticket').doc(ticketdoc).update({
-                    state: 'used',
-                    },{merge:true}) 
-                })
-            }
-            res.status(200).send({ 'data':true});
-            return;
         })
         .catch(error =>  {
-            console.error("Error: ", error);
             res.status(200).send({ 'error':"An error occurred."});
             return;
         });
@@ -107,7 +87,7 @@ Output: JSON with result value
 Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -263,15 +243,17 @@ const listTickets = functions.https.onRequest((req, res) => {
         admin.firestore().collection('ticket').get()
         .then( snapshot => {
             snapshot.forEach(elemTicket => {
-                var ticket = {
-                    price:elemTicket.data().price,
-                    date: elemTicket.data().date,
-                    name: elemTicket.data().name,
-                    name: elemTicket.data().name,
-
-                    id: elemTicket.id,
+                var datenow =  Date.now();
+                var myDate = new Date(elemTicket.data().date);
+                if(datenow - myDate < 0) {
+                    var ticket = {
+                        price:elemTicket.data().price,
+                        date: elemTicket.data().date,
+                        name: elemTicket.data().name,
+                        id: elemTicket.id,
+                    }
+                    result.push(ticket)
                 }
-                result.push(ticket)
             })
             res.status(200).send({ 'data':result});
             return; 
@@ -282,6 +264,84 @@ const listTickets = functions.https.onRequest((req, res) => {
         });
     });
 })
+
+
+/*
+*
+*    auxiliary functions
+*
+*
+*/
+
+function validTicketsAuxiliary(listTickets, userId){
+    var printError="";
+    var performanceIdGeral=""
+    var resultTickets = [];
+    var obj = {}
+    var usersRef = admin.firestore().collection('customer');
+    var promises = [];
+
+    listTickets.forEach(ticket => {
+        const p=usersRef.doc(userId).collection('ticket').doc(ticket).get()
+        promises.push(p)
+    })
+    return Promise.all(promises)
+    .then(snapshot => {
+        if(snapshot.length==0){
+            printError="User or tickets not found.";
+            return;
+        }
+        snapshot.forEach(ticketdoc => {
+            const state = ticketdoc.data().state;
+            const performanceId = ticketdoc.data().performanceId;
+
+            if(performanceIdGeral==""){
+                performanceIdGeral = performanceId
+            }
+            else{
+                if(performanceIdGeral!= performanceId){
+                    printError = 'tickets not of the same performance';
+                    return;
+                }
+            }
+            if(state == "used") {
+                printError = 'already validated ticket';
+                return; 
+            }
+            resultTickets.push(ticketdoc.id)
+        })
+
+        if(printError !=""){
+            return printError
+        }
+        else {
+            obj["performanceIdGeral"] = performanceIdGeral;
+            obj["resultTickets"] = resultTickets
+            return obj;
+        }
+    })
+    .catch(error =>  {
+        return "An error occurred."
+    });
+}
+
+function pastEvent(performanceId) {
+
+    return admin.firestore().collection('ticket').doc(performanceId).get()
+    .then(doc => {
+        var datenow =  Date.now();
+        var myDate = new Date(doc.data().date);
+        if(datenow - myDate > 0) {
+            return true;
+        }
+        else 
+            return false;
+    })
+    .catch(error =>  {
+        return "An error occurred."
+    });
+    
+}
 
 module.exports = {
     validTickets,

@@ -1,7 +1,5 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
-const UIDGenerator = require('uid-generator');
 const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
 
@@ -15,7 +13,7 @@ Parameters: publicKey ->
         creditCardValidity ->
 Output: JSON with result value 
 Teste:
-     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "October 13, 2014 11:13:00" }' -g -H "Content-Type: application/json"
+     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "November 11, 2018 11:13:00" }' -g -H "Content-Type: application/json"
 */
 
 const register = functions.https.onRequest((req, res) => {
@@ -77,9 +75,10 @@ const register = functions.https.onRequest((req, res) => {
         .then(function() {
 
             const number = parseInt(creditCardNumber);
-            var myDate = new Date(creditCardValidity);
             promises = [];
             var datenow =  Date.now();
+            var myDate = new Date(creditCardValidity);
+
 
 
             if(isNaN(number)|| isNaN(myDate.getMonth())) {
@@ -131,7 +130,10 @@ Parameters: username -> the USER name
 	    password ->the password of the user
 Output: JSON with data value that could be "Please enter a username|password", "invalid username|password", or the token of the session
 TEST: 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"57900f70-e1d6-11e8-a855-57782ab5d15f","products": {"product1":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }} }' -g -H "Content-Type: application/json"
+1053ff40-e51e-11e8-8996-7f28f998adb6
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher1":"c531c6e0-e415-11e8-82ca-35782305cc78", "voucher":"08c85400-e416-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"1" }}}' -g -H "Content-Type: application/json"
+
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher":"c531c6e0-e415-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"3wa7bd4ZhRHyb7lbdfqj", "quantity":"3" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }}}' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
@@ -158,7 +160,7 @@ const payOrder = functions.https.onRequest((req, res) => {
         var popcorn = 0;
         var valueCoffe=0;
         var valuepopCorn =0;
-        var lisproducts = [];
+        var listproducts = [];
         var priceProducts= 0;
         var numberOfCoffee = 0;
         var numberOfPopcorn = 0;
@@ -166,6 +168,7 @@ const payOrder = functions.https.onRequest((req, res) => {
         var listVoucher = [];
         var creditCardUser;
         var productsPurchased = []
+
         var obj = {}
         var usersRef= admin.firestore().collection('customer');
 
@@ -179,89 +182,34 @@ const payOrder = functions.https.onRequest((req, res) => {
                 docProduct:products[key].docProduct,
                 quantity: products[key].quantity
             }
-            lisproducts.push(product)
+            listproducts.push(product)
         }
 
-        var index1=0
-        lisproducts.forEach(product =>{
-            index1++
-
-            var docProduct =  product.docProduct;
-            var quantity = product.quantity;
-            if(!docProduct || !quantity) {
-                res.status(200).send({ 'error':"Please enter the doc and quantity of product1"});
-                return;  
+        getProducts(listproducts).then(result=>{
+            if(result.priceProducts == undefined){
+                res.status(200).send({ 'error':result});
+                return;
             }
-       
-            admin.firestore().collection('product').doc(docProduct).get()
-            .then(doc=> {
-                var nameProduct = doc.data().name;
-                var priceProduct = doc.data().price;
-                priceProducts = priceProducts + priceProduct * quantity;
+            productsPurchased = result.productsPurchased;
+            priceProducts = result.priceProducts;
+            numberOfCoffee = result.numberOfCoffee;
+            valueCoffe = result.valueCoffe;
+            numberOfPopcorn = result.numberOfPopcorn;
+            valuepopCorn = result.valuepopCorn;
 
-                var purchase = {
-                    nameProduct:nameProduct,
-                    priceProduct:priceProduct,
-                    quantity:quantity
+        })
+        .then(snapshot => {
+            getVouchers(listVoucher, userId, numberOfCoffee, numberOfPopcorn).then(result=>{
+                if(result.discont==undefined && result!=null){
+                    res.status(200).send({ 'error':result});
+                    return;  
                 }
-                productsPurchased.push(purchase);
-
-                if(nameProduct == 'freecoffee') {
-                    numberOfCoffee++
-                    valueCoffe = priceProduct;
+                if(result != null){
+                    discont = result.discont;
+                    freecoffee = result.freecoffee;
+                    popcorn = result.popcorn;
+                    voucherUsed = result.voucherUsed
                 }
-
-                if(nameProduct == 'popcorn') {
-                    numberOfPopcorn++;
-                    valuepopCorn = priceProduct;
-                }
-
-                if(index1==lisproducts.length){
-                    const promises = []
-                    listVoucher.forEach(voucher => {
-                        const p = usersRef.doc(userId).collection('voucher').doc(voucher).get()
-                        promises.push(p)
-                    })
-                    return Promise.all(promises)
-                }
-            })
-            .then(snapshot => {
-                var index2=0
-                const promises = []
-
-                snapshot.forEach( doc => {
-                    index2++
-                    var used = false;
-                    if(doc.data().state == "not used") {
-                        if(doc.data().productCode =="5%discountCafeteria") {
-                            if(discont !=0.05){
-                                discont = 0.05;
-                                used = true;
-                            }
-                        }else if(doc.data().productCode =="freecoffee") {
-                            if(numberOfCoffee > freecoffee ){
-                                freecoffee++
-                                used = true;
-                            }
-                        }else if(doc.data().productCode =="popcorn") {
-                            if( numberOfPopcorn > popcorn){ 
-                                popcorn++;
-                                used = true;
-                            }
-                        }
-    
-                        if (used){
-                            voucherUsed.push(doc.id)
-                        }
-                    } else {
-                        console.log('used')
-                    }
-                    if(index2==snapshot.length){
-                        return Promise.all(promises)
-                    }
-                })
-            })
-            .then(snapshot => {
                 usersRef.doc(userId).collection('creditCard').get()
                 .then(snapshot => {
                     if(snapshot.size != 1){
@@ -272,27 +220,26 @@ const payOrder = functions.https.onRequest((req, res) => {
                     
                     snapshot.forEach(creditCard =>{
                         creditCardUser = creditCard.id
-
+    
                         const p = usersRef.doc(userId).collection('creditCard').doc(creditCardUser).get()
                         promises.push(p);
                     })
                     return Promise.all(promises);
-
+    
                 })
                 .then(snapshot => { 
                     var valueSpent;
                     snapshot.forEach(docreditcard => { 
                         var valueSpentMod100 = docreditcard.data().valueSpentMod100;
                         var voucher = (valueSpentMod100 + priceProducts)/100;
-                        valueSpent =priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
+                        valueSpent = priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
         
-   
                             if(valueSpent > 0 ){
                                 usersRef.doc(userId).collection('creditCard').doc(creditCardUser).update({
                                     valueSpentMod100: (valueSpentMod100 + valueSpent)%100,
                                 },{merge:true})
                             }
-
+    
                             if(voucher>=1) {
                                 const idVoucher = uuidv1();
                                 var newVoucher = {
@@ -300,20 +247,19 @@ const payOrder = functions.https.onRequest((req, res) => {
                                     state: 'not used',
                                     productCode: '5%discountCafeteria'
                                 }
-
                                 admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(newVoucher); 
                             }
                     })
-
+    
                     voucherUsed.forEach(voucherId => {
                         usersRef.doc(userId).collection('voucher').doc(voucherId).update({
                             state: 'used',
                         },{merge:true})
                     }) 
-
+    
                     var valueSpendkey = "valueSpend";
                     obj[valueSpendkey] = valueSpent;
-
+    
                     var vouvherKey = 'vouchers'
                     obj[vouvherKey] = voucherUsed;
                     addProductUser(userId, productsPurchased)
@@ -322,7 +268,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                         if(number!=null){
                             var numberKey = "number"; 
                             obj[numberKey] = number;
-
+    
                             res.status(200).send({ 'data':obj});
                             return;
                         }else {
@@ -331,24 +277,20 @@ const payOrder = functions.https.onRequest((req, res) => {
                         }
                     })
                     .catch(err => {
-                        console.log(err);
-                        res.status(200).send({ 'error':"Error"});
+                        res.status(200).send({ 'error':err});
                         return;
                     });
-
                 })
                 .catch(err => {
-                    console.log(err);
-                    res.status(200).send({ 'error':"Error"});
+                    res.status(200).send({ 'error':err});
                     return;
                 });
             })
-            .catch(err => {
-                console.log(err);
-                res.status(200).send({ 'error':"Not found product"});
-                return;
-            });
         })
+        .catch(err => {
+            res.status(200).send({ 'error':err});
+            return;
+        });       
     })
 })
 
@@ -383,7 +325,6 @@ const listTicketsNotUsed = functions.https.onRequest((req, res) => {
             return;
         })
         .catch (error=> {
-            console.log(error);
             res.status(200).send({ 'error':"Error"});
             return;
         })
@@ -417,6 +358,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                         date: ticketdoc.data().date,
                         place: ticketdoc.data().place,
                         performanceId: ticketdoc.data().performanceId,
+                        state:ticketdoc.data().state
                     }
                     ticketsResult.push(ticket);
                 }   
@@ -428,6 +370,8 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                         var voucher = {
                             id: voucherdoc.id,
                             productCode: voucherdoc.data().productCode,
+                            state:voucherdoc.data().state
+
                         }
                         vouchersResult.push(voucher);
                     }   
@@ -459,7 +403,6 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
             })
         })
         .catch (error=> {
-            console.log(error);
             res.status(200).send({ 'error':"Error"});
             return;
         })
@@ -496,13 +439,11 @@ const listVouchersUser = functions.https.onRequest((req, res) => {
             return;
         })
         .catch (error=> {
-            console.log(error);
             res.status(200).send({ 'error':error});
             return;
         })
     })
 })
-
 
 
 /*
@@ -527,13 +468,139 @@ function getNumberOrder() {
     })
 }
 
-function addProductUser(userId, lisproducts){
-    lisproducts.forEach(product=>{
+function addProductUser(userId, listproducts){
+    listproducts.forEach(product=>{
         admin.firestore().collection('customer').doc(userId).collection('productsPurchased').add({
             nameProduct:product.nameProduct,
             priceProduct:product.priceProduct,
             quantity:product.quantity
         })
+    })
+}
+
+function getProducts(listproducts) {
+    var productsPurchased = []
+    var priceProducts = 0;
+    var numberOfCoffee = 0;
+    var valueCoffe = 0;
+    var numberOfPopcorn = 0;
+    var valuepopCorn = 0;
+    var obj = {};
+    var error = ""
+
+    var promises= [];
+    var listquantity = [];
+    var i=0
+    listproducts.forEach(product =>{
+        var docProduct =  product.docProduct;
+        var quantity = product.quantity;
+        if(!docProduct || !quantity) {
+            error = "Please enter the doc and quantity of product";
+            return;
+        }
+        listquantity.push(quantity);
+   
+        const p = admin.firestore().collection('product').doc(docProduct).get()
+        promises.push(p);
+    })
+    return Promise.all(promises)
+    .then(snapshot =>{
+        if(error!=""){
+            return error;
+        }
+        snapshot.forEach(doc=>{
+            var quantity = Number(listquantity[i])
+            var nameProduct = doc.data().name;
+            var priceProduct = doc.data().price;
+            priceProducts = priceProducts + priceProduct * quantity;
+
+            var purchase = {
+                nameProduct:nameProduct,
+                priceProduct:priceProduct,
+                quantity:quantity
+            }
+            productsPurchased.push(purchase);
+
+            if(nameProduct == 'coffee') {
+                numberOfCoffee = numberOfCoffee + quantity;
+                valueCoffe = priceProduct;
+            }
+
+            if(nameProduct == 'popcorn') {
+                numberOfPopcorn = numberOfPopcorn + quantity;
+                valuepopCorn = priceProduct;
+            }
+            i++
+        })
+            obj["productsPurchased"] = productsPurchased;
+            obj["priceProducts"] = priceProducts;
+            obj["numberOfCoffee"] = numberOfCoffee;
+            obj["valueCoffe"] = valueCoffe;
+            obj["numberOfPopcorn"] = numberOfPopcorn;
+            obj["valuepopCorn"] = valuepopCorn;
+            
+            return obj;
+    })
+    .catch(error=>{
+        return "error";
+    })
+}
+
+function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
+    var discont =0;
+    var freecoffee =0;
+    var popcorn=0;
+    var voucherUsed = [];
+    var obj = {};
+
+    if(listVouchers.length == 0){
+        return null;
+    }
+
+    const promises = [];
+    var usersRef= admin.firestore().collection('customer');
+
+    listVouchers.forEach(voucher => {
+        const p = usersRef.doc(userId).collection('voucher').doc(voucher).get()
+        promises.push(p)
+    })
+    return Promise.all(promises)
+    .then(snapshot=>{
+        snapshot.forEach( doc => {
+            var used = false;
+
+            if(doc.data().state == "not used") {
+                if(doc.data().productCode =="5%discountCafeteria") {
+                    if(discont !=0.05){
+                        discont = 0.05;
+                        used = true;
+                    }
+                }else if(doc.data().productCode =="freecoffee") {
+                    if(numberOfCoffee > freecoffee ){
+                        freecoffee++
+                        used = true;
+                    }
+                }else if(doc.data().productCode =="popcorn") {
+                    if( numberOfPopcorn > popcorn){ 
+                        popcorn++;
+                        used = true;
+                    }
+                }
+
+                if (used){
+                    voucherUsed.push(doc.id)
+                }
+            } 
+        })
+
+        obj["discont"]=discont;
+        obj["freecoffee"]=freecoffee;
+        obj["popcorn"]=popcorn;
+        obj["voucherUsed"]=voucherUsed
+        return obj;
+    })
+    .catch(error=>{
+        return "invalid voucher";
     })
 }
 
