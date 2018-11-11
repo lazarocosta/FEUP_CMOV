@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,10 +55,16 @@ public class SelectTicketsActivity extends NavigableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.selectTicketsActivityFinishButton) {
-            String qrCodeContent = generateQRCodeContent();
-            markSelectedTicketsAsUsed();
-            Intent i = new Intent(this, ShowQRCodeActivity.class);
-            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+            Intent i;
+            if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
+                String qrCodeContent = generateQRCodeContent();
+                markSelectedTicketsAsUsed();
+                i = new Intent(this, ShowQRCodeActivity.class);
+                i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+            } else {
+                Toast.makeText(this, "No ticket selected.", Toast.LENGTH_LONG).show();
+                i = new Intent(this, MainActivity.class);
+            }
             startActivity(i);
             finish();
         }
