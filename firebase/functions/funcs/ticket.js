@@ -3,6 +3,8 @@ const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
 const random = require('random')
+const crypto = require('crypto');
+
 /**
 Function to validateticket the icket
 Parameters: ticketId -> 
@@ -87,13 +89,18 @@ Output: JSON with result value
 Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' { "tickets":{"ticket":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const tickets = req.body.tickets;
-        const userId = req.body.userId;
+        const performances = req.body.data.performances;
+        const userId = req.body.data.userId;
+        const signature = req.body.signature
+        console.log(req.body.data)
+        console.log(signature)
+
+        var dataToString = JSON.stringify(req.body.data);
 
         var obj = {}
 
@@ -102,125 +109,138 @@ const buyTickets = functions.https.onRequest((req, res) => {
             return;
         }
 
-        if(!tickets) {
-            res.status(200).send({ 'error': "Please enter a tickets."});
+        if(!performances) {
+            res.status(200).send({ 'error': "Please enter a performances."});
             return;
         }
-        var listTickets=[]
-        for(elem in tickets){
-            if(!tickets[elem].id || !tickets[elem].numberTickets ) {
+        var listperformances=[]
+        for(elem in performances){
+            if(!performances[elem].id || !performances[elem].numberTickets ) {
                 res.status(200).send({ 'error': "Please insert a ticket of the form {id, numberTickets}."});
                 return;
             }
             var ticket = {
-                id : tickets[elem].id,
-                numberTickets: Number(tickets[elem].numberTickets)
+                id : performances[elem].id,
+                numberTickets: Number(performances[elem].numberTickets)
             }
-            listTickets.push(ticket)
+            listperformances.push(ticket)
         }
 
         var resultTickets = [];
         var vouchers = [];
-        var listTicketsDefault= []
+        var listperformancesDefault= []
         var priceOfTickets=0;
 
-        listTickets.forEach(elem=>{
-            admin.firestore().collection('ticket').doc(elem.id).get()
-            .then(doc=>{
-                var ticket = {
-                    id:elem.id,
-                    date: doc.data().date,
-                    price:doc.data().price,
-                    name:doc.data().name,
-                    numberTickets: elem.numberTickets,
-                    numberOfFirstTicket: doc.data().sold,
-                }
-                priceOfTickets = priceOfTickets + doc.data().price* elem.numberTickets
-                listTicketsDefault.push(ticket)
-            })
-        })
-        admin.firestore().collection('customer').doc(userId).collection('creditCard').get()
-        .then(snapshot =>{
-            if(snapshot.size != 1){
-                res.status(200).send({ 'error':"Invalid userId"});
+        VerifySignature(userId, dataToString,signature).then(result=>{
+            console.log(result)
+
+            if(!result){
+                res.status(200).send({ 'error':"Signature error"});
                 return;
             }
-            snapshot.forEach(creditCardDoc => { 
-                var valueSpentMod100 = creditCardDoc.data().valueSpentMod100
-                var amountSpend = valueSpentMod100 + priceOfTickets
-
-
-                var numberOfVouchers= Math.floor(amountSpend/100);
-                if( numberOfVouchers != 0 ) {
-                    for (i=1; i<= numberOfVouchers; i++){
-                        const idVoucher = uuidv1();
-                        var voucher = {
-                            id: idVoucher,
-                            productCode : '5%discountCafeteria',
-                            state:'not used' 
-                        };
-                        vouchers.push(voucher);
-                        admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher); 
+        
+            listperformances.forEach(elem=>{
+                admin.firestore().collection('ticket').doc(elem.id).get()
+                .then(doc=>{
+                    var ticket = {
+                        id:elem.id,
+                        date: doc.data().date,
+                        price:doc.data().price,
+                        name:doc.data().name,
+                        numberTickets: elem.numberTickets,
+                        numberOfFirstTicket: doc.data().sold,
                     }
-                }
-
-                admin.firestore().collection('customer').doc(userId).collection('creditCard').doc(creditCardDoc.id).update({
-                    valueSpentMod100: amountSpend % 100, 
-                },{merge:true})
-
-                //adicionar vouchers
-                listTicketsDefault.forEach(ticketGeral=> {
-                    admin.firestore().collection('ticket').doc(ticketGeral.id).update({
-                        sold: ticketGeral.numberTickets + ticketGeral.numberOfFirstTicket
-                    },{merge:true})
-   
-                    var place = ticketGeral.numberOfFirstTicket - 1;
-                    
-                    var max = Number(ticketGeral.numberTickets);
-                    for(let j=0; j<max; j++){
-                        place++
-                        const idTicket = uuidv1();
-                        const state = 'not used'
-
-                        console.log('aqui')
-                        var ticket = {
-                            id: idTicket ,
-                            date: ticketGeral.date,
-                            state: state,
-                            name:ticketGeral.name,
-                            place:place,
-                            performanceId:ticketGeral.id
-                        };
-                        resultTickets.push(ticket);
-                        
-                        admin.firestore().collection('customer').doc(userId).collection('ticket').doc(idTicket).set(ticket)
-
-                        const idVoucher = uuidv1();
-                        const typeOfOfferBoolean = random.boolean();
-                        var typeOfOffer;
-                        if (typeOfOfferBoolean) {
-                            typeOfOffer = 'freecoffee'
-                        } else typeOfOffer = 'popcorn'
-
-                        var voucher = {
-                            id: idVoucher,
-                            productCode : typeOfOffer,
-                            state: state
-                        };
-                        vouchers.push(voucher);
-
-                        admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher);
-                    }
+                    priceOfTickets = priceOfTickets + doc.data().price* elem.numberTickets
+                    listperformancesDefault.push(ticket)
                 })
-                var vou = "vouchers";
-                obj[vou] = vouchers;
-      
-                var tickets = "tickets";
-                obj[tickets] = resultTickets;
-
             })
-            res.status(200).send({'data':obj});
-            return;
+            admin.firestore().collection('customer').doc(userId).collection('creditCard').get()
+            .then(snapshot =>{
+                if(snapshot.size != 1){
+                    res.status(200).send({ 'error':"Invalid userId"});
+                    return;
+                }
+                snapshot.forEach(creditCardDoc => { 
+                    var valueSpentMod100 = creditCardDoc.data().valueSpentMod100
+                    var amountSpend = valueSpentMod100 + priceOfTickets
+
+
+                    var numberOfVouchers= Math.floor(amountSpend/100);
+                    if( numberOfVouchers != 0 ) {
+                        for (i=1; i<= numberOfVouchers; i++){
+                            const idVoucher = uuidv1();
+                            var voucher = {
+                                id: idVoucher,
+                                productCode : '5%discountCafeteria',
+                                state:'not used' 
+                            };
+                            vouchers.push(voucher);
+                            admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher); 
+                        }
+                    }
+
+                    admin.firestore().collection('customer').doc(userId).collection('creditCard').doc(creditCardDoc.id).update({
+                        valueSpentMod100: amountSpend % 100, 
+                    },{merge:true})
+
+                    //adicionar vouchers
+                    listperformancesDefault.forEach(ticketGeral=> {
+                        admin.firestore().collection('ticket').doc(ticketGeral.id).update({
+                            sold: ticketGeral.numberTickets + ticketGeral.numberOfFirstTicket
+                        },{merge:true})
+    
+                        var place = ticketGeral.numberOfFirstTicket - 1;
+                        
+                        var max = Number(ticketGeral.numberTickets);
+                        for(let j=0; j<max; j++){
+                            place++
+                            const idTicket = uuidv1();
+                            const state = 'not used'
+
+                            console.log('aqui')
+                            var ticket = {
+                                id: idTicket ,
+                                date: ticketGeral.date,
+                                state: state,
+                                name:ticketGeral.name,
+                                place:place,
+                                performanceId:ticketGeral.id
+                            };
+                            resultTickets.push(ticket);
+                            
+                            admin.firestore().collection('customer').doc(userId).collection('ticket').doc(idTicket).set(ticket)
+
+                            const idVoucher = uuidv1();
+                            const typeOfOfferBoolean = random.boolean();
+                            var typeOfOffer;
+                            if (typeOfOfferBoolean) {
+                                typeOfOffer = 'freecoffee'
+                            } else typeOfOffer = 'popcorn'
+
+                            var voucher = {
+                                id: idVoucher,
+                                productCode : typeOfOffer,
+                                state: state
+                            };
+                            vouchers.push(voucher);
+
+                            admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(voucher);
+                        }
+                    })
+                    var vou = "vouchers";
+                    obj[vou] = vouchers;
+        
+                    var tickets = "tickets";
+                    obj[tickets] = resultTickets;
+
+                })
+                res.status(200).send({'data':obj});
+                return;
+            })
+            .catch(error =>{
+                res.status(200).send({ 'error':error});
+                return;
+            });
         })
         .catch(error =>{
             res.status(200).send({ 'error':error});
@@ -341,6 +361,28 @@ function pastEvent(performanceId) {
         return "An error occurred."
     });
     
+}
+
+function VerifySignature(userId, data,signature){
+    const verify = crypto.createVerify('SHA256')
+    verify.update(data);
+    var publicKey
+
+    return admin.firestore().collection('customer').doc(userId).get()
+    .then(snapshot => {
+        if(snapshot.size != 1){
+            return false
+        }
+        
+        snapshot.forEach(user=>{
+            publicKey = user.data().publicKey
+
+        })
+        return verify.verify(publicKey, signature);
+    })
+    .catch(error =>  {
+        return false
+    });
 }
 
 module.exports = {

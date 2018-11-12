@@ -20,7 +20,7 @@ Parameters:
 Output: JSON with result value 
 {"data":"{ 'valueSpend': '2', 'voucher':['e0593540-de9b-11e8-8169-cfeb6c1d7363'],'number':'0008'}"}
 or
-{ "error": {error that caused the failure} }
+{ "error": {Error that caused the failure} }
 
 
 
@@ -44,7 +44,7 @@ or
 }
 
 or
-{ "error": {error that caused the failure} }
+{ "error": {Error that caused the failure} }
 
 --------------------------------------------------------
 function buyTickets
@@ -75,7 +75,7 @@ output:
 	"
 }
 or 
-{ "error": {error that caused the failure} }
+{ "error": {Error that caused the failure} }
 
 
 ---------------------------------------

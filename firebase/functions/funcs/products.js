@@ -1,10 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
-const UIDGenerator = require('uid-generator');
 const cors = require('cors')({origin: true});
-const uuidv1 = require('uuid/v1');
-const random = require('random')
 /**
 Function to list of products
 Parameters:

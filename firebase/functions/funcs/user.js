@@ -2,6 +2,8 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
+const crypto = require('crypto');
+
 
 /**
 Function to register the customer
@@ -13,7 +15,7 @@ Parameters: publicKey ->
         creditCardValidity ->
 Output: JSON with result value 
 Teste:
-     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "November 11, 2018 11:13:00" }' -g -H "Content-Type: application/json"
+     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/register --data ' { "publicKey" : "000030002300002", "name":"TESTE", "nif":"12121212", "creditCardType":"asas", "creditCardNumber":"11", "creditCardValidity": "2019-12-12" }' -g -H "Content-Type: application/json"
 */
 
 const register = functions.https.onRequest((req, res) => {
@@ -58,7 +60,7 @@ const register = functions.https.onRequest((req, res) => {
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(200).send({ 'error':"nif not is a number"});
+            res.status(200).send({ 'error':"Nif not is a number"});
             console.error("nif not is a number: ", error);
             return;
         }
@@ -77,14 +79,13 @@ const register = functions.https.onRequest((req, res) => {
             const number = parseInt(creditCardNumber);
             promises = [];
             var datenow =  Date.now();
-            var myDate = new Date(creditCardValidity);
-
-
+            var dateArray = creditCardValidity.split("-");
+            var myDate = new Date(dateArray[0], dateArray[1],dateArray[2]);
 
             if(isNaN(number)|| isNaN(myDate.getMonth())) {
                 adduser= false;
                 admin.firestore().collection('customer').doc(id).delete()
-                errorOccurred ="creditCardNumber not is number or the validity is not a date";
+                errorOccurred ="CreditCardNumber not is number or the validity is not a date";
                 return;
             }
             if(datenow - myDate > 0) {
@@ -133,13 +134,16 @@ TEST:
 1053ff40-e51e-11e8-8996-7f28f998adb6
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher1":"c531c6e0-e415-11e8-82ca-35782305cc78", "voucher":"08c85400-e416-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"1" }}}' -g -H "Content-Type: application/json"
 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher":"c531c6e0-e415-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"3wa7bd4ZhRHyb7lbdfqj", "quantity":"3" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"signature":"asasa","data": { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher":"c531c6e0-e415-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"3wa7bd4ZhRHyb7lbdfqj", "quantity":"3" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }}}}' -g -H "Content-Type: application/json"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const userId = req.body.userId;
-        const vouchers = req.body.vouchers;
-        const products = req.body.products;
+        const userId = req.body.data.userId;
+        const vouchers = req.body.data.vouchers;
+        const products = req.body.data.products;
+        const signature = req.body.signature
+        var dataToString = JSON.stringify(req.body.data);
+
 
         if(!userId){
             res.status(200).send({ 'error':"Please enter a userId."});
@@ -172,7 +176,6 @@ const payOrder = functions.https.onRequest((req, res) => {
         var obj = {}
         var usersRef= admin.firestore().collection('customer');
 
-
         for(key in vouchers){
             listVoucher.push(vouchers[key])
         }
@@ -185,112 +188,124 @@ const payOrder = functions.https.onRequest((req, res) => {
             listproducts.push(product)
         }
 
-        getProducts(listproducts).then(result=>{
-            if(result.priceProducts == undefined){
-                res.status(200).send({ 'error':result});
+        VerifySignature(userId, dataToString,signature).then(result=>{
+            console.log(result)
+
+            if(!result){
+                res.status(200).send({ 'error':"Signature error"});
                 return;
             }
-            productsPurchased = result.productsPurchased;
-            priceProducts = result.priceProducts;
-            numberOfCoffee = result.numberOfCoffee;
-            valueCoffe = result.valueCoffe;
-            numberOfPopcorn = result.numberOfPopcorn;
-            valuepopCorn = result.valuepopCorn;
 
-        })
-        .then(snapshot => {
-            getVouchers(listVoucher, userId, numberOfCoffee, numberOfPopcorn).then(result=>{
-                if(result.discont==undefined && result!=null){
+            getProducts(listproducts).then(result=>{
+                if(result.priceProducts == undefined){
                     res.status(200).send({ 'error':result});
-                    return;  
+                    return;
                 }
-                if(result != null){
-                    discont = result.discont;
-                    freecoffee = result.freecoffee;
-                    popcorn = result.popcorn;
-                    voucherUsed = result.voucherUsed
-                }
-                usersRef.doc(userId).collection('creditCard').get()
-                .then(snapshot => {
-                    if(snapshot.size != 1){
-                        res.status(200).send({ 'error':"Credit card not found"});
-                        return;
+                productsPurchased = result.productsPurchased;
+                priceProducts = result.priceProducts;
+                numberOfCoffee = result.numberOfCoffee;
+                valueCoffe = result.valueCoffe;
+                numberOfPopcorn = result.numberOfPopcorn;
+                valuepopCorn = result.valuepopCorn;
+
+            })
+            .then(snapshot => {
+                getVouchers(listVoucher, userId, numberOfCoffee, numberOfPopcorn).then(result=>{
+                    if(result.discont == undefined && result != null){
+                        res.status(200).send({ 'error':result});
+                        return;  
                     }
-                    const promises = []
-                    
-                    snapshot.forEach(creditCard =>{
-                        creditCardUser = creditCard.id
-    
-                        const p = usersRef.doc(userId).collection('creditCard').doc(creditCardUser).get()
-                        promises.push(p);
-                    })
-                    return Promise.all(promises);
-    
-                })
-                .then(snapshot => { 
-                    var valueSpent;
-                    snapshot.forEach(docreditcard => { 
-                        var valueSpentMod100 = docreditcard.data().valueSpentMod100;
-                        var voucher = (valueSpentMod100 + priceProducts)/100;
-                        valueSpent = priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
-        
-                            if(valueSpent > 0 ){
-                                usersRef.doc(userId).collection('creditCard').doc(creditCardUser).update({
-                                    valueSpentMod100: (valueSpentMod100 + valueSpent)%100,
-                                },{merge:true})
-                            }
-    
-                            if(voucher>=1) {
-                                const idVoucher = uuidv1();
-                                var newVoucher = {
-                                    id: idVoucher,
-                                    state: 'not used',
-                                    productCode: '5%discountCafeteria'
-                                }
-                                admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(newVoucher); 
-                            }
-                    })
-    
-                    voucherUsed.forEach(voucherId => {
-                        usersRef.doc(userId).collection('voucher').doc(voucherId).update({
-                            state: 'used',
-                        },{merge:true})
-                    }) 
-    
-                    var valueSpendkey = "valueSpend";
-                    obj[valueSpendkey] = valueSpent;
-    
-                    var vouvherKey = 'vouchers'
-                    obj[vouvherKey] = voucherUsed;
-                    addProductUser(userId, productsPurchased)
-                    
-                    getNumberOrder().then(number=>{
-                        if(number!=null){
-                            var numberKey = "number"; 
-                            obj[numberKey] = number;
-    
-                            res.status(200).send({ 'data':obj});
-                            return;
-                        }else {
-                            res.status(200).send({ 'error':'error'});
+                    if(result != null){
+                        discont = result.discont;
+                        freecoffee = result.freecoffee;
+                        popcorn = result.popcorn;
+                        voucherUsed = result.voucherUsed
+                    }
+                    usersRef.doc(userId).collection('creditCard').get()
+                    .then(snapshot => {
+                        if(snapshot.size != 1){
+                            res.status(200).send({ 'error':"Credit card not found"});
                             return;
                         }
+                        const promises = []
+                        
+                        snapshot.forEach(creditCard =>{
+                            creditCardUser = creditCard.id
+        
+                            const p = usersRef.doc(userId).collection('creditCard').doc(creditCardUser).get()
+                            promises.push(p);
+                        })
+                        return Promise.all(promises);
+                    })
+                    .then(snapshot => { 
+                        var valueSpent;
+                        snapshot.forEach(docreditcard => { 
+                            var valueSpentMod100 = docreditcard.data().valueSpentMod100;
+                            var voucher = (valueSpentMod100 + priceProducts)/100;
+                            valueSpent = priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
+            
+                                if(valueSpent > 0 ){
+                                    usersRef.doc(userId).collection('creditCard').doc(creditCardUser).update({
+                                        valueSpentMod100: (valueSpentMod100 + valueSpent) % 100,
+                                    },{merge:true})
+                                }
+        
+                                if(voucher>=1) {
+                                    const idVoucher = uuidv1();
+                                    var newVoucher = {
+                                        id: idVoucher,
+                                        state: 'not used',
+                                        productCode: '5%discountCafeteria'
+                                    }
+                                    admin.firestore().collection('customer').doc(userId).collection('voucher').doc(idVoucher).set(newVoucher); 
+                                }
+                        })
+        
+                        voucherUsed.forEach(voucherId => {
+                            usersRef.doc(userId).collection('voucher').doc(voucherId).update({
+                                state: 'used',
+                            },{merge:true})
+                        }) 
+        
+                        var valueSpendkey = "valueSpend";
+                        obj[valueSpendkey] = valueSpent;
+        
+                        var vouvherKey = 'vouchers'
+                        obj[vouvherKey] = voucherUsed;
+                        addProductUser(userId, productsPurchased)
+                        
+                        getNumberOrder().then(number=>{
+                            if(number != null){
+                                var numberKey = "number"; 
+                                obj[numberKey] = number;
+        
+                                res.status(200).send({ 'data':obj});
+                                return;
+                            }else {
+                                res.status(200).send({ 'error':'Error'});
+                                return;
+                            }
+                        })
+                        .catch(err => {
+                            res.status(200).send({ 'Error':err});
+                            return;
+                        });
                     })
                     .catch(err => {
-                        res.status(200).send({ 'error':err});
+                        res.status(200).send({ 'Error':err});
                         return;
                     });
                 })
-                .catch(err => {
-                    res.status(200).send({ 'error':err});
-                    return;
-                });
             })
+            .catch(err => {
+                res.status(200).send({ 'error':err});
+                return;
+            });   
         })
         .catch(err => {
             res.status(200).send({ 'error':err});
             return;
-        });       
+        });     
     })
 })
 
@@ -542,7 +557,7 @@ function getProducts(listproducts) {
             return obj;
     })
     .catch(error=>{
-        return "error";
+        return "Error";
     })
 }
 
@@ -600,8 +615,30 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
         return obj;
     })
     .catch(error=>{
-        return "invalid voucher";
+        return "Invalid voucher";
     })
+}
+
+function VerifySignature(userId, data,signature){
+    const verify = crypto.createVerify('SHA256')
+    verify.update(data);
+    var publicKey
+
+    return admin.firestore().collection('customer').doc(userId).get()
+    .then(snapshot => {
+        if(snapshot.size != 1){
+            return false
+        }
+        
+        snapshot.forEach(user=>{
+            publicKey = user.data().publicKey
+
+        })
+        return verify.verify(publicKey, signature);
+    })
+    .catch(error =>  {
+        return false
+    });
 }
 
 module.exports={
