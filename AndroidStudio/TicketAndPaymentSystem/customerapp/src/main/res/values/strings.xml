@@ -14,7 +14,7 @@
     <string name="performance_tickets_quantity">Qty:</string>
     <string name="buy_string">BUY</string>
     <string name="list_transactions_ticket_name">Tickets</string>
-    <string name="list_transactions_ticket_price">Price</string>
+    <string name="list_transactions_ticket_place">Place</string>
     <string name="ticketName">name</string>
     <string name="ticketPrice">price</string>
     <string name="ticketDate">date</string>
@@ -39,4 +39,12 @@
     <string name="main_activity_title">Dashboard</string>
     <string name="select_tickets_activity_title">Select tickets</string>
     <string name="list_transactions_activity_title">Transactions</string>
+    <string name="product_name">Name</string>
+    <string name="product_price">Price</string>
+    <string name="product_quantity">Qty: </string>
+    <string name="title_activity_vouchers">VouchersActivity</string>
+    <string name="select_products_activity_title">Select products</string>
+    <string name="add_vouchers_product_code">Product code</string>
+    <string name="add_vouchers_voucher_state">State</string>
+    <string name="continue_string">CONTINUE</string>
 </resources>

@@ -78,7 +78,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     jsonPerformance.put("numberTickets", numTickets);
                     jsonPerformances.put(jsonPerformance);
                 }
-                buyTicketsData.put("tickets", jsonPerformances);
+                buyTicketsData.put("performances", jsonPerformances);
                 buyTicketsData.put("userId", uuid);
                 signedJSONObject = app.getEncryptionManager().buildSignedJSONObject(buyTicketsData);
             } catch (JSONException e) {

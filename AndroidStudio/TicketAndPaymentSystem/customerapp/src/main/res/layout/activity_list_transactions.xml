@@ -28,12 +28,12 @@
                 android:text="@string/list_transactions_ticket_name" />
 
             <TextView
-                android:id="@+id/listTransactionsTicketPrice"
+                android:id="@+id/listTransactionsTicketPlace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:text="@string/list_transactions_ticket_price"
+                android:text="@string/list_transactions_ticket_place"
                 android:textAlignment="textEnd" />
 
         </LinearLayout>

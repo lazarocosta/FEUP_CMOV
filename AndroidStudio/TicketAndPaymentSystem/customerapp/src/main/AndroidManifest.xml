@@ -23,6 +23,8 @@
         <activity android:name=".ListTransactionsActivity" />
         <activity android:name=".SelectTicketsActivity" />
         <activity android:name=".NavigableActivity" />
+        <activity android:name=".Cafeteria.SelectProductsActivity" />
+        <activity android:name=".Cafeteria.AddVouchersActivity" />
     </application>
 
 </manifest>

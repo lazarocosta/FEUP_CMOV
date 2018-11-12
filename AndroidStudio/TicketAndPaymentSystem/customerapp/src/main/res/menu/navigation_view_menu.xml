@@ -13,4 +13,8 @@
         android:id="@+id/listTransactionsActivityNavButton"
         android:title="@string/list_transactions_activity_title"
         android:checkable="true" />
+    <item
+        android:id="@+id/selectProductsActivityNavButton"
+        android:title="@string/select_products_activity_title"
+        android:checkable="true" />
 </menu>

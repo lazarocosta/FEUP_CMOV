@@ -1,6 +1,9 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable {
+    public enum Products {Coffee, Soda, Drink, Popcorn, Sandwich}
     private String name;
     private int price;
     private int quantity;
@@ -26,5 +29,9 @@ public class Product {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }
