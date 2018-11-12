@@ -18,11 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
-import pt.up.fe.up201405729.cmov1.sharedlibrary.SHA256;
 
 public class CheckoutActivity extends AppCompatActivity {
     private CustomerApp app;
@@ -68,8 +66,9 @@ public class CheckoutActivity extends AppCompatActivity {
             SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             String uuid = preferences.getString("uuid", null);
 
-            JSONObject buyTicketsData = new JSONObject();
+            JSONObject signedJSONObject = new JSONObject();
             try {
+                JSONObject buyTicketsData = new JSONObject();
                 JSONArray jsonPerformances = new JSONArray();
                 for (int i = 0; i < performances.size(); i++) {
                     Performance p = performances.get(i);
@@ -81,14 +80,12 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
                 buyTicketsData.put("tickets", jsonPerformances);
                 buyTicketsData.put("userId", uuid);
-                String hash = SHA256.SHA256(buyTicketsData.toString());
-                buyTicketsData.put("hash", hash);
-                buyTicketsData.put("encryptedHash", app.getEncryptionManager().encryptString(hash));
-            } catch (JSONException | NoSuchAlgorithmException e) {
+                signedJSONObject = app.getEncryptionManager().buildSignedJSONObject(buyTicketsData);
+            } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-            JSONObject response = RestServices.PUT("/buyTickets", buyTicketsData);
+            JSONObject response = RestServices.PUT("/buyTickets", signedJSONObject);
             try {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");
