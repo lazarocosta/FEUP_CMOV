@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processQRCode(String contents) {
-        final Context packageContext = this;
+        final Context context = this;
         String[] uuids = contents.split(qrCodeContentDelimiter);
         if (uuids.length == 0)
             return;
@@ -72,22 +72,22 @@ public class MainActivity extends AppCompatActivity {
             validationData.put("userId", uuids[0]);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
         JSONObject response = RestServices.GET("/validTickets", validationData);
         try {
             response.getString("data");   // If no exception is thrown, the returned value should be "true".
-            Intent i = new Intent(packageContext, QRCodeValidatedActivity.class);
+            Intent i = new Intent(context, QRCodeValidatedActivity.class);
             startActivity(i);
             finish();
         } catch (JSONException e) {
             try {
-                Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
             } catch (JSONException e1) {
                 e1.printStackTrace();
-                Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
             }
-            Intent i = new Intent(packageContext, MainActivity.class);
+            Intent i = new Intent(context, MainActivity.class);
             startActivity(i);
             finish();
         }

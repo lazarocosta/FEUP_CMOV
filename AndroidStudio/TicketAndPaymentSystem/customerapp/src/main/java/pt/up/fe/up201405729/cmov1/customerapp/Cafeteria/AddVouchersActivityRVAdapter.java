@@ -21,12 +21,12 @@ import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
 public class AddVouchersActivityRVAdapter extends RecyclerView.Adapter<AddVouchersActivityRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Voucher> vouchers;
     private HashSet<Voucher> selectedVouchers;
-    private Context packageContext;
+    private Context context;
 
     public AddVouchersActivityRVAdapter(ArrayList<Voucher> vouchers, Context context) {
         this.vouchers = vouchers;
         this.selectedVouchers = new HashSet<>();
-        this.packageContext = context;
+        this.context = context;
     }
 
     @NonNull
@@ -48,7 +48,7 @@ public class AddVouchersActivityRVAdapter extends RecyclerView.Adapter<AddVouche
                 Voucher selectedVoucher = vouchers.get(holder.getAdapterPosition());
                 if (v.isActivated()) {
                     if (selectedVouchers.size() > 2) {
-                        Toast.makeText(packageContext, "Maximum number of vouchers reached.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Maximum number of vouchers reached.", Toast.LENGTH_LONG).show();
                         v.setActivated(false);
                     } else
                         selectedVouchers.add(selectedVoucher);

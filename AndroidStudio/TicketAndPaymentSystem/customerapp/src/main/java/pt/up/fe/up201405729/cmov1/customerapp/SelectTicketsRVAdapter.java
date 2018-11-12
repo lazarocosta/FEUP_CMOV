@@ -17,12 +17,12 @@ import java.util.HashSet;
 public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRVAdapter.MyViewHolder> {
     private ArrayList<Ticket> tickets;
     private HashSet<Ticket> selectedTickets;
-    private Context packageContext;
+    private Context context;
 
     public SelectTicketsRVAdapter(ArrayList<Ticket> tickets, Context context) {
         this.tickets = tickets;
         this.selectedTickets = new HashSet<>();
-        this.packageContext = context;
+        this.context = context;
     }
 
     @NonNull
@@ -46,12 +46,12 @@ public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRV
                 Ticket selectedTicket = tickets.get(holder.getAdapterPosition());
                 if (v.isActivated()) {
                     if (selectedTickets.size() >= 4) {
-                        Toast.makeText(packageContext, "Maximum number of tickets reached.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Maximum number of tickets reached.", Toast.LENGTH_LONG).show();
                         v.setActivated(false);
                     } else {
                         for (Ticket t : selectedTickets) {
                             if (!t.getPerformanceId().equals(selectedTicket.getPerformanceId())) {
-                                Toast.makeText(packageContext, "All tickets must be for the same performance.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, "All tickets must be for the same performance.", Toast.LENGTH_LONG).show();
                                 v.setActivated(false);
                                 return;
                             }

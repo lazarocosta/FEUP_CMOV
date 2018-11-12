@@ -71,7 +71,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        final Context packageContext = this;
+        final Context context = this;
         if (item.getItemId() == R.id.registrationActivityRegisterButton) {
             // TODO: check input data?
             JSONObject registrationData = new JSONObject();
@@ -84,7 +84,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 registrationData.put("creditCardValidity", ((EditText) findViewById(R.id.registrationCreditCardValidityET)).getText().toString());
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
             JSONObject response = RestServices.PUT("/register", registrationData);
             SharedPreferences sharedPreferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
@@ -93,15 +93,15 @@ public class RegistrationActivity extends AppCompatActivity {
                 editor.putString("uuid", response.getString("data"));
             } catch (JSONException e) {
                 try {
-                    Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e1) {
                     e1.printStackTrace();
-                    Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
             editor.apply();
 
-            Intent i = new Intent(packageContext, MainActivity.class);
+            Intent i = new Intent(context, MainActivity.class);
             startActivity(i);
             finish();
         }

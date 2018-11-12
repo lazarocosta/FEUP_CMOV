@@ -51,7 +51,7 @@ public class SelectProductsActivity extends NavigableActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Context packageContext = this;
+        Context context = this;
         if (item.getItemId() == R.id.cafeteriaSelectProductsActivityBuyButton) {
             ArrayList<Product> allProducts = selectProductsRVAdapter.getProducts();
             ArrayList<Product> desiredProducts = new ArrayList<>();
@@ -61,9 +61,9 @@ public class SelectProductsActivity extends NavigableActivity {
                     desiredProducts.add(p);
             }
             if (desiredProducts.isEmpty())
-                Toast.makeText(packageContext, "You should select at least one product.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You should select at least one product.", Toast.LENGTH_LONG).show();
             else {
-                Intent i = new Intent(packageContext, AddVouchersActivity.class);
+                Intent i = new Intent(context, AddVouchersActivity.class);
                 i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, desiredProducts);
                 startActivity(i);
                 finish();

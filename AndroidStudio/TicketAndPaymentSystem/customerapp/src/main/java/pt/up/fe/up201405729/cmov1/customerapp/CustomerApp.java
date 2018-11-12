@@ -20,8 +20,8 @@ public class CustomerApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Context packageContext = this;
-        encryptionManager = new EncryptionManager(packageContext);
+        Context context = this;
+        encryptionManager = new EncryptionManager(context);
     }
 
     public EncryptionManager getEncryptionManager() {

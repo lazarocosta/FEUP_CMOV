@@ -39,7 +39,7 @@ public class ListTransactionsActivity extends NavigableActivity {
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
-        final Context packageContext = this;
+        final Context context = this;
         this.app = (CustomerApp) getApplicationContext();
 
 
@@ -49,7 +49,7 @@ public class ListTransactionsActivity extends NavigableActivity {
             transactions.put("userId", uuid);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
         JSONObject response = RestServices.PUT("/listTransactionsUser", transactions);
         listTickets = new ArrayList<>();
@@ -95,10 +95,10 @@ public class ListTransactionsActivity extends NavigableActivity {
         }catch (JSONException e) {
             System.out.println("erro");
             try {
-                Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
             } catch (JSONException e1) {
                 e1.printStackTrace();
-                Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
 

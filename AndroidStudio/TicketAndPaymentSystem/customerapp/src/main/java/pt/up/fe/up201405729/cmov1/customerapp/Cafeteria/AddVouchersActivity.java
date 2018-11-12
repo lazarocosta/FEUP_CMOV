@@ -42,16 +42,16 @@ public class AddVouchersActivity extends NavigableActivity {
         Intent i = getIntent();
         products = ((ArrayList<Product>) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName));
 
-        Context packageContext = this;
+        Context context = this;
         RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(packageContext, 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
         addVouchersRV.setLayoutManager(gridLayoutManager);
-        ArrayList<Voucher> allVouchers = FileManager.readVouchers(packageContext);
+        ArrayList<Voucher> allVouchers = FileManager.readVouchers(context);
         ArrayList<Voucher> vouchers = new ArrayList<>();
         for (Voucher v : allVouchers)
             if (v.getState().equals(Voucher.State.notUsed))
                 vouchers.add(v);
-        addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, packageContext);
+        addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, context);
         addVouchersRV.setAdapter(addVouchersActivityRVAdapter);
     }
 
@@ -64,15 +64,15 @@ public class AddVouchersActivity extends NavigableActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Context packageContext = this;
+        Context context = this;
         if (item.getItemId() == R.id.cafeteriaAddVouchersActivityContinueButton) {
             HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
             if (vouchers.size() > 2)
-                Toast.makeText(packageContext, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
             else {
                 String qrCodeContent = generateQRCodeContent();
                 updateStoredVouchers();
-                Intent i = new Intent(packageContext, ShowQRCodeActivity.class);
+                Intent i = new Intent(context, ShowQRCodeActivity.class);
                 i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
                 startActivity(i);
                 finish();

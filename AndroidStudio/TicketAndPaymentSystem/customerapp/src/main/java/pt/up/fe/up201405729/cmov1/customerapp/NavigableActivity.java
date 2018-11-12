@@ -26,7 +26,7 @@ public class NavigableActivity extends AppCompatActivity {
             bar.setDisplayShowHomeEnabled(true);
             bar.setDisplayHomeAsUpEnabled(true);
         }
-        final Context packageContext = this;
+        final Context context = this;
         navigationView = findViewById(R.id.navigationView);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -34,13 +34,13 @@ public class NavigableActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Intent i = null;
                 if (menuItem.getTitle().equals(getResources().getString(R.string.main_activity_title)))
-                    i = new Intent(packageContext, MainActivity.class);
+                    i = new Intent(context, MainActivity.class);
                 else if (menuItem.getTitle().equals(getResources().getString(R.string.select_tickets_activity_title)))
-                    i = new Intent(packageContext, SelectTicketsActivity.class);
+                    i = new Intent(context, SelectTicketsActivity.class);
                 else if (menuItem.getTitle().equals(getResources().getString(R.string.list_transactions_activity_title)))
-                    i = new Intent(packageContext, ListTransactionsActivity.class);
+                    i = new Intent(context, ListTransactionsActivity.class);
                 else if (menuItem.getTitle().equals(getResources().getString(R.string.select_products_activity_title)))
-                    i = new Intent(packageContext, SelectProductsActivity.class);
+                    i = new Intent(context, SelectProductsActivity.class);
                 else
                     System.err.println("This statement should not be reached.");
                 if (i != null && !menuItem.isChecked())

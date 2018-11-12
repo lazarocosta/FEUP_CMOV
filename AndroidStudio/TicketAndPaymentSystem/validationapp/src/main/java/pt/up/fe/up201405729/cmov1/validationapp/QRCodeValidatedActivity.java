@@ -34,7 +34,7 @@ public class QRCodeValidatedActivity extends AppCompatActivity {
         videoView.requestFocus();
         videoView.start();
 
-        final Context packageContext = this;
+        final Context context = this;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -51,7 +51,7 @@ public class QRCodeValidatedActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Intent i = new Intent(packageContext, MainActivity.class);
+                        Intent i = new Intent(context, MainActivity.class);
                         startActivity(i);
                         finish();
                     }

@@ -36,9 +36,9 @@ public class MainActivity extends NavigableActivity {
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
-        final Context packageContext = this;
+        final Context context = this;
         if (uuid == null) {
-            Intent i = new Intent(packageContext, RegistrationActivity.class);
+            Intent i = new Intent(context, RegistrationActivity.class);
             startActivity(i);
             finish();
         } else {
@@ -60,10 +60,10 @@ public class MainActivity extends NavigableActivity {
                 Collections.sort(performances);
             } catch (JSONException e) {
                 try {
-                    Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e1) {
                     e1.printStackTrace();
-                    Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
             ArrayList<Integer> ticketsQuantities = new ArrayList<>(Collections.nCopies(performances.size(), 0));
@@ -81,7 +81,7 @@ public class MainActivity extends NavigableActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Context packageContext = this;
+        Context context = this;
         if (item.getItemId() == R.id.mainActivityBuyButton) {
             ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
             ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
@@ -95,10 +95,10 @@ public class MainActivity extends NavigableActivity {
                 }
             }
             if (desiredPerformances.isEmpty())
-                Toast.makeText(packageContext, "You should select at least one performance.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You should select at least one performance.", Toast.LENGTH_LONG).show();
             else {
                 CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
-                Intent i = new Intent(packageContext, CheckoutActivity.class);
+                Intent i = new Intent(context, CheckoutActivity.class);
                 i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
                 startActivity(i);
                 finish();

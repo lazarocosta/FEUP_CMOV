@@ -31,7 +31,7 @@ public class ShowQRCodeActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         final String qrCodeContent = i.getStringExtra(CustomerApp.qrCodeContentKeyName);
-        final Context packageContext = this;
+        final Context context = this;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -49,8 +49,8 @@ public class ShowQRCodeActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(packageContext, errorMsg, Toast.LENGTH_LONG).show();
-                            Intent i = new Intent(packageContext, MainActivity.class);
+                            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(context, MainActivity.class);
                             startActivity(i);
                             finish();
                         }

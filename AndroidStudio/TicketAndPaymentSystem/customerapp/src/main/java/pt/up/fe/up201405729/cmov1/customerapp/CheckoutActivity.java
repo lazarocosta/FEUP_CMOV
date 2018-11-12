@@ -59,7 +59,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        final Context packageContext = this;
+        final Context context = this;
         if (item.getItemId() == R.id.checkoutActivityBuyButton) {
             ArrayList<Performance> performances = performancesRVAdapter.getPerformances();
             ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
@@ -83,13 +83,13 @@ public class CheckoutActivity extends AppCompatActivity {
                 signedJSONObject = app.getEncryptionManager().buildSignedJSONObject(buyTicketsData);
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(packageContext, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
             JSONObject response = RestServices.PUT("/buyTickets", signedJSONObject);
             try {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");
-                ArrayList<Voucher> vouchers = FileManager.readVouchers(packageContext);
+                ArrayList<Voucher> vouchers = FileManager.readVouchers(context);
                 for (int i = 0; i < jsonVouchers.length(); i++) {
                     JSONObject jsonVoucher = jsonVouchers.getJSONObject(i);
                     String id = jsonVoucher.getString("id");
@@ -99,7 +99,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     vouchers.add(v);
                 }
                 JSONArray jsonTickets = jsonData.getJSONArray("tickets");
-                ArrayList<Ticket> tickets = FileManager.readTickets(packageContext);
+                ArrayList<Ticket> tickets = FileManager.readTickets(context);
                 for (int i = 0; i < jsonTickets.length(); i++) {
                     JSONObject jsonTicket = jsonTickets.getJSONObject(i);
                     String id = jsonTicket.getString("id");
@@ -111,18 +111,18 @@ public class CheckoutActivity extends AppCompatActivity {
                     Ticket t = new Ticket(id, performanceId, showName, date, roomPlace, state);
                     tickets.add(t);
                 }
-                FileManager.writeVouchers(packageContext, vouchers);
-                FileManager.writeTickets(packageContext, tickets);
+                FileManager.writeVouchers(context, vouchers);
+                FileManager.writeTickets(context, tickets);
             } catch (JSONException e) {
                 try {
-                    Toast.makeText(packageContext, response.getString("error"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
                 } catch (JSONException e1) {
                     e1.printStackTrace();
-                    Toast.makeText(packageContext, e1.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
 
-            Intent i = new Intent(packageContext, MainActivity.class);
+            Intent i = new Intent(context, MainActivity.class);
             startActivity(i);
             finish();
         }
