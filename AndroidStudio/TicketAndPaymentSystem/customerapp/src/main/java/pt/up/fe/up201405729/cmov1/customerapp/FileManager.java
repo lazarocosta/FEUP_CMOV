@@ -2,11 +2,12 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 
 import android.content.Context;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class FileManager {
@@ -15,10 +16,12 @@ public class FileManager {
         String filename = CustomerApp.ticketsFilename;
         try {
             FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            for (Ticket t : tickets)
-                oos.writeObject(t);
-            oos.close();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            for (Ticket t : tickets) {
+                osw.write(t.toString());
+                osw.write("\n");
+            }
+            osw.close();
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -29,10 +32,12 @@ public class FileManager {
         String filename = CustomerApp.vouchersFilename;
         try {
             FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            for (Voucher v : vouchers)
-                oos.writeObject(v);
-            oos.close();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            for (Voucher v : vouchers) {
+                osw.write(v.toString());
+                osw.write("\n");
+            }
+            osw.close();
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,14 +48,16 @@ public class FileManager {
         String filename = CustomerApp.ticketsFilename;
         try {
             FileInputStream fis = context.openFileInput(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
             ArrayList<Ticket> tickets = new ArrayList<>();
-            while (ois.available() > 0)
-                tickets.add((Ticket) ois.readObject());
-            ois.close();
+            while (br.ready())
+                tickets.add(new Ticket(br.readLine()));
+            br.close();
+            isr.close();
             fis.close();
             return tickets;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -60,14 +67,16 @@ public class FileManager {
         String filename = CustomerApp.vouchersFilename;
         try {
             FileInputStream fis = context.openFileInput(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
             ArrayList<Voucher> vouchers = new ArrayList<>();
-            while (ois.available() > 0)
-                vouchers.add((Voucher) ois.readObject());
-            ois.close();
+            while (isr.ready())
+                vouchers.add(new Voucher(br.readLine()));
+            br.close();
+            isr.close();
             fis.close();
             return vouchers;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }

@@ -1,5 +1,11 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
+import android.support.annotation.NonNull;
+import android.util.JsonReader;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class Voucher implements Serializable {
@@ -40,6 +46,18 @@ public class Voucher implements Serializable {
         this.state = myState;
     }
 
+    public Voucher(String str) {
+        try {
+            JSONObject jsonObject = new JSONObject(str);
+            JSONObject voucher = jsonObject.getJSONObject("Voucher");
+            this.uuid = voucher.getString("uuid");
+            this.productCode = ProductCode.Popcorn; // TODO: voucher.get("productCode");
+            this.state = State.notUsed; // TODO: voucher.get("state");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getUuid() {
         return uuid;
     }
@@ -54,5 +72,21 @@ public class Voucher implements Serializable {
 
     public State getState() {
         return state;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject voucher = new JSONObject();
+            voucher.put("uuid", uuid);
+            //TODO: voucher.put("productCode", productCode);
+            //TODO: voucher.put("state", state);
+            jsonObject.put("Voucher", voucher);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
     }
 }

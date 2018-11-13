@@ -1,5 +1,10 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
+import android.support.annotation.NonNull;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -11,7 +16,6 @@ public class Ticket implements Serializable {
     private MyDate date;
     private String roomPlace;
     private State state;
-
     public Ticket(String uuid, String performanceId, String showName, MyDate date, String roomPlace, String state) {
         State myState;
         switch (state) {
@@ -30,6 +34,21 @@ public class Ticket implements Serializable {
         this.date = date;
         this.roomPlace = roomPlace;
         this.state = myState;
+    }
+
+    public Ticket(String str) {
+        try {
+            JSONObject jsonObject = new JSONObject(str);
+            JSONObject ticket = jsonObject.getJSONObject("Ticket");
+            this.uuid = ticket.getString("uuid");
+            this.performanceId = ticket.getString("performanceId");
+            this.showName = ticket.getString("showName");
+            this.date = new MyDate(ticket.getString("date"));
+            this.roomPlace = ticket.getString("roomPlace");
+            this.state = State.notUsed; // TODO: ticket.get("state");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getUuid() {
@@ -76,5 +95,24 @@ public class Ticket implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(uuid, performanceId, showName, date, roomPlace, state);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject ticket = new JSONObject();
+            ticket.put("uuid", uuid);
+            ticket.put("performanceId", performanceId);
+            ticket.put("showName", showName);
+            ticket.put("date", date);
+            ticket.put("roomPlace", roomPlace);
+            ticket.put("state", state);
+            jsonObject.put("Ticket", ticket);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
     }
 }
