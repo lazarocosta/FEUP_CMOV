@@ -18,6 +18,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Calendar;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
@@ -76,7 +78,11 @@ public class RegistrationActivity extends AppCompatActivity {
             // TODO: check input data?
             JSONObject registrationData = new JSONObject();
             try {
-                registrationData.put("publicKey", app.getEncryptionManager().getPublicKey());
+                JSONObject rsaPublicKeyJSONObject = new JSONObject();
+                RSAPublicKey rsaPublicKey = app.getEncryptionManager().getPublicKey();
+                rsaPublicKeyJSONObject.put("modulus", rsaPublicKey.getModulus().toString());
+                rsaPublicKeyJSONObject.put("publicExponent", rsaPublicKey.getPublicExponent().toString());
+                registrationData.put("publicKey", rsaPublicKeyJSONObject);
                 registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
                 registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());
                 registrationData.put("creditCardType", ((EditText) findViewById(R.id.registrationCreditCardTypeET)).getText().toString());

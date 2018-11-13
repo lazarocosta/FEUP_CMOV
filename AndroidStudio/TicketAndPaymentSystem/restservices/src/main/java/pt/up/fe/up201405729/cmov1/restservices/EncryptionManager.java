@@ -31,6 +31,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -128,10 +129,9 @@ public class EncryptionManager {
         Log.e(TAG, Log.getStackTraceString(e));
     }
 
-    public String getPublicKey() {
+    public RSAPublicKey getPublicKey() {
         try {
-            PublicKey publicKey = keyStore.getCertificate(keyAlias).getPublicKey();
-            return publicKey.toString();
+            return (RSAPublicKey) keyStore.getCertificate(keyAlias).getPublicKey();
         } catch (KeyStoreException e) {
             e.printStackTrace();
             return null;
