@@ -264,6 +264,8 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
+    curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/listTickets --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listTickets  --data '{}' -g -H "Content-Type: application/json"
 
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTickets --data '{}' -g -H "Content-Type: application/json"
@@ -298,6 +300,8 @@ const listTickets = functions.https.onRequest((req, res) => {
 
 
 /*
+curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/deletePerformances --data '{}' -g -H "Content-Type: application/json"
+
 curl -X POST http://localhost:5000/cmov-d52d6/us-central1/deletePerformances --data '{}' -g -H "Content-Type: application/json"
 
 */
@@ -320,6 +324,8 @@ const  deletePerformances = functions.https.onRequest((req, res) => {
 })
 
 /*
+curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
+
 curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
 
 */

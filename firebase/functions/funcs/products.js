@@ -7,6 +7,8 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
+    curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
 
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listProducts --data ' {}' -g -H "Content-Type: application/json"
@@ -34,7 +36,9 @@ const listProducts = functions.https.onRequest((req, res) => {
 });
 
 /*
-curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
+    curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
+
+    curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
 **
 */
 
@@ -56,7 +60,32 @@ const addProducts = functions.https.onRequest((req,res)=>{
     })
 })
 
+/*
+curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/deleteProducts --data '{}' -g -H "Content-Type: application/json"
+
+curl -X POST http://localhost:5000/cmov-d52d6/us-central1/deleteProducts --data '{}' -g -H "Content-Type: application/json"
+
+*/
+const  deleteProducts = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+
+
+        admin.firestore().collection('product').get()
+        .then(snapshot=>{
+            snapshot.forEach(performance=>{
+                admin.firestore().collection('product').doc(performance.id).delete();
+            })
+            res.status(200).send({ 'data':true});
+            return;
+        })
+        .catch(error =>  {
+            return "An error occurred."
+        });
+    })
+})
+
 module.exports= {
     listProducts,
-    addProducts
+    addProducts,
+    deleteProducts
 }
