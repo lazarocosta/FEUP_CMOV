@@ -92,22 +92,32 @@ Output: JSON with result value
 Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
+ 
+    curl -X POST http://localhost:5000/cmov-d52d6/us-central1/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
+
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
+        /*
+        Pegar em req.rawBody e dividir em dois, sendo que o segundo array terá os últimos 64 bytes.
+        Dar à função de validar assinatura os dois arrays sob a forma de bytes.
+        Pegar no 1º array e isto é o data que terá de ser convertido em jsonobject
+        A partir daqui,o objecto convertido é acedido como se fosse um objecto normal: data.id
+        */
+       const este = req.rawBody;
+       var signature = este.slice(-64)
+       console.log(signatureN)
+       var dataN = este.slice(0,-64)
+       var dataString = bin2string(dataN)
+       console.log('datasring', dataString)
 
-        const dataString = req.body.data
-
-       /* const data = JSON.parse(dataString)
+       const data = JSON.parse(dataString)
+       console.log('datajson', data)
         
-         const performances = data.performances
-        const userId = data.userId */
-        const signature = req.body.signature 
-        console.log('aqui')
+        const performances = data.performances
+        const userId = data.userId
 
-        console.log(toHexString(getBytes(signature)))
-        console.log(toHexString(getBytes(dataString)))
         console.log('depois')
         res.status(200).send({ 'data': true});
         return ;
@@ -465,6 +475,14 @@ function getBytes(str) {
     }
     console.log('saiu')
     return myBuffer
+}
+
+function bin2string(array){
+	var result = "";
+	for(var i = 0; i < array.length; ++i){
+		result+= (String.fromCharCode(array[i]));
+	}
+	return result;
 }
 module.exports = {
     validTickets,
