@@ -93,6 +93,8 @@ Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
  
+    curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
+
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
 
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
@@ -107,7 +109,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
         */
        const este = req.rawBody;
        var signature = este.slice(-64)
-       console.log(signatureN)
+       console.log(signature)
        var dataN = este.slice(0,-64)
        var dataString = bin2string(dataN)
        console.log('datasring', dataString)
