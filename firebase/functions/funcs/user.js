@@ -26,6 +26,7 @@ const register = functions.https.onRequest((req, res) => {
         const creditCardType = req.body.creditCardType;
         const creditCardNumber = req.body.creditCardNumber;
         const creditCardValidity = req.body.creditCardValidity;
+        console.log("publicKey", publicKey);
 
         if(!publicKey) {
             res.status(200).send({ 'error': "Please enter a publicKey."});
@@ -142,7 +143,7 @@ const payOrder = functions.https.onRequest((req, res) => {
         const vouchers = req.body.data.vouchers;
         const products = req.body.data.products;
         const signature = req.body.signature
-        var dataToString = JSON.stringify(req.body.data);
+        const dataToString = JSON.stringify(req.body.data);
 
 
         if(!userId){
@@ -619,24 +620,28 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
     })
 }
 
-function VerifySignature(userId, data,signature){
-    const verify = crypto.createVerify('SHA256')
-    verify.update(data);
-    var publicKey
+function VerifySignature(userId, data, signature){
+
 
     return admin.firestore().collection('customer').doc(userId).get()
-    .then(snapshot => {
-        if(snapshot.size != 1){
-            return false
-        }
-        
-        snapshot.forEach(user=>{
-            publicKey = user.data().publicKey
+    .then(doc => {
+        console.log('entrou')
+        var publicKey;
+        console.log(doc)
+        console.log(doc.data())
+        publicKey = doc.data().publicKey
+        console.log(publicKey)
+        var verify = crypto.createVerify('RSA-SHA256')
+        verify.update(data);
+        console.log('data',data)
+        console.log('signature',signature)
+        console.log('user',userId)
 
-        })
+        console.log('aqui')
         return verify.verify(publicKey, signature);
     })
     .catch(error =>  {
+        console.log(error)
         return false
     });
 }

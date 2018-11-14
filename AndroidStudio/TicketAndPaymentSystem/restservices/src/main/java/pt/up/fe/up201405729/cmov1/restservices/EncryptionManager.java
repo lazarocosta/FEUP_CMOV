@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -161,20 +162,34 @@ public class EncryptionManager {
     public JSONObject buildSignedJSONObject(JSONObject jsonObject) {
         JSONObject signedJSONObject = new JSONObject();
         try {
-            signedJSONObject.put("data", jsonObject);
+            String jsonObjectString = new String(jsonObject.toString().getBytes("UTF-16"), "UTF-16");
+            signedJSONObject.put("data", jsonObjectString);
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, null);
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initSign(privateKey);
-            sg.update(jsonObject.toString().getBytes());
+            sg.update(jsonObjectString.getBytes("UTF-16"));
             byte[] signature = new byte[NUM_KEY_BYTES];
             sg.sign(signature, 0, NUM_KEY_BYTES);
-            signedJSONObject.put("signature", signature);
+            signedJSONObject.put("signature", new String(signature, "UTF-16"));
+            System.out.println(bytesToHex(jsonObjectString.getBytes()));
+            System.out.println(bytesToHex(new String(signature, "UTF-16").getBytes()));
         } catch (JSONException | NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
             handleException(e);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return signedJSONObject;
     }
-
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
     /*
     // Based on https://paginas.fe.up.pt/~apm/CM/docs/MsgSignNFCandQR.zip and adapted for our needs
     public boolean validate(byte[] message, byte[] signature) {

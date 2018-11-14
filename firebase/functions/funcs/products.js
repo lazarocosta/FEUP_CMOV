@@ -7,6 +7,8 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
+    curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listProducts --data ' {}' -g -H "Content-Type: application/json"
 */
 const listProducts = functions.https.onRequest((req, res) => {
@@ -31,6 +33,30 @@ const listProducts = functions.https.onRequest((req, res) => {
     });
 });
 
+/*
+curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
+**
+*/
+
+const addProducts = functions.https.onRequest((req,res)=>{
+    return cors(req,res, () =>{
+
+        admin.firestore().collection('product').add({
+            name:'popcorn',
+            price:2
+        })
+        
+        admin.firestore().collection('product').add({
+            name:'coffee',
+            price:2
+        })
+
+        res.status(200).send({ 'data':true});
+        return;
+    })
+})
+
 module.exports= {
-    listProducts
+    listProducts,
+    addProducts
 }

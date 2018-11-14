@@ -4,6 +4,9 @@ const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
 const random = require('random')
 const crypto = require('crypto');
+var Buffer = require('buffer/').Buffer
+var getPem = require('rsa-pem-from-mod-exp');
+const { StringDecoder } = require('string_decoder');
 
 /**
 Function to validateticket the icket
@@ -11,7 +14,7 @@ Parameters: ticketId ->
         userId ->
 Output: JSON with result value 
 Teste:
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "c53151b0-e415-11e8-82ca-35782305cc78", "tick":"349bcf80-e416-11e8-82ca-35782305cc78", "ticket3":"08c7ded0-e416-11e8-82ca-35782305cc78"}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
+    curl -X POST https://luisbarbosa.ddns.net:5000/us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "c53151b0-e415-11e8-82ca-35782305cc78", "tick":"349bcf80-e416-11e8-82ca-35782305cc78", "ticket3":"08c7ded0-e416-11e8-82ca-35782305cc78"}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
 
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/validTickets --data ' { "tickets":{"ticketId1" : "fdd775a0-e2c9-11e8-8f21-b3cacf712523"}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}' -g -H "Content-Type: application/json"
 */
@@ -89,25 +92,32 @@ Output: JSON with result value
 Teste:
 //5QQ3bv9JkuiskIqn35x5
 //4YMjcrIXgaZmIzNH8BDF
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e"}}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/buyTickets --data ' {"signature":"asasasa", "data":{"performances":{"performance":{"id":"5QQ3bv9JkuiskIqn35x5","numberTickets":"1"}}, "userId":"340ab1d0-e731-11e8-b054-5d30f732ed63"}}' -g -H "Content-Type: application/json"
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const performances = req.body.data.performances;
-        const userId = req.body.data.userId;
-        const signature = req.body.signature
-        console.log(req.body.data)
-        console.log(signature)
+        const dataString = req.body.data
 
-        var dataToString = JSON.stringify(req.body.data);
+       /* const data = JSON.parse(dataString)
+        
+         const performances = data.performances
+        const userId = data.userId */
+        const signature = req.body.signature 
+        console.log('aqui')
 
+        console.log(toHexString(getBytes(signature)))
+        console.log(toHexString(getBytes(dataString)))
+        console.log('depois')
+        res.status(200).send({ 'data': true});
+        return ;
         var obj = {}
 
         if(!userId) {
             res.status(200).send({ 'error': "Please enter a userId."});
             return;
         }
+
 
         if(!performances) {
             res.status(200).send({ 'error': "Please enter a performances."});
@@ -131,7 +141,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
         var listperformancesDefault= []
         var priceOfTickets=0;
 
-        VerifySignature(userId, dataToString,signature).then(result=>{
+        VerifySignature(userId, dataString,signature).then(result=>{
             console.log(result)
 
             if(!result){
@@ -197,7 +207,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
                             const idTicket = uuidv1();
                             const state = 'not used'
 
-                            console.log('aqui')
                             var ticket = {
                                 id: idTicket ,
                                 date: ticketGeral.date,
@@ -255,6 +264,8 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
+    curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listTickets  --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listTickets --data '{}' -g -H "Content-Type: application/json"
 */
 const listTickets = functions.https.onRequest((req, res) => {
@@ -286,6 +297,51 @@ const listTickets = functions.https.onRequest((req, res) => {
 })
 
 
+/*
+curl -X POST http://localhost:5000/cmov-d52d6/us-central1/deletePerformances --data '{}' -g -H "Content-Type: application/json"
+
+*/
+const  deletePerformances = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+
+
+        admin.firestore().collection('ticket').get()
+        .then(snapshot=>{
+            snapshot.forEach(performance=>{
+                admin.firestore().collection('ticket').doc(performance.id).delete();
+            })
+            res.status(200).send({ 'data':true});
+            return;
+        })
+        .catch(error =>  {
+            return "An error occurred."
+        });
+    })
+})
+
+/*
+curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
+
+*/
+const  addPerformances = functions.https.onRequest((req, res) => {
+    return  cors(req, res, () => {
+        for(var i=0; i<10; i++){
+            var nameS = "name"+ i;
+
+        admin.firestore().collection('ticket').add({
+            date: new Date("Wed Nov 14 2019 11:23:20 GMT+0000"),
+            name:nameS,
+            price:10 + i,
+            sold:0
+        })
+
+            if(i=9){
+                res.status(200).send({ 'data':true});
+                return;
+            }
+        }
+    })
+})
 /*
 *
 *    auxiliary functions
@@ -363,30 +419,51 @@ function pastEvent(performanceId) {
     
 }
 
-function VerifySignature(userId, data,signature){
-    const verify = crypto.createVerify('SHA256')
-    verify.update(data);
-    var publicKey
+function VerifySignature(userId, data, signature){
 
     return admin.firestore().collection('customer').doc(userId).get()
-    .then(snapshot => {
-        if(snapshot.size != 1){
-            return false
-        }
-        
-        snapshot.forEach(user=>{
-            publicKey = user.data().publicKey
+    .then(doc => {
 
-        })
-        return verify.verify(publicKey, signature);
+        var modulus;
+        var exponent;
+        modulus = doc.data().publicKey.modulus
+        exponent = doc.data().publicKey.publicExponent
+        //console.log(modulus)
+        //console.log(exponent)
+
+        var certificated = getPem(modulus, exponent);
+        console.log(certificated)
+
+        var verify = crypto.createVerify('RSA-SHA256')
+        verify.update(data);
+       
+        return verify.verify(certificated, signature);
     })
     .catch(error =>  {
+        console.log(error)
         return false
     });
 }
 
+function toHexString(byteArray) {
+    return Array.from(byteArray, function(byte) {
+      return (byte & 0xFF).toString(8)
+    }).join('')
+}
+function getBytes(str) {
+    var myBuffer = [];
+    console.log('entrou')
+    var buffer = new Buffer(str, 'utf8');
+    for (var i = 0; i < buffer.length; i++) {
+        myBuffer.push(buffer[i]);
+    }
+    console.log('saiu')
+    return myBuffer
+}
 module.exports = {
     validTickets,
     buyTickets,
     listTickets,
+    addPerformances,
+    deletePerformances
 }
