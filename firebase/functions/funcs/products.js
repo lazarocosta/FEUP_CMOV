@@ -36,6 +36,8 @@ const listProducts = functions.https.onRequest((req, res) => {
 });
 
 /*
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/addProducts --data ' {}' -g -H "Content-Type: application/json"
+
     curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
 
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addProducts --data '{}' -g -H "Content-Type: application/json"
@@ -48,15 +50,39 @@ const addProducts = functions.https.onRequest((req,res)=>{
         admin.firestore().collection('product').add({
             name:'popcorn',
             price:2
-        })
-        
-        admin.firestore().collection('product').add({
-            name:'coffee',
-            price:2
-        })
-
-        res.status(200).send({ 'data':true});
-        return;
+        }).then(()=>{
+            admin.firestore().collection('product').add({
+                name:'coffee',
+                price:2
+            }).then(()=>{
+                admin.firestore().collection('product').add({
+                    name:'sandwich',
+                    price:2
+                }).then(()=>{
+                    admin.firestore().collection('product').add({
+                        name:'sodadrink',
+                        price:2
+                    }).then(()=>{
+                        res.status(200).send({ 'data':true});
+                        return;
+                    }).catch(error =>  {
+                        res.status(200).send({ 'data':error});
+                        return "An error occurred."
+                    });
+                    
+                }).catch(error =>  {
+                    res.status(200).send({ 'data':error});
+                    return "An error occurred."
+                });
+                
+            }).catch(error =>  {
+                res.status(200).send({ 'data':error});
+                return "An error occurred."
+            });
+        }).catch(error =>  {
+            res.status(200).send({ 'data':error});
+            return "An error occurred."
+        });
     })
 })
 

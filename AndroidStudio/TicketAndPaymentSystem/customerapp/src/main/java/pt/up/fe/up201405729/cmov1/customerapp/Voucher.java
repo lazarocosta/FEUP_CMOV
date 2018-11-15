@@ -14,18 +14,22 @@ public class Voucher implements Serializable {
     private String uuid;
     private ProductCode productCode;
     private State state;
+    private String productCodeString;
 
     public Voucher(String uuid, String productCode, String state) {
         ProductCode myProductCode;
         State myState;
         switch (productCode) {
             case "freecoffee":
+                productCodeString = "free coffee";
                 myProductCode = ProductCode.FreeCoffee;
                 break;
             case "popcorn":
+                productCodeString = "popcorn";
                 myProductCode = ProductCode.Popcorn;
                 break;
             case "5%discountCafeteria":
+                productCodeString = "5 discount Cafeteria";
                 myProductCode = ProductCode.Discount;
                 break;
             default:
@@ -56,6 +60,10 @@ public class Voucher implements Serializable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getProductCodeString() {
+        return productCodeString;
     }
 
     public String getUuid() {

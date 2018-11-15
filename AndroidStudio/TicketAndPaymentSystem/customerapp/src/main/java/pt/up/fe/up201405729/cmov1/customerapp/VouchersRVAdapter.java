@@ -27,7 +27,9 @@ public class VouchersRVAdapter extends RecyclerView.Adapter<VouchersRVAdapter.My
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Voucher p = vouchers.get(position);
-        ((TextView) holder.linearLayout.findViewById(R.id.voucher)).setText("a");
+        ((TextView) holder.linearLayout.findViewById(R.id.voucher)).setText(p.getProductCodeString());
+        //((TextView) holder.linearLayout.findViewById(R.id.voucher)).setText("a");
+
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 public class RestServices {
-    private static final String databaseUrl = "https://us-central1-cmov-d52d6.cloudfunctions.net";
+    private static final String databaseUrl = " https://us-central1-cmov-d52d6.cloudfunctions.net";
 
     public static JSONObject GET(String relativeUrl, JSONObject data) {
         return RestTask(relativeUrl, "GET", data);

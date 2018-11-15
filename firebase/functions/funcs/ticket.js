@@ -339,6 +339,7 @@ const  deletePerformances = functions.https.onRequest((req, res) => {
 curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
 
 curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
+    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/addPerformances --data '{}' -g -H "Content-Type: application/json"
 
 */
 const  addPerformances = functions.https.onRequest((req, res) => {
@@ -481,7 +482,7 @@ function getBytes(str) {
 
 function bin2string(array){
 	var result = "";
-	for(var i = 0; i < array.length; ++i){
+	for(var i = 0; i < array.length; i++){
 		result+= (String.fromCharCode(array[i]));
 	}
 	return result;
