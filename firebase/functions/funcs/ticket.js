@@ -101,14 +101,10 @@ Teste:
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const dataHex = res.body.data
-        const signatureHex = res.body.signature
-        console.log(dataHex)
-        console.log(signatureHex)
-        const dataBytes = hexToBytes(dataHex)
-        const signatureBytes = hexToBytes(signatureHex)
-        const dataString = dataBytes.toString('utf8')
-        const data = Buffer.from(JSON.parse(dataString).data);
+        const dataBytes = res.rawBody.slice(0, -64)
+        const signatureBytes = res.rawBody.slice(-64)
+        const dataString = dataBytes.toString()
+        const data = JSON.parse(dataString).data;
         const performances = data.performances
         const userId = data.userId
         var obj = {}
@@ -445,14 +441,6 @@ function VerifySignature(userId, data, signature){
         console.log(error)
         return false
     });
-}
-
-function hexToBytes(hexString) {
-    bytes = new byte[hexString.length() / 2];
-    for (i = 0; i < bytes.length; i += 2)
-        bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
-                + Character.digit(hexString.charAt(i + 1), 16));
-    return bytes;
 }
 
 module.exports = {
