@@ -101,28 +101,16 @@ Teste:
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        /*
-        Pegar em req.rawBody e dividir em dois, sendo que o segundo array terá os últimos 64 bytes.
-        Dar à função de validar assinatura os dois arrays sob a forma de bytes.
-        Pegar no 1º array e isto é o data que terá de ser convertido em jsonobject
-        A partir daqui,o objecto convertido é acedido como se fosse um objecto normal: data.id
-        */
-       const este = req.rawBody;
-       var signature = este.slice(-64)
-       console.log(signature)
-       var dataN = este.slice(0,-64)
-       var dataString = bin2string(dataN)
-       console.log('datasring', dataString)
-
-       const data = JSON.parse(dataString)
-       console.log('datajson', data)
-        
+        const dataHex = res.body.data
+        const signatureHex = res.body.signature
+        console.log(dataHex)
+        console.log(signatureHex)
+        const dataBytes = hexToBytes(dataHex)
+        const signatureBytes = hexToBytes(signatureHex)
+        const dataString = dataBytes.toString('utf8')
+        const data = Buffer.from(JSON.parse(dataString).data);
         const performances = data.performances
         const userId = data.userId
-
-        console.log('depois')
-        res.status(200).send({ 'data': true});
-        return ;
         var obj = {}
 
         if(!userId) {
@@ -153,7 +141,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
         var listperformancesDefault= []
         var priceOfTickets=0;
 
-        VerifySignature(userId, dataString,signature).then(result=>{
+        VerifySignature(userId, dataBytes,signatureBytes).then(result=>{
             console.log(result)
 
             if(!result){
@@ -447,16 +435,11 @@ function VerifySignature(userId, data, signature){
         var exponent;
         modulus = doc.data().publicKey.modulus
         exponent = doc.data().publicKey.publicExponent
-        //console.log(modulus)
-        //console.log(exponent)
-
-        var certificated = getPem(modulus, exponent);
-        console.log(certificated)
-
+        var certificate = getPem(modulus, exponent);
+        console.log(certificate)
         var verify = crypto.createVerify('RSA-SHA256')
         verify.update(data);
-       
-        return verify.verify(certificated, signature);
+        return verify.verify(certificate, signature);
     })
     .catch(error =>  {
         console.log(error)
@@ -464,29 +447,14 @@ function VerifySignature(userId, data, signature){
     });
 }
 
-function toHexString(byteArray) {
-    return Array.from(byteArray, function(byte) {
-      return (byte & 0xFF).toString(8)
-    }).join('')
-}
-function getBytes(str) {
-    var myBuffer = [];
-    console.log('entrou')
-    var buffer = new Buffer(str, 'utf8');
-    for (var i = 0; i < buffer.length; i++) {
-        myBuffer.push(buffer[i]);
-    }
-    console.log('saiu')
-    return myBuffer
+function hexToBytes(hexString) {
+    bytes = new byte[hexString.length() / 2];
+    for (i = 0; i < bytes.length; i += 2)
+        bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                + Character.digit(hexString.charAt(i + 1), 16));
+    return bytes;
 }
 
-function bin2string(array){
-	var result = "";
-	for(var i = 0; i < array.length; i++){
-		result+= (String.fromCharCode(array[i]));
-	}
-	return result;
-}
 module.exports = {
     validTickets,
     buyTickets,
