@@ -34,6 +34,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
@@ -160,24 +161,23 @@ public class EncryptionManager {
     }
     */
 
-    public JSONObject buildSignedJSONObject(JSONObject jsonObject) {
-        JSONObject signedJSONObject = new JSONObject();
+    public byte[] buildSignedMessage(JSONObject jsonObject) {
+        byte[] signedMessage = new byte[0];
         try {
-            String jsonObjectString = bytesToHex(jsonObject.toString().getBytes(charsetName));
-            signedJSONObject.put("data", jsonObjectString);
+            byte[] jsonObjectBytes = jsonObject.toString().getBytes();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, null);
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initSign(privateKey);
-            sg.update(jsonObjectString.getBytes(charsetName));
+            sg.update(jsonObjectBytes);
             byte[] signature = new byte[NUM_KEY_BYTES];
             sg.sign(signature, 0, NUM_KEY_BYTES);
-            signedJSONObject.put("signature", bytesToHex(signature));
-        } catch (JSONException | NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
+            signedMessage = new byte[jsonObjectBytes.length + signature.length];
+            System.arraycopy(jsonObjectBytes, 0, signedMessage, 0, jsonObjectBytes.length);
+            System.arraycopy(signature, 0, signedMessage, jsonObjectBytes.length, signature.length);
+        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
             handleException(e);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
-        return signedJSONObject;
+        return signedMessage;
     }
 
     /*
@@ -197,15 +197,15 @@ public class EncryptionManager {
     }
     */
 
-    public boolean validate(JSONObject signedJSONObject) {
+    public boolean validate(byte[] message, byte[] signature) {
         boolean verified = false;
         try {
             PublicKey publicKey = keyStore.getCertificate(keyAlias).getPublicKey();
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initVerify(publicKey);
-            sg.update(signedJSONObject.getString("data").getBytes(charsetName));
-            verified = sg.verify(signedJSONObject.getString("signature").getBytes(charsetName));
-        } catch (NoSuchAlgorithmException | JSONException | InvalidKeyException | KeyStoreException | SignatureException | UnsupportedEncodingException e) {
+            sg.update(message);
+            verified = sg.verify(signature);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | KeyStoreException | SignatureException e) {
             handleException(e);
         }
         return verified;

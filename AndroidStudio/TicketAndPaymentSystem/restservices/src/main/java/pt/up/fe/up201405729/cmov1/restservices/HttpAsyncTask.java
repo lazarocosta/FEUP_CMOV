@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class HttpAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+class HttpAsyncTask extends AsyncTask<byte[], Void, JSONObject> {
     private String urlString;
     private String requestMethod;
 
@@ -25,9 +25,9 @@ class HttpAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     }
 
     @Override
-    protected JSONObject doInBackground(JSONObject... jsonObjects) {
-        if (jsonObjects.length != 1)
-            throw new IllegalArgumentException("Only one JSONObject is expected");
+    protected JSONObject doInBackground(byte[]... byteArrays) {
+        if (byteArrays.length != 1)
+            throw new IllegalArgumentException("Only one byte array is expected.");
 
         URL url;
         HttpURLConnection urlConnection = null;
@@ -40,7 +40,7 @@ class HttpAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
-            outputStream.writeBytes(jsonObjects[0].toString());
+            outputStream.write(byteArrays[0]);
             outputStream.flush();
             outputStream.close();
             int responseCode = urlConnection.getResponseCode();

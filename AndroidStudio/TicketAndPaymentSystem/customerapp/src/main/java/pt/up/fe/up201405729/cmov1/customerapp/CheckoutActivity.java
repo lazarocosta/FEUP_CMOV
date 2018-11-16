@@ -66,7 +66,7 @@ public class CheckoutActivity extends AppCompatActivity {
             SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             String uuid = preferences.getString("uuid", null);
 
-            JSONObject signedJSONObject = new JSONObject();
+            byte[] signedMessage = new byte[0];
             try {
                 JSONObject buyTicketsData = new JSONObject();
                 JSONArray jsonPerformances = new JSONArray();
@@ -80,12 +80,12 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
                 buyTicketsData.put("performances", jsonPerformances);
                 buyTicketsData.put("userId", uuid);
-                signedJSONObject = app.getEncryptionManager().buildSignedJSONObject(buyTicketsData);
+                signedMessage = app.getEncryptionManager().buildSignedMessage(buyTicketsData);
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-            JSONObject response = RestServices.PUT("/buyTickets", signedJSONObject);
+            JSONObject response = RestServices.POST("/buyTickets", signedMessage);
             try {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");
