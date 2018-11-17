@@ -30,7 +30,7 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration); // TODO: landscape layout
+        setContentView(R.layout.activity_registration);
 
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
@@ -75,7 +75,6 @@ public class RegistrationActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         final Context context = this;
         if (item.getItemId() == R.id.registrationActivityRegisterButton) {
-            // TODO: check input data?
             JSONObject registrationData = new JSONObject();
             try {
                 JSONObject rsaPublicKeyJSONObject = new JSONObject();
