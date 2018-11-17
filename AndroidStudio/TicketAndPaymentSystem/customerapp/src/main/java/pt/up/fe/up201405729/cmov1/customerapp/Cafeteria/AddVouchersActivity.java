@@ -27,7 +27,7 @@ import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelim
 
 public class AddVouchersActivity extends NavigableActivity {
     private AddVouchersActivityRVAdapter addVouchersActivityRVAdapter;
-    private ArrayList<Product> products;
+    private CheckoutProducts checkoutProducts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class AddVouchersActivity extends NavigableActivity {
         }
 
         Intent i = getIntent();
-        products = ((ArrayList<Product>) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName));
+        checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
 
         Context context = this;
         RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
@@ -99,7 +99,7 @@ public class AddVouchersActivity extends NavigableActivity {
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
         sb.append(uuid);
-        for (Product p : products) {
+        for (Product p : checkoutProducts.getProducts()) {
             sb.append(qrCodeContentDelimiter).append(p.getName());
             sb.append(qrCodeContentDelimiter).append(p.getQuantity());
         }

@@ -65,7 +65,7 @@ public class SelectProductsActivity extends NavigableActivity {
                 Toast.makeText(context, "You should select at least one product.", Toast.LENGTH_LONG).show();
             else {
                 Intent i = new Intent(context, AddVouchersActivity.class);
-                i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, desiredProducts);
+                i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, new CheckoutProducts(desiredProducts));
                 startActivity(i);
                 finish();
             }
