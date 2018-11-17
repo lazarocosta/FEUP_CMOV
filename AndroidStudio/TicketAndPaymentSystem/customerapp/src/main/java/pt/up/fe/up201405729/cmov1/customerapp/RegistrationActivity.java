@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Calendar;
 
+import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class RegistrationActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
@@ -82,9 +83,9 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
                 JSONObject registrationData = new JSONObject();
                 try {
                     JSONObject rsaPublicKeyJSONObject = new JSONObject();
-                    RSAPublicKey rsaPublicKey = app.getEncryptionManager().getPublicKey();
-                    rsaPublicKeyJSONObject.put("modulus", rsaPublicKey.getModulus().toString());
-                    rsaPublicKeyJSONObject.put("publicExponent", rsaPublicKey.getPublicExponent().toString());
+                    EncryptionManager encryptionManager = app.getEncryptionManager();
+                    rsaPublicKeyJSONObject.put("modulus", encryptionManager.getPublicKeyModulus());
+                    rsaPublicKeyJSONObject.put("publicExponent", encryptionManager.getPublicKeyExponent());
                     registrationData.put("publicKey", rsaPublicKeyJSONObject);
                     registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
                     registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());

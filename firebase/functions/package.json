@@ -15,7 +15,6 @@
     "firebase-functions": "^2.1.0",
     "random": "^2.0.12",
     "rsa-pem-from-mod-exp": "^0.8.4",
-    "string_decoder": "^1.1.1",
     "uuid": "^3.3.2"
   },
   "private": true

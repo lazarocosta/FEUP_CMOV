@@ -21,12 +21,13 @@ Teste:
 
 const register = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const publicKey = req.body.publicKey;
-        const name = req.body.name;
-        const nif = req.body.nif;
-        const creditCardType = req.body.creditCardType;
-        const creditCardNumber = req.body.creditCardNumber;
-        const creditCardValidity = req.body.creditCardValidity;
+        body = JSON.parse(req.body.toString())
+        const publicKey = body.publicKey;
+        const name = body.name;
+        const nif = body.nif;
+        const creditCardType = body.creditCardType;
+        const creditCardNumber = body.creditCardNumber;
+        const creditCardValidity = body.creditCardValidity;
         console.log("publicKey", publicKey);
 
         if(!publicKey) {

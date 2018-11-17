@@ -6,7 +6,6 @@ const random = require('random')
 const crypto = require('crypto');
 var Buffer = require('buffer/').Buffer
 var getPem = require('rsa-pem-from-mod-exp');
-const { StringDecoder } = require('string_decoder');
 
 /**
 Function to validateticket the icket
@@ -101,13 +100,11 @@ Teste:
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        console.log("rawBody",res.rawBody)
-        const dataBytes = res.rawBody.slice(0, -64)
-        const signatureBytes = res.rawBody.slice(-64)
-        console.log(signatureBytes)
+        const buffer = Buffer.from(req.rawBody)
+        const dataBytes = buffer.slice(0, -64)
+        const signatureBytes = buffer.slice(-64)
         const dataString = dataBytes.toString()
-        console.log(dataString)
-        const data = JSON.parse(dataString).data;
+        const data = JSON.parse(dataString);
         const performances = data.performances
         const userId = data.userId
 
@@ -141,8 +138,6 @@ const buyTickets = functions.https.onRequest((req, res) => {
         var priceOfTickets=0;
 
         VerifySignature(userId, dataBytes,signatureBytes).then(result=>{
-            console.log(result)
-
             if(!result){
                 res.status(200).send({ 'error':"Signature error"});
                 return;
@@ -263,9 +258,6 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
-
-    curl -X POST http://192.168.1.58:5000/cmov-d52d6/us-central1/listTickets --data '{}' -g -H "Content-Type: application/json"
-
     curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/listTickets --data '{}' -g -H "Content-Type: application/json"
 
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listTickets  --data '{}' -g -H "Content-Type: application/json"
@@ -431,20 +423,16 @@ function pastEvent(performanceId) {
     
 }
 
-function VerifySignature(userId, data, signature){
+function VerifySignature(userId, dataBytes, signatureBytes){
 
     return admin.firestore().collection('customer').doc(userId).get()
     .then(doc => {
-
-        var modulus;
-        var exponent;
-        modulus = doc.data().publicKey.modulus
-        exponent = doc.data().publicKey.publicExponent
-        var certificate = getPem(modulus, exponent);
-        console.log(certificate)
-        var verify = crypto.createVerify('RSA-SHA256')
-        verify.update(data);
-        return verify.verify(certificate, signature);
+        const modulus = doc.data().publicKey.modulus;
+        const exponent = doc.data().publicKey.publicExponent;
+        const pem = getPem(modulus, exponent);
+        const verify = crypto.createVerify('RSA-SHA256')
+        verify.update(dataBytes);
+        return verify.verify(pem, signatureBytes);
     })
     .catch(error =>  {
         console.log(error)

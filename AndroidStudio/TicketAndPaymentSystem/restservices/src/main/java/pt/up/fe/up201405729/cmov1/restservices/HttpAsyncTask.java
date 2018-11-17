@@ -37,7 +37,7 @@ class HttpAsyncTask extends AsyncTask<byte[], Void, JSONObject> {
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
             urlConnection.setRequestMethod(requestMethod);
-            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Content-Type", "application/octet-stream");
             urlConnection.setUseCaches(false);
             DataOutputStream outputStream = new DataOutputStream(urlConnection.getOutputStream());
             outputStream.write(byteArrays[0]);

@@ -12,13 +12,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -34,7 +32,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
@@ -132,15 +129,6 @@ public class EncryptionManager {
         Log.e(TAG, Log.getStackTraceString(e));
     }
 
-    public RSAPublicKey getPublicKey() {
-        try {
-            return (RSAPublicKey) keyStore.getCertificate(keyAlias).getPublicKey();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     /*
     // Based on https://paginas.fe.up.pt/~apm/CM/docs/MsgSignNFCandQR.zip and adapted for our needs
     public byte[] buildMessage(String message) {
@@ -227,5 +215,30 @@ public class EncryptionManager {
             bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
                     + Character.digit(hexString.charAt(i + 1), 16));
         return bytes;
+    }
+
+    private static String toBase64(BigInteger bigInteger) {
+        byte[] bytes = Base64.encode(bigInteger.toByteArray(), Base64.DEFAULT);
+        return new String(bytes);
+    }
+
+    public String getPublicKeyModulus() {
+        try {
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyStore.getCertificate(keyAlias).getPublicKey();
+            return toBase64(rsaPublicKey.getModulus());
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getPublicKeyExponent() {
+        try {
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyStore.getCertificate(keyAlias).getPublicKey();
+            return toBase64(rsaPublicKey.getPublicExponent());
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

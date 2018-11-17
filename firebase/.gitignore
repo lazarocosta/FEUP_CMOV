@@ -63,3 +63,6 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# Script used to install Node.js
+nodesource_setup.sh
