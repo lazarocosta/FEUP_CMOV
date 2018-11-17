@@ -47,10 +47,12 @@ public class FileManager {
     public static ArrayList<Ticket> readTickets(Context context) {
         String filename = CustomerApp.ticketsFilename;
         try {
+            ArrayList<Ticket> tickets = new ArrayList<>();
+            if (!existsFile(context, filename))
+                return tickets;
             FileInputStream fis = context.openFileInput(filename);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
-            ArrayList<Ticket> tickets = new ArrayList<>();
             while (br.ready())
                 tickets.add(new Ticket(br.readLine()));
             br.close();
@@ -66,10 +68,12 @@ public class FileManager {
     public static ArrayList<Voucher> readVouchers(Context context) {
         String filename = CustomerApp.vouchersFilename;
         try {
+            ArrayList<Voucher> vouchers = new ArrayList<>();
+            if (!existsFile(context, filename))
+                return vouchers;
             FileInputStream fis = context.openFileInput(filename);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
-            ArrayList<Voucher> vouchers = new ArrayList<>();
             while (isr.ready())
                 vouchers.add(new Voucher(br.readLine()));
             br.close();
@@ -80,5 +84,12 @@ public class FileManager {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    private static boolean existsFile(Context context, String filename) {
+        for (String f : context.fileList())
+            if (f.equals(filename))
+                return true;
+        return false;
     }
 }
