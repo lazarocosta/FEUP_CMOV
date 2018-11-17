@@ -41,7 +41,6 @@ public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProducts
         Product p = products.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.productName)).setText(p.getName());
         ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsPrice(p.getPrice()));
-        ((TextView) holder.linearLayout.findViewById(R.id.productQuantity)).setText(StringFormat.formatAsInteger(p.getQuantity()));
         EditText editText = holder.linearLayout.findViewById(R.id.productQuantityET);
         editText.setText(StringFormat.formatAsInteger(p.getQuantity()));
         editText.addTextChangedListener(new TextWatcher() {

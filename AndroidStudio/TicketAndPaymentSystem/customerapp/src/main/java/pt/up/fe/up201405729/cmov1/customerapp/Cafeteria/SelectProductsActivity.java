@@ -11,6 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -18,6 +22,9 @@ import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
 import pt.up.fe.up201405729.cmov1.customerapp.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
+
+import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+
 
 public class SelectProductsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private SelectProductsRVAdapter selectProductsRVAdapter;
@@ -41,6 +48,26 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
         productsRV.setLayoutManager(gridLayoutManager);
         ArrayList<Product> products = new ArrayList<>();
         Collections.addAll(products, Product.products);
+
+       /* JSONObject response = RestServices.GET("/listProducts",new JSONObject());
+        try {
+            JSONArray arrayProducts = response.getJSONArray("data");
+
+            for (int i = 0; i < arrayProducts.length(); i++) {
+                JSONObject jsonObject = arrayProducts.getJSONObject(i);
+                String name = jsonObject.getString("name");
+                Double price = jsonObject.getDouble("price");
+                products.add(new Product(name, price));
+            }
+        } catch (JSONException e) {
+            try {
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+                Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }*/
+
         selectProductsRVAdapter = new SelectProductsRVAdapter(products, context);
         productsRV.setAdapter(selectProductsRVAdapter);
     }
