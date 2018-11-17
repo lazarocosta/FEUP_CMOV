@@ -28,7 +28,7 @@ public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.My
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Product p = products.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.productName)).setText(p.getName());
-        ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsInteger(p.getPrice()));
+        ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsPrice(p.getPrice()));
         ((TextView) holder.linearLayout.findViewById(R.id.productQuantity)).setText(StringFormat.formatAsInteger(p.getQuantity()));
     }
 

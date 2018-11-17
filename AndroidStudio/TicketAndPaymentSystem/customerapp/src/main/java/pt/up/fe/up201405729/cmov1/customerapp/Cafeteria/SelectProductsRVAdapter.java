@@ -1,5 +1,6 @@
 package pt.up.fe.up201405729.cmov1.customerapp.Cafeteria;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,9 +22,11 @@ import pt.up.fe.up201405729.cmov1.customerapp.StringFormat;
 
 public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProductsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Product> products;
+    private Context context;
 
-    public SelectProductsRVAdapter(ArrayList<Product> products) {
+    public SelectProductsRVAdapter(ArrayList<Product> products, Context context) {
         this.products = products;
+        this.context = context;
     }
 
     @NonNull
@@ -36,7 +40,7 @@ public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProducts
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Product p = products.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.productName)).setText(p.getName());
-        ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsInteger(p.getPrice()));
+        ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsPrice(p.getPrice()));
         ((TextView) holder.linearLayout.findViewById(R.id.productQuantity)).setText(StringFormat.formatAsInteger(p.getQuantity()));
         EditText editText = holder.linearLayout.findViewById(R.id.productQuantityET);
         editText.setText(StringFormat.formatAsInteger(p.getQuantity()));
@@ -57,7 +61,12 @@ public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProducts
                 } catch (NumberFormatException e) {
                     value = 0;
                 }
-                products.get(holder.getAdapterPosition()).setQuantity(value);
+                try {
+                    products.get(holder.getAdapterPosition()).setQuantity(value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

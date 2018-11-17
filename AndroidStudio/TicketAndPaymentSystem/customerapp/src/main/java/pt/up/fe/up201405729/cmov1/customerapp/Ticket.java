@@ -16,24 +16,14 @@ public class Ticket implements Serializable {
     private MyDate date;
     private String roomPlace;
     private State state;
+
     public Ticket(String uuid, String performanceId, String showName, MyDate date, String roomPlace, String state) {
-        State myState;
-        switch (state) {
-            case "used":
-                myState = State.used;
-                break;
-            case "not used":
-                myState = State.notUsed;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid state: " + state);
-        }
         this.uuid = uuid;
         this.performanceId = performanceId;
         this.showName = showName;
         this.date = date;
         this.roomPlace = roomPlace;
-        this.state = myState;
+        this.state = parseState(state);
     }
 
     public Ticket(String str) {
@@ -45,10 +35,25 @@ public class Ticket implements Serializable {
             this.showName = ticket.getString("showName");
             this.date = new MyDate(ticket.getString("date"));
             this.roomPlace = ticket.getString("roomPlace");
-            this.state = State.notUsed; // TODO: ticket.get("state");
+            this.state = parseState(ticket.getString("state"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private State parseState(String state) {
+        State myState;
+        switch (state) {
+            case "used":
+                myState = State.used;
+                break;
+            case "not used":
+                myState = State.notUsed;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid state: " + state);
+        }
+        return myState;
     }
 
     public String getUuid() {
@@ -108,11 +113,22 @@ public class Ticket implements Serializable {
             ticket.put("showName", showName);
             ticket.put("date", date);
             ticket.put("roomPlace", roomPlace);
-            ticket.put("state", state);
+            ticket.put("state", parseState(state));
             jsonObject.put("Ticket", ticket);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject.toString();
+    }
+
+    private String parseState(State state) {
+        String stateStr;
+        if (state.equals(State.used))
+            stateStr = "used";
+        else if (state.equals(State.notUsed))
+            stateStr = "not used";
+        else
+            throw new IllegalArgumentException("Invalid state: " + state);
+        return stateStr;
     }
 }

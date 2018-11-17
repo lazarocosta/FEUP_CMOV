@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-public class CheckoutActivity extends AppCompatActivity {
+public class CheckoutActivity extends NavigableActivity {
     private CustomerApp app;
     private PerformancesRVAdapter performancesRVAdapter;
 
@@ -66,7 +65,7 @@ public class CheckoutActivity extends AppCompatActivity {
             SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
             String uuid = preferences.getString("uuid", null);
 
-            JSONObject signedJSONObject = new JSONObject();
+            byte[] signedMessage = new byte[0];
             try {
                 JSONObject buyTicketsData = new JSONObject();
                 JSONArray jsonPerformances = new JSONArray();
@@ -80,12 +79,12 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
                 buyTicketsData.put("performances", jsonPerformances);
                 buyTicketsData.put("userId", uuid);
-                signedJSONObject = app.getEncryptionManager().buildSignedJSONObject(buyTicketsData);
+                signedMessage = app.getEncryptionManager().buildSignedMessage(buyTicketsData);
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-            JSONObject response = RestServices.PUT("/buyTickets", signedJSONObject);
+            JSONObject response = RestServices.POST("/buyTickets", signedMessage);
             try {
                 JSONObject jsonData = response.getJSONObject("data");
                 JSONArray jsonVouchers = jsonData.getJSONArray("vouchers");

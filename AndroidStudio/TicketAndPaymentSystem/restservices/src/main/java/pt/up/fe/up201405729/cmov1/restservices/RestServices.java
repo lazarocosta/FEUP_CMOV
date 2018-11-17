@@ -7,28 +7,32 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 public class RestServices {
-    private static final String databaseUrl = " https://us-central1-cmov-d52d6.cloudfunctions.net";
+    private static final String databaseUrl = "https://us-central1-cmov-d52d6.cloudfunctions.net";
 
     public static JSONObject GET(String relativeUrl, JSONObject data) {
-        return RestTask(relativeUrl, "GET", data);
+        return RestTask(relativeUrl, "GET", data.toString().getBytes());
     }
 
     public static JSONObject POST(String relativeUrl, JSONObject data) {
+        return RestTask(relativeUrl, "POST", data.toString().getBytes());
+    }
+
+    public static JSONObject POST(String relativeUrl, byte[] data) {
         return RestTask(relativeUrl, "POST", data);
     }
 
     public static JSONObject PUT(String relativeUrl, JSONObject data) {
-        return RestTask(relativeUrl, "PUT", data);
+        return RestTask(relativeUrl, "PUT", data.toString().getBytes());
     }
 
     public static JSONObject DELETE(String relativeUrl, JSONObject data) {
-        return RestTask(relativeUrl, "DELETE", data);
+        return RestTask(relativeUrl, "DELETE", data.toString().getBytes());
     }
 
-    private static JSONObject RestTask(String relativeUrl, String method, JSONObject data) {
+    private static JSONObject RestTask(String relativeUrl, String method, byte[] data) {
         String url = databaseUrl + relativeUrl;
         HttpAsyncTask httpAsyncTask = new HttpAsyncTask(url, method);
-        AsyncTask<JSONObject, Void, JSONObject> execute = httpAsyncTask.execute(data);
+        AsyncTask<byte[], Void, JSONObject> execute = httpAsyncTask.execute(data);
         try {
             return execute.get();
         } catch (ExecutionException | InterruptedException e) {

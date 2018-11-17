@@ -1,15 +1,12 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
-const UIDGenerator = require('uid-generator');
 
 admin.initializeApp(functions.config().firebase);
 
 
 const fs = require('fs');
 const path = require('path');
-const cors = require('cors')({origin: false});
 
 // Folder where all your individual Cloud Functions files are located.
 const FUNCTIONS_FOLDER = './funcs';

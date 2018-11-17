@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
@@ -31,13 +32,13 @@ public class SelectProductsActivity extends NavigableActivity {
             bar.setTitle(R.string.select_products_activity_title);
         }
 
+        Context context = this;
         RecyclerView productsRV = findViewById(R.id.selectProductsRV);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
         productsRV.setLayoutManager(gridLayoutManager);
         ArrayList<Product> products = new ArrayList<>();
-        for (Product.Products p : Product.Products.values())
-            products.add(new Product(p.name(), 1, 1));  // TODO: adjust data
-        selectProductsRVAdapter = new SelectProductsRVAdapter(products);
+        Collections.addAll(products, Product.products);
+        selectProductsRVAdapter = new SelectProductsRVAdapter(products, context);
         productsRV.setAdapter(selectProductsRVAdapter);
     }
 
@@ -64,7 +65,7 @@ public class SelectProductsActivity extends NavigableActivity {
                 Toast.makeText(context, "You should select at least one product.", Toast.LENGTH_LONG).show();
             else {
                 Intent i = new Intent(context, AddVouchersActivity.class);
-                i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, desiredProducts);
+                i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, new CheckoutProducts(desiredProducts));
                 startActivity(i);
                 finish();
             }

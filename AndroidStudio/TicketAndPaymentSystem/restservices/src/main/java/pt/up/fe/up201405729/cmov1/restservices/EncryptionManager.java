@@ -34,6 +34,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
@@ -50,6 +51,7 @@ public class EncryptionManager {
     private static final String charsetName = "UTF-8";
     private static final int NUM_KEY_BYTES = KEY_SIZE / Byte.SIZE;
     private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private KeyStore keyStore;
     private Context context;
 
@@ -159,37 +161,25 @@ public class EncryptionManager {
     }
     */
 
-    public JSONObject buildSignedJSONObject(JSONObject jsonObject) {
-        JSONObject signedJSONObject = new JSONObject();
+    public byte[] buildSignedMessage(JSONObject jsonObject) {
+        byte[] signedMessage = new byte[0];
         try {
-            String jsonObjectString = new String(jsonObject.toString().getBytes("UTF-16"), "UTF-16");
-            signedJSONObject.put("data", jsonObjectString);
+            byte[] jsonObjectBytes = jsonObject.toString().getBytes();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, null);
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initSign(privateKey);
-            sg.update(jsonObjectString.getBytes("UTF-16"));
+            sg.update(jsonObjectBytes);
             byte[] signature = new byte[NUM_KEY_BYTES];
             sg.sign(signature, 0, NUM_KEY_BYTES);
-            signedJSONObject.put("signature", new String(signature, "UTF-16"));
-            System.out.println(bytesToHex(jsonObjectString.getBytes()));
-            System.out.println(bytesToHex(new String(signature, "UTF-16").getBytes()));
-        } catch (JSONException | NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
+            signedMessage = new byte[jsonObjectBytes.length + signature.length];
+            System.arraycopy(jsonObjectBytes, 0, signedMessage, 0, jsonObjectBytes.length);
+            System.arraycopy(signature, 0, signedMessage, jsonObjectBytes.length, signature.length);
+        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
             handleException(e);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
-        return signedJSONObject;
+        return signedMessage;
     }
-    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
+
     /*
     // Based on https://paginas.fe.up.pt/~apm/CM/docs/MsgSignNFCandQR.zip and adapted for our needs
     public boolean validate(byte[] message, byte[] signature) {
@@ -207,17 +197,35 @@ public class EncryptionManager {
     }
     */
 
-    public boolean validate(JSONObject signedJSONObject) {
+    public boolean validate(byte[] message, byte[] signature) {
         boolean verified = false;
         try {
             PublicKey publicKey = keyStore.getCertificate(keyAlias).getPublicKey();
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initVerify(publicKey);
-            sg.update(signedJSONObject.getJSONObject("data").toString().getBytes());
-            verified = sg.verify((byte[]) signedJSONObject.get("signature"));
-        } catch (NoSuchAlgorithmException | JSONException | InvalidKeyException | KeyStoreException | SignatureException e) {
+            sg.update(message);
+            verified = sg.verify(signature);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | KeyStoreException | SignatureException e) {
             handleException(e);
         }
         return verified;
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+    private static byte[] hexToBytes(String hexString) {
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < bytes.length; i += 2)
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+        return bytes;
     }
 }

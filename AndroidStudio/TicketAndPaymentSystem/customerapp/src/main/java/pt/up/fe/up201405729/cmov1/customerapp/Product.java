@@ -3,23 +3,23 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 import java.io.Serializable;
 
 public class Product implements Serializable {
-    public enum Products {Coffee, Soda, Drink, Popcorn, Sandwich}
+    public static final Product[] products = new Product[]{
+            new Product("Coffee", 0.8, 0),
+            new Product("Soda drink", 1.5, 0),
+            new Product("Popcorn", 3.0, 0),
+            new Product("Sandwich", 1.5, 0)
+    };
     private String name;
-    private int price;
+    private double price;
     private int quantity;
 
-    public Product(String name, int price){
-        this.name = name;
-        this.price = price;
-        this.quantity = 1;
-    }
-    public Product(String name, int price, int quantity){
+    public Product(String name, double price, int quantity){
         this.name = name;
         this.price = price;
         this.quantity = quantity;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -31,7 +31,12 @@ public class Product implements Serializable {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(int quantity) throws IllegalAccessException {
+        for (Product p : products)
+            if (this == p)
+                throw new IllegalAccessException("This object should not be changed.");
+        if (quantity < 0)
+            throw new IllegalArgumentException("Quantity should be zero or higher.");
         this.quantity = quantity;
     }
 }

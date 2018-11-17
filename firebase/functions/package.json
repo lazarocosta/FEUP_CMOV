@@ -11,13 +11,11 @@
   "dependencies": {
     "buffer": "^5.2.1",
     "cors": "^2.8.4",
-    "firebase-admin": "~6.0.0",
-    "firebase-functions": "^2.0.3",
-    "get-random-values": "^1.2.0",
+    "firebase-admin": "^6.1.0",
+    "firebase-functions": "^2.1.0",
     "random": "^2.0.12",
     "rsa-pem-from-mod-exp": "^0.8.4",
     "string_decoder": "^1.1.1",
-    "uid-generator": "^1.0.0",
     "uuid": "^3.3.2"
   },
   "private": true
