@@ -263,6 +263,9 @@ Parameters:
 
 Output: JSON with result value 
 Teste:
+
+    curl -X POST http://192.168.1.58:5000/cmov-d52d6/us-central1/listTickets --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/listTickets --data '{}' -g -H "Content-Type: application/json"
 
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listTickets  --data '{}' -g -H "Content-Type: application/json"
