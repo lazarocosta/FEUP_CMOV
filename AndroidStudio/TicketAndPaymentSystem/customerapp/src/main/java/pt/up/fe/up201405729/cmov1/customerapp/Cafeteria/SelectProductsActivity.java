@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
@@ -35,8 +36,7 @@ public class SelectProductsActivity extends NavigableActivity {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
         productsRV.setLayoutManager(gridLayoutManager);
         ArrayList<Product> products = new ArrayList<>();
-        for (Product.Products p : Product.Products.values())
-            products.add(new Product(p.name(), 1, 1));  // TODO: adjust data
+        Collections.addAll(products, Product.products);
         selectProductsRVAdapter = new SelectProductsRVAdapter(products);
         productsRV.setAdapter(selectProductsRVAdapter);
     }

@@ -48,19 +48,19 @@ const addProducts = functions.https.onRequest((req,res)=>{
     return cors(req,res, () =>{
 
         admin.firestore().collection('product').add({
-            name:'popcorn',
+            name:'Popcorn',
             price:2
         }).then(()=>{
             admin.firestore().collection('product').add({
-                name:'coffee',
+                name:'Coffee',
                 price:2
             }).then(()=>{
                 admin.firestore().collection('product').add({
-                    name:'sandwich',
+                    name:'Sandwich',
                     price:2
                 }).then(()=>{
                     admin.firestore().collection('product').add({
-                        name:'sodadrink',
+                        name:'Soda drink',
                         price:2
                     }).then(()=>{
                         res.status(200).send({ 'data':true});
