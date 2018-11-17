@@ -32,12 +32,13 @@ public class SelectProductsActivity extends NavigableActivity {
             bar.setTitle(R.string.select_products_activity_title);
         }
 
+        Context context = this;
         RecyclerView productsRV = findViewById(R.id.selectProductsRV);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
         productsRV.setLayoutManager(gridLayoutManager);
         ArrayList<Product> products = new ArrayList<>();
         Collections.addAll(products, Product.products);
-        selectProductsRVAdapter = new SelectProductsRVAdapter(products);
+        selectProductsRVAdapter = new SelectProductsRVAdapter(products, context);
         productsRV.setAdapter(selectProductsRVAdapter);
     }
 
