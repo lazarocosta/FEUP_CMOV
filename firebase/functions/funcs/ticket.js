@@ -121,8 +121,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
         const userId = data.userId
 
         console.log('depois')
-        res.status(200).send({ 'data': true});
-        return ;
+   
         var obj = {}
 
         if(!userId) {

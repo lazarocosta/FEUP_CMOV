@@ -1,6 +1,11 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
+const firestore = new Firestore();
+const settings = {timestampsInSnapshots: true};
+firestore.settings(settings);
+
+
 /**
 Function to list of products
 Parameters:

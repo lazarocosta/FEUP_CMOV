@@ -5,6 +5,7 @@ const uuidv1 = require('uuid/v1');
 const crypto = require('crypto');
 
 
+
 /**
 Function to register the customer
 Parameters: publicKey -> 
