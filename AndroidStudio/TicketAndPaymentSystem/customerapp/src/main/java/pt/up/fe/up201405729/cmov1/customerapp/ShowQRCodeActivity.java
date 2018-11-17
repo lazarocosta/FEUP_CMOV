@@ -16,7 +16,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
-public class ShowQRCodeActivity extends AppCompatActivity {
+public class ShowQRCodeActivity extends NavigableActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
