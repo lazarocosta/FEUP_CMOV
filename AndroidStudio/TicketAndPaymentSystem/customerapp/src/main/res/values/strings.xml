@@ -14,10 +14,11 @@
     <string name="performance_tickets_quantity">Qty:</string>
     <string name="buy_string">BUY</string>
     <string name="list_transactions_ticket_name">Tickets</string>
+    <string name="list_transactions_ticket_date">Date</string>
     <string name="list_transactions_ticket_place">Place</string>
     <string name="ticketName">name</string>
-    <string name="ticketPrice">price</string>
     <string name="ticketDate">date</string>
+    <string name="ticketPrice">price</string>
     <string name="list_transactions_voucher">Product Code of Vouchers </string>
     <string name="voucher">Voucher</string>
     <string name="list_transactions_product_name">Products</string>
