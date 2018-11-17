@@ -26,6 +26,8 @@ import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class RegistrationActivity extends AppCompatActivity {
     private CustomerApp app;
+    private Calendar calendar;
+    private DatePickerDialog datePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +47,8 @@ public class RegistrationActivity extends AppCompatActivity {
                 creditCardValidity.setText(StringFormat.formatAsDate(year, month, dayOfMonth));
             }
         };
-        Calendar calendar = Calendar.getInstance();
-        final DatePickerDialog datePicker = new DatePickerDialog(this, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        calendar = Calendar.getInstance();
+        datePicker = new DatePickerDialog(this, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         creditCardValidity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -62,6 +64,12 @@ public class RegistrationActivity extends AppCompatActivity {
                 datePicker.show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        datePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     @Override
