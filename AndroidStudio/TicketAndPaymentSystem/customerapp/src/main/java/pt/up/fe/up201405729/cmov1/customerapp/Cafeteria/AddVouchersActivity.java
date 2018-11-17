@@ -3,12 +3,12 @@ package pt.up.fe.up201405729.cmov1.customerapp.Cafeteria;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -25,7 +25,7 @@ import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
 
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
-public class AddVouchersActivity extends NavigableActivity {
+public class AddVouchersActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private AddVouchersActivityRVAdapter addVouchersActivityRVAdapter;
     private CheckoutProducts checkoutProducts;
 
@@ -34,10 +34,13 @@ public class AddVouchersActivity extends NavigableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_vouchers);
 
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setTitle("Add vouchers");
-        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle("Add vouchers");
+        toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.setOnMenuItemClickListener(this);
+        ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
+        actionMenuItemView.setText(R.string.continue_string);
 
         Intent i = getIntent();
         checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
@@ -56,29 +59,25 @@ public class AddVouchersActivity extends NavigableActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_cafeteria_add_vouchers, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onMenuItemClick(MenuItem menuItem) {
         Context context = this;
-        if (item.getItemId() == R.id.cafeteriaAddVouchersActivityContinueButton) {
-            HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
-            if (vouchers.size() > 2)
-                Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
-            else {
-                String qrCodeContent = generateQRCodeContent();
-                updateStoredVouchers();
-                Intent i = new Intent(context, ShowQRCodeActivity.class);
-                i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
-                startActivity(i);
-                finish();
-            }
+        switch (menuItem.getItemId()) {
+            case R.id.toolbar_button:
+                HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
+                if (vouchers.size() > 2)
+                    Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
+                else {
+                    String qrCodeContent = generateQRCodeContent();
+                    updateStoredVouchers();
+                    Intent i = new Intent(context, ShowQRCodeActivity.class);
+                    i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+                    startActivity(i);
+                    finish();
+                }
+                return true;
+            default:
+                return false;
         }
-        return (super.onOptionsItemSelected(item));
     }
 
     @Override

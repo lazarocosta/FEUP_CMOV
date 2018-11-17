@@ -47,4 +47,5 @@
     <string name="add_vouchers_product_code">Product code</string>
     <string name="add_vouchers_voucher_state">State</string>
     <string name="continue_string">CONTINUE</string>
+    <string name="toolbar_button_string">BUTTON</string>
 </resources>

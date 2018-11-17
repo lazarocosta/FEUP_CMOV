@@ -3,12 +3,12 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -21,7 +21,7 @@ import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-public class MainActivity extends NavigableActivity {
+public class MainActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private PerformancesRVAdapter performancesRVAdapter;
 
     @Override
@@ -29,10 +29,13 @@ public class MainActivity extends NavigableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setTitle(R.string.main_activity_title);
-        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle(R.string.main_activity_title);
+        toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.setOnMenuItemClickListener(this);
+        ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
+        actionMenuItemView.setText(R.string.buy_string);
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
@@ -73,38 +76,34 @@ public class MainActivity extends NavigableActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onMenuItemClick(MenuItem menuItem) {
         Context context = this;
-        if (item.getItemId() == R.id.mainActivityBuyButton) {
-            ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
-            ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
-            ArrayList<Performance> desiredPerformances = new ArrayList<>();
-            ArrayList<Integer> desiredTicketsQuantities = new ArrayList<>();
-            for (int i = 0; i < allPerformances.size(); i++) {
-                Integer quantity = ticketsQuantities.get(i);
-                if (quantity > 0) {
-                    desiredPerformances.add(allPerformances.get(i));
-                    desiredTicketsQuantities.add(quantity);
+        switch (menuItem.getItemId()) {
+            case R.id.toolbar_button:
+                ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
+                ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
+                ArrayList<Performance> desiredPerformances = new ArrayList<>();
+                ArrayList<Integer> desiredTicketsQuantities = new ArrayList<>();
+                for (int i = 0; i < allPerformances.size(); i++) {
+                    Integer quantity = ticketsQuantities.get(i);
+                    if (quantity > 0) {
+                        desiredPerformances.add(allPerformances.get(i));
+                        desiredTicketsQuantities.add(quantity);
+                    }
                 }
-            }
-            if (desiredPerformances.isEmpty())
-                Toast.makeText(context, "You should select at least one performance.", Toast.LENGTH_LONG).show();
-            else {
-                CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
-                Intent i = new Intent(context, CheckoutActivity.class);
-                i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
-                startActivity(i);
-                finish();
-            }
+                if (desiredPerformances.isEmpty())
+                    Toast.makeText(context, "You should select at least one performance.", Toast.LENGTH_LONG).show();
+                else {
+                    CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
+                    Intent i = new Intent(context, CheckoutActivity.class);
+                    i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
+                    startActivity(i);
+                    finish();
+                }
+                return true;
+            default:
+                return false;
         }
-        return (super.onOptionsItemSelected(item));
     }
 
     @Override

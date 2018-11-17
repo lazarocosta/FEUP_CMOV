@@ -2,10 +2,12 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -23,10 +25,13 @@ public class ListTransactionsActivity extends NavigableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_transactions);
 
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setTitle(R.string.list_transactions_activity_title);
-        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle(R.string.list_transactions_activity_title);
+        toolbar.inflateMenu(R.menu.toolbar_menu);
+        ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
+        actionMenuItemView.setText("");
+        actionMenuItemView.setEnabled(false);
 
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);

@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 import pt.up.fe.up201405729.cmov1.customerapp.Cafeteria.SelectProductsActivity;
 
-public class NavigableActivity extends AppCompatActivity {
+public abstract class NavigableActivity extends AppCompatActivity {
     private static Integer checkedItem = null;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -23,12 +23,6 @@ public class NavigableActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setHomeButtonEnabled(true);
-            bar.setDisplayShowHomeEnabled(true);
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
         final Context context = this;
         final Class myActivity = getClass();
         navigationView = findViewById(R.id.navigationView);
@@ -71,17 +65,6 @@ public class NavigableActivity extends AppCompatActivity {
         MenuItem menuItem = navigationView.getCheckedItem();
         if (menuItem != null)
             checkedItem = menuItem.getItemId();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (drawerLayout.isDrawerOpen(navigationView))
-                drawerLayout.closeDrawer(navigationView);
-            else
-                drawerLayout.openDrawer(navigationView);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
