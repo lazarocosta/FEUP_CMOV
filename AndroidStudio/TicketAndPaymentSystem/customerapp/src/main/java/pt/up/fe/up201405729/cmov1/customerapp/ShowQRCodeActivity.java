@@ -5,9 +5,10 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItemView;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -23,11 +24,14 @@ public class ShowQRCodeActivity extends NavigableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_qrcode);
 
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setTitle("QR code");
-            bar.hide();
-        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle("QR code");
+        toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.hideOverflowMenu();
+        ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
+        actionMenuItemView.setText("");
+        actionMenuItemView.setEnabled(false);
 
         Intent i = getIntent();
         final String qrCodeContent = i.getStringExtra(CustomerApp.qrCodeContentKeyName);
