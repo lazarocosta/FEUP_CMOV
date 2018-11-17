@@ -101,22 +101,22 @@ Teste:
 */
 const buyTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
+        console.log("rawBody",res.rawBody)
         const dataBytes = res.rawBody.slice(0, -64)
         const signatureBytes = res.rawBody.slice(-64)
+        console.log(signatureBytes)
         const dataString = dataBytes.toString()
+        console.log(dataString)
         const data = JSON.parse(dataString).data;
         const performances = data.performances
         const userId = data.userId
 
-        console.log('depois')
-   
         var obj = {}
 
         if(!userId) {
             res.status(200).send({ 'error': "Please enter a userId."});
             return;
         }
-
 
         if(!performances) {
             res.status(200).send({ 'error': "Please enter a performances."});
@@ -326,25 +326,28 @@ const  deletePerformances = functions.https.onRequest((req, res) => {
 curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
 
 curl -X POST http://localhost:5000/cmov-d52d6/us-central1/addPerformances --data '{}' -g -H "Content-Type: application/json"
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/addPerformances --data '{}' -g -H "Content-Type: application/json"
+    
+curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/addPerformances --data '{}' -g -H "Content-Type: application/json"
 
 */
 const  addPerformances = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
         for(var i=0; i<10; i++){
-            var nameS = "name"+ i;
+            var nameS = "evento"+ i;
 
         admin.firestore().collection('ticket').add({
             date: new Date("Wed Nov 14 2019 11:23:20 GMT+0000"),
             name:nameS,
             price:10 + i,
             sold:0
-        })
-
+        }).then(()=>{
             if(i=9){
                 res.status(200).send({ 'data':true});
                 return;
             }
+        })
+
+
         }
     })
 })

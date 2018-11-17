@@ -1,9 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
-const firestore = new Firestore();
-const settings = {timestampsInSnapshots: true};
-firestore.settings(settings);
 
 
 /**
@@ -58,15 +55,15 @@ const addProducts = functions.https.onRequest((req,res)=>{
         }).then(()=>{
             admin.firestore().collection('product').add({
                 name:'Coffee',
-                price:2
+                price:1
             }).then(()=>{
                 admin.firestore().collection('product').add({
                     name:'Sandwich',
-                    price:2
+                    price:5
                 }).then(()=>{
                     admin.firestore().collection('product').add({
                         name:'Soda drink',
-                        price:2
+                        price:4
                     }).then(()=>{
                         res.status(200).send({ 'data':true});
                         return;
@@ -92,6 +89,8 @@ const addProducts = functions.https.onRequest((req,res)=>{
 })
 
 /*
+curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/deleteProducts --data '{}' -g -H "Content-Type: application/json"
+
 curl -X POST http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1/deleteProducts --data '{}' -g -H "Content-Type: application/json"
 
 curl -X POST http://localhost:5000/cmov-d52d6/us-central1/deleteProducts --data '{}' -g -H "Content-Type: application/json"

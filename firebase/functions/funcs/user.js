@@ -140,11 +140,13 @@ TEST:
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const userId = req.body.data.userId;
-        const vouchers = req.body.data.vouchers;
-        const products = req.body.data.products;
-        const signature = req.body.signature
-        const dataToString = JSON.stringify(req.body.data);
+        const dataBytes = res.rawBody.slice(0, -64)
+        const signatureBytes = res.rawBody.slice(-64)
+        const dataString = dataBytes.toString()
+        const data = JSON.parse(dataString).data;
+        const userId = data.userId;
+        const vouchers = data.vouchers;
+        const products = data.products;
 
 
         if(!userId){
@@ -190,7 +192,7 @@ const payOrder = functions.https.onRequest((req, res) => {
             listproducts.push(product)
         }
 
-        VerifySignature(userId, dataToString,signature).then(result=>{
+        VerifySignature(userId, dataBytes,signatureBytes).then(result=>{
             console.log(result)
 
             if(!result){
@@ -623,23 +625,18 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
 
 function VerifySignature(userId, data, signature){
 
-
     return admin.firestore().collection('customer').doc(userId).get()
     .then(doc => {
-        console.log('entrou')
-        var publicKey;
-        console.log(doc)
-        console.log(doc.data())
-        publicKey = doc.data().publicKey
-        console.log(publicKey)
+
+        var modulus;
+        var exponent;
+        modulus = doc.data().publicKey.modulus
+        exponent = doc.data().publicKey.publicExponent
+        var certificate = getPem(modulus, exponent);
+        console.log(certificate)
         var verify = crypto.createVerify('RSA-SHA256')
         verify.update(data);
-        console.log('data',data)
-        console.log('signature',signature)
-        console.log('user',userId)
-
-        console.log('aqui')
-        return verify.verify(publicKey, signature);
+        return verify.verify(certificate, signature);
     })
     .catch(error =>  {
         console.log(error)
