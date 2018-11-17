@@ -1,7 +1,6 @@
 package pt.up.fe.up201405729.cmov1.customerapp;
 
 import android.support.annotation.NonNull;
-import android.util.JsonReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,8 +16,25 @@ public class Voucher implements Serializable {
     private String productCodeString;
 
     public Voucher(String uuid, String productCode, String state) {
+        this.uuid = uuid;
+        this.productCode = parseProductCode(productCode);
+        this.state = parseState(state);
+    }
+
+    public Voucher(String str) {
+        try {
+            JSONObject jsonObject = new JSONObject(str);
+            JSONObject voucher = jsonObject.getJSONObject("Voucher");
+            this.uuid = voucher.getString("uuid");
+            this.productCode = parseProductCode(voucher.getString("productCode"));
+            this.state = parseState(voucher.getString("state"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ProductCode parseProductCode(String productCode) {
         ProductCode myProductCode;
-        State myState;
         switch (productCode) {
             case "freecoffee":
                 productCodeString = "free coffee";
@@ -35,6 +51,11 @@ public class Voucher implements Serializable {
             default:
                 throw new IllegalArgumentException("Invalid product code: " + productCode);
         }
+        return myProductCode;
+    }
+
+    private State parseState(String state) {
+        State myState;
         switch (state) {
             case "used":
                 myState = State.used;
@@ -45,21 +66,7 @@ public class Voucher implements Serializable {
             default:
                 throw new IllegalArgumentException("Invalid state: " + state);
         }
-        this.uuid = uuid;
-        this.productCode = myProductCode;
-        this.state = myState;
-    }
-
-    public Voucher(String str) {
-        try {
-            JSONObject jsonObject = new JSONObject(str);
-            JSONObject voucher = jsonObject.getJSONObject("Voucher");
-            this.uuid = voucher.getString("uuid");
-            this.productCode = ProductCode.Popcorn; // TODO: voucher.get("productCode");
-            this.state = State.notUsed; // TODO: voucher.get("state");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        return myState;
     }
 
     public String getProductCodeString() {
@@ -89,12 +96,39 @@ public class Voucher implements Serializable {
         try {
             JSONObject voucher = new JSONObject();
             voucher.put("uuid", uuid);
-            //TODO: voucher.put("productCode", productCode);
-            //TODO: voucher.put("state", state);
+            voucher.put("productCode", parseProductCode(productCode));
+            voucher.put("state", parseState(state));
             jsonObject.put("Voucher", voucher);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject.toString();
+    }
+
+    private String parseProductCode(ProductCode productCode) {
+        String productCodeStr;
+        if (productCode.equals(ProductCode.FreeCoffee)) {
+            productCodeString = "free coffee";
+            productCodeStr = "freecoffee";
+        } else if (productCode.equals(ProductCode.Popcorn)) {
+            productCodeString = "popcorn";
+            productCodeStr = "popcorn";
+        } else if (productCode.equals(ProductCode.Discount)) {
+            productCodeString = "5 discount Cafeteria";
+            productCodeStr = "5%discountCafeteria";
+        } else
+            throw new IllegalArgumentException("Invalid product code: " + productCode);
+        return productCodeStr;
+    }
+
+    private String parseState(State state) {
+        String stateStr;
+        if (state.equals(State.used))
+            stateStr = "used";
+        else if (state.equals(State.notUsed))
+            stateStr = "not used";
+        else
+            throw new IllegalArgumentException("Invalid state: " + state);
+        return stateStr;
     }
 }
