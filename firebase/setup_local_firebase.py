@@ -8,6 +8,7 @@ import time
 import threading
 
 def my_call(args_array):
+    print("\nExecuting: " + str(args_array))
     if subprocess.call(args_array) != 0:
         print("An error occurred.")
         sys.exit()
