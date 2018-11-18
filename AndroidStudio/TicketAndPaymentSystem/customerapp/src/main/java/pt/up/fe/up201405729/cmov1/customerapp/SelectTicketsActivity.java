@@ -18,6 +18,7 @@ import java.util.HashSet;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 public class SelectTicketsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
+    private final Context context = this;
     private ArrayList<Ticket> allTickets;
     private SelectTicketsRVAdapter selectTicketsRVAdapter;
 
@@ -34,35 +35,48 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.finish_string);
 
-        allTickets = FileManager.readTickets(this);
-        ArrayList<Ticket> selectableTickets = new ArrayList<>();
-        for (Ticket t : allTickets)
-            if (t.getState() == Ticket.State.notUsed)
-                selectableTickets.add(t);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                allTickets = FileManager.readTickets(context);
+                ArrayList<Ticket> selectableTickets = new ArrayList<>();
+                for (Ticket t : allTickets)
+                    if (t.getState() == Ticket.State.notUsed)
+                        selectableTickets.add(t);
 
-        RecyclerView selectTicketsRV = findViewById(R.id.selectTicketsRV);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
-        selectTicketsRV.setLayoutManager(gridLayoutManager);
-        selectTicketsRVAdapter = new SelectTicketsRVAdapter(selectableTickets, this);
-        selectTicketsRV.setAdapter(selectTicketsRVAdapter);
+                RecyclerView selectTicketsRV = findViewById(R.id.selectTicketsRV);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+                selectTicketsRV.setLayoutManager(gridLayoutManager);
+                selectTicketsRVAdapter = new SelectTicketsRVAdapter(selectableTickets, context);
+                selectTicketsRV.setAdapter(selectTicketsRVAdapter);
+            }
+        }).start();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                Intent i;
-                if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
-                    String qrCodeContent = generateQRCodeContent();
-                    markSelectedTicketsAsUsed();
-                    i = new Intent(this, ShowQRCodeActivity.class);
-                    i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
-                } else {
-                    Toast.makeText(this, "No ticket selected.", Toast.LENGTH_LONG).show();
-                    i = new Intent(this, MainActivity.class);
-                }
-                startActivity(i);
-                finish();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
+                            String qrCodeContent = generateQRCodeContent();
+                            markSelectedTicketsAsUsed();
+                            Intent i = new Intent(context, ShowQRCodeActivity.class);
+                            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+                            startActivity(i);
+                            finish();
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "No ticket selected.", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
                 return true;
             default:
                 return false;
@@ -84,6 +98,6 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         for (Ticket t : allTickets)
             if (selectedTickets.contains(t))
                 t.setState(Ticket.State.used);
-        FileManager.writeTickets(this, allTickets);
+        FileManager.writeTickets(context, allTickets);
     }
 }

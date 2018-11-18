@@ -18,13 +18,13 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.interfaces.RSAPublicKey;
 import java.util.Calendar;
 
 import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 public class RegistrationActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
+    private final Context context = this;
     private CustomerApp app;
     private Calendar calendar;
     private DatePickerDialog datePicker;
@@ -51,7 +51,7 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
             }
         };
         calendar = Calendar.getInstance();
-        datePicker = new DatePickerDialog(this, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        datePicker = new DatePickerDialog(context, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         creditCardValidity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -77,46 +77,65 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
-        Context context = this;
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                JSONObject registrationData = new JSONObject();
-                try {
-                    JSONObject rsaPublicKeyJSONObject = new JSONObject();
-                    EncryptionManager encryptionManager = app.getEncryptionManager();
-                    rsaPublicKeyJSONObject.put("modulus", encryptionManager.getPublicKeyModulus());
-                    rsaPublicKeyJSONObject.put("publicExponent", encryptionManager.getPublicKeyExponent());
-                    registrationData.put("publicKey", rsaPublicKeyJSONObject);
-                    registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
-                    registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());
-                    registrationData.put("creditCardType", ((EditText) findViewById(R.id.registrationCreditCardTypeET)).getText().toString());
-                    registrationData.put("creditCardNumber", ((EditText) findViewById(R.id.registrationCreditCardNumberET)).getText().toString());
-                    registrationData.put("creditCardValidity", ((EditText) findViewById(R.id.registrationCreditCardValidityET)).getText().toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                JSONObject response = RestServices.PUT("/register", registrationData);
-                SharedPreferences sharedPreferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                try {
-                    editor.putString("uuid", response.getString("data"));
-                } catch (JSONException e) {
-                    try {
-                        Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                        Toast.makeText(context, e1.getMessage(), Toast.LENGTH_LONG).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        performRegistration();
+                        goToMainActivity();
                     }
-                }
-                editor.apply();
-
-                Intent i = new Intent(context, MainActivity.class);
-                startActivity(i);
-                finish();
+                }).start();
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void performRegistration() {
+        JSONObject registrationData = new JSONObject();
+        try {
+            JSONObject rsaPublicKeyJSONObject = new JSONObject();
+            EncryptionManager encryptionManager = app.getEncryptionManager();
+            rsaPublicKeyJSONObject.put("modulus", encryptionManager.getPublicKeyModulus());
+            rsaPublicKeyJSONObject.put("publicExponent", encryptionManager.getPublicKeyExponent());
+            registrationData.put("publicKey", rsaPublicKeyJSONObject);
+            registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
+            registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());
+            registrationData.put("creditCardType", ((EditText) findViewById(R.id.registrationCreditCardTypeET)).getText().toString());
+            registrationData.put("creditCardNumber", ((EditText) findViewById(R.id.registrationCreditCardNumberET)).getText().toString());
+            registrationData.put("creditCardValidity", ((EditText) findViewById(R.id.registrationCreditCardValidityET)).getText().toString());
+
+            final JSONObject response = RestServices.PUT("/register", registrationData);
+            SharedPreferences sharedPreferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (response.has("data"))
+                editor.putString("uuid", response.getString("data"));
+            else {
+                final String error = response.getString("error");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            editor.apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            final String exceptionMessage = e.getMessage();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void goToMainActivity() {
+        Intent i = new Intent(context, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 }
