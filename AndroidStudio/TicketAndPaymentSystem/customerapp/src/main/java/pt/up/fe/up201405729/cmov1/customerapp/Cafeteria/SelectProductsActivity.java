@@ -40,7 +40,7 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
         new Thread(new Runnable() {
             @Override
             public void run() {
-                RecyclerView productsRV = findViewById(R.id.selectProductsRV);
+                final RecyclerView productsRV = findViewById(R.id.selectProductsRV);
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
                 productsRV.setLayoutManager(gridLayoutManager);
                 ArrayList<Product> products = new ArrayList<>();
@@ -56,15 +56,33 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
                             Double price = jsonObject.getDouble("price");
                             products.add(new Product(name, price));
                         }
-                    } else
-                        Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+                    } else {
+                        final String error = response.getString("error");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                    final String exceptionMessage = e.getMessage();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }*/
 
                 selectProductsRVAdapter = new SelectProductsRVAdapter(products);
-                productsRV.setAdapter(selectProductsRVAdapter);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        productsRV.setAdapter(selectProductsRVAdapter);
+                    }
+                });
             }
         }).start();
     }
