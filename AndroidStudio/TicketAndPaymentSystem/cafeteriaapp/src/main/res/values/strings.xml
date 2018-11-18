@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Cafeteria App</string>
+    <string name="app_name">CafeteriaApp</string>
+    <string name="start_qr_code_reader_msg">Starting QR code reader&#8230;</string>
 </resources>

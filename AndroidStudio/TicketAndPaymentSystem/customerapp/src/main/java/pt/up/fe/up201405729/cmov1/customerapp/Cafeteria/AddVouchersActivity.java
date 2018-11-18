@@ -76,7 +76,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
                     public void run() {
                         HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
                         if (vouchers.size() <= 2) {
-                            byte[] qrCodeContent = generateQRCodeContent();
+                            String qrCodeContent = generateQRCodeContent();
                             updateStoredVouchers();
                             Intent i = new Intent(context, ShowQRCodeActivity.class);
                             i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
@@ -111,7 +111,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         ((RecyclerView) findViewById(R.id.addVouchersRV)).setAdapter(addVouchersActivityRVAdapter);
     }
 
-    private byte[] generateQRCodeContent() {
+    private String generateQRCodeContent() {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
@@ -125,7 +125,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         for (Voucher v : addVouchersActivityRVAdapter.getSelectedVouchers())
             sb.append(v.getUuid()).append(qrCodeContentDataDelimiter);
         sb.deleteCharAt(sb.length() - 1);
-        return app.getEncryptionManager().buildSignedMessage(EncryptionManager.toBase64(sb.toString()).getBytes());
+        return EncryptionManager.toBase64(app.getEncryptionManager().buildSignedMessage(sb.toString().getBytes()));
     }
 
     private void updateStoredVouchers() {

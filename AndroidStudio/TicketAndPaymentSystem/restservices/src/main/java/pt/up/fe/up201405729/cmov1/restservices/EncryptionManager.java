@@ -218,18 +218,20 @@ public class EncryptionManager {
     }
 
     public static String toBase64(BigInteger bigInteger) {
-        byte[] bytes = Base64.encode(bigInteger.toByteArray(), base64Flags);
+        return Base64.encodeToString(bigInteger.toByteArray(), base64Flags);
+    }
+
+    public static String toBase64(byte[] bytes) {
+        return Base64.encodeToString(bytes, base64Flags);
+    }
+
+    public static String fromBase64ToString(String base64String) {
+        byte[] bytes = fromBase64ToByteArray(base64String);
         return new String(bytes);
     }
 
-    public static String toBase64(String str) {
-        byte[] bytes = Base64.encode(str.getBytes(), base64Flags);
-        return new String(bytes);
-    }
-
-    public static String fromBase64(String base64String) {
-        byte[] bytes = Base64.decode(base64String, base64Flags);
-        return new String(bytes);
+    public static byte[] fromBase64ToByteArray(String base64String) {
+        return Base64.decode(base64String, base64Flags);
     }
 
     public String getPublicKeyModulus() {

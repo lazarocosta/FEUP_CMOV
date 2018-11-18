@@ -88,7 +88,7 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
                 Performance p = performances.get(i);
                 Integer numTickets = ticketsQuantities.get(i);
                 JSONObject jsonPerformance = new JSONObject();
-                jsonPerformance.put("id", p.getId());
+                jsonPerformance.put("id", p.getUuid());
                 jsonPerformance.put("numberTickets", numTickets);
                 jsonPerformances.put(jsonPerformance);
             }

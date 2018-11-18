@@ -94,7 +94,7 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
             sb.append(t.getUuid()).append(qrCodeContentDataDelimiter);
         sb.deleteCharAt(sb.length() - 1);
-        return EncryptionManager.toBase64(sb.toString());
+        return EncryptionManager.toBase64(sb.toString().getBytes());
     }
 
     private void markSelectedTicketsAsUsed() {
