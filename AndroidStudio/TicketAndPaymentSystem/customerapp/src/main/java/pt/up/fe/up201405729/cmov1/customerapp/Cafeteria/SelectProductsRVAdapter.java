@@ -57,8 +57,6 @@ public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProducts
                 }
                 try {
                     products.get(holder.getAdapterPosition()).setQuantity(value);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
                 } catch (IllegalArgumentException e) {
                     s.clear();
                 }

@@ -67,10 +67,11 @@ public class ListTransactionsActivity extends NavigableActivity {
 
                         for (int i = 0; i < products.length(); i++) {
                             JSONObject jsonObject = products.getJSONObject(i);
+                            String id = jsonObject.getString("id");
                             String name = jsonObject.getString("nameProduct");
                             int price = jsonObject.getInt("priceProduct");
                             int quantity = jsonObject.getInt("quantity");
-                            listProducts.add(new Product(name, price, quantity));
+                            listProducts.add(new Product(id, name, price, quantity));
                         }
 
                         for (int i = 0; i < vouchers.length(); i++) {

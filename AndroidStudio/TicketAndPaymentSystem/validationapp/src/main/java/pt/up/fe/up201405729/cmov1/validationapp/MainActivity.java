@@ -11,9 +11,11 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,19 +59,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void processQRCode(String contents) {
+    private void processQRCode(String base64Contents) {
         final Context context = this;
-        String[] uuids = contents.split(qrCodeContentDelimiter);
-        if (uuids.length == 0)
-            return;
-
+        String contents = EncryptionManager.fromBase64(base64Contents);
+        String[] dataTypes = contents.split(qrCodeContentDataTypeDelimiter);
+        if (dataTypes.length != 2)
+            throw new IllegalArgumentException("It was expected 2 data types. Found: " + dataTypes.length);
+        String uuid = dataTypes[0];
+        String[] ticketsUuids = dataTypes[1].split(qrCodeContentDataDelimiter);
         JSONObject validationData = new JSONObject();
         try {
             JSONObject ticketsIds = new JSONObject();
-            for (int i = 1; i < uuids.length; i++)
-                ticketsIds.put("ticketId" + i, uuids[i]);
+            for (int i = 0; i < ticketsUuids.length; i++)
+                ticketsIds.put("ticketId" + i, ticketsUuids[i]);
             validationData.put("tickets", ticketsIds);
-            validationData.put("userId", uuids[0]);
+            validationData.put("userId", uuid);
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();

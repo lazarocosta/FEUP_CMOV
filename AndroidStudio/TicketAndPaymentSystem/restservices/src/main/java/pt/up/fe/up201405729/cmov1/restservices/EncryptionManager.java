@@ -49,6 +49,7 @@ public class EncryptionManager {
     private static final int NUM_KEY_BYTES = KEY_SIZE / Byte.SIZE;
     private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    private final static int base64Flags = Base64.DEFAULT;
     private KeyStore keyStore;
     private Context context;
 
@@ -149,19 +150,18 @@ public class EncryptionManager {
     }
     */
 
-    public byte[] buildSignedMessage(JSONObject jsonObject) {
+    public byte[] buildSignedMessage(byte[] message) {
         byte[] signedMessage = new byte[0];
         try {
-            byte[] jsonObjectBytes = jsonObject.toString().getBytes();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, null);
             Signature sg = Signature.getInstance(SIGNATURE_ALGORITHM);
             sg.initSign(privateKey);
-            sg.update(jsonObjectBytes);
+            sg.update(message);
             byte[] signature = new byte[NUM_KEY_BYTES];
             sg.sign(signature, 0, NUM_KEY_BYTES);
-            signedMessage = new byte[jsonObjectBytes.length + signature.length];
-            System.arraycopy(jsonObjectBytes, 0, signedMessage, 0, jsonObjectBytes.length);
-            System.arraycopy(signature, 0, signedMessage, jsonObjectBytes.length, signature.length);
+            signedMessage = new byte[message.length + signature.length];
+            System.arraycopy(message, 0, signedMessage, 0, message.length);
+            System.arraycopy(signature, 0, signedMessage, message.length, signature.length);
         } catch (NoSuchAlgorithmException | UnrecoverableKeyException | SignatureException | InvalidKeyException | KeyStoreException e) {
             handleException(e);
         }
@@ -217,8 +217,18 @@ public class EncryptionManager {
         return bytes;
     }
 
-    private static String toBase64(BigInteger bigInteger) {
-        byte[] bytes = Base64.encode(bigInteger.toByteArray(), Base64.DEFAULT);
+    public static String toBase64(BigInteger bigInteger) {
+        byte[] bytes = Base64.encode(bigInteger.toByteArray(), base64Flags);
+        return new String(bytes);
+    }
+
+    public static String toBase64(String str) {
+        byte[] bytes = Base64.encode(str.getBytes(), base64Flags);
+        return new String(bytes);
+    }
+
+    public static String fromBase64(String base64String) {
+        byte[] bytes = Base64.decode(base64String, base64Flags);
         return new String(bytes);
     }
 
