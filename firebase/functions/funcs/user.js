@@ -137,61 +137,42 @@ TEST:
 1053ff40-e51e-11e8-8996-7f28f998adb6
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data ' { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher1":"c531c6e0-e415-11e8-82ca-35782305cc78", "voucher":"08c85400-e416-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"26QU3Rxbt3OdOyO8UP4X", "quantity":"1" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"1" }}}' -g -H "Content-Type: application/json"
 
-    curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/payOrder --data '{"signature":"asasa","data": { "userId":"739c7ea0-e407-11e8-a890-d53adf44ae9e","vouchers": {"voucher":"c531c6e0-e415-11e8-82ca-35782305cc78"},"products": {"product1":{"docProduct":"3wa7bd4ZhRHyb7lbdfqj", "quantity":"3" },"product2":{"docProduct":"wxR6vHBwaYqXVPmPvJBk", "quantity":"2" }}}}' -g -H "Content-Type: application/json"
+    curl -X POST http://localhost:5000/cmov-d52d6/us-central1/payOrder --data-binary '7573657269647c7469636b65743e7174793e74693e74797c766f753e766f75733132333435363738393131323334353637383932313233343536373839333132' -g -H "Content-Type: application/octet-stream"
 */
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const dataBytes = res.rawBody.slice(0, -64)
-        const signatureBytes = res.rawBody.slice(-64)
+
+        const buffer = Buffer.from(req.rawBody)
+        const dataBytes = buffer.slice(0, -64)
+        const signatureBytes = buffer.slice(-64)
         const dataString = dataBytes.toString()
-        const data = JSON.parse(dataString).data;
-        const userId = data.userId;
-        const vouchers = data.vouchers;
-        const products = data.products;
 
+        var data = getparameters(dataString)
+        console.log(data)
 
-        if(!userId){
-            res.status(200).send({ 'error':"Please enter a userId."});
+        if (data.userId == undefined) {
+            res.status(200).send({ 'error':data});
             return;
         }
 
-        if(!products){
-            res.status(200).send({ 'error':"Please enter a products."});
-        }
-        if(vouchers){
-            if(vouchers.length >2){
-                res.status(200).send({ 'error':"It is not allowed to enter more than 2 voucher."});
-            }
-        }
+        const userId = data.userId;
+        const listVoucher = data.vouchers
+        const listproducts = data.products
 
         var discont=0;
         var freecoffee = 0;
         var popcorn = 0;
         var valueCoffe=0;
         var valuepopCorn =0;
-        var listproducts = [];
         var priceProducts= 0;
         var numberOfCoffee = 0;
         var numberOfPopcorn = 0;
         var voucherUsed = [];
-        var listVoucher = [];
         var creditCardUser;
         var productsPurchased = []
 
         var obj = {}
         var usersRef= admin.firestore().collection('customer');
-
-        for(key in vouchers){
-            listVoucher.push(vouchers[key])
-        }
-
-        for(key in products){
-            var product = {
-                docProduct:products[key].docProduct,
-                quantity: products[key].quantity
-            }
-            listproducts.push(product)
-        }
 
         VerifySignature(userId, dataBytes,signatureBytes).then(result=>{
             console.log(result)
@@ -650,6 +631,43 @@ function VerifySignature(userId, dataBytes, signatureBytes){
         console.log(error)
         return false
     });
+}
+
+function getparameters(dataString) {
+
+    var arraySplit = dataString.split("|");
+    if(arraySplit.length < 3)
+        return "lack of arguments"
+
+    var userId = arraySplit[0]
+    var productsString = arraySplit[1]
+    var productsIdQty = productsString.split(">")
+    var products = {}
+
+    for(var i=0; i < productsIdQty.length; i+2){
+        var id = productsIdQty[i]
+        var qty = productsIdQty[i+1]
+
+        var product = {
+            docProduct:id,
+            quantity:qty
+        }
+        products.push(product)
+    }
+
+    var vouchersString = arraySplit[2]
+    var vouchers = vouchersString.split(">")
+
+    if(vouchers.length >2){
+        return "It is not allowed to enter more than 2 voucher."
+    }
+
+    var obj = {}
+    obj["userId"] = userId
+    obj["vouchers"] = vouchers
+    obj["products"] = products
+
+    return obj
 }
 
 module.exports={

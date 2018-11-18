@@ -20,11 +20,13 @@ Teste:
 const validTickets = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const tickets = req.body.tickets;
-        const userId = req.body.userId;
+        body = JSON.parse(req.body.toString())
+        console.log(body)
+        const tickets = body.tickets;
+        const userId = body.userId;
 
         if(!tickets) {
-            res.status(200).send({'error': "Please enter a tickets."});
+            res.status(200).send({'error': "Please enter tickets"});
             return;
         }
         if (tickets.length == 0){
