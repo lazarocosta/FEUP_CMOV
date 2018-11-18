@@ -44,7 +44,7 @@ public class ListTransactionsActivity extends NavigableActivity {
                     JSONObject transactions = new JSONObject();
                     transactions.put("userId", uuid);
 
-                    JSONObject response = RestServices.PUT("/listTransactionsUser", transactions);
+                    JSONObject response = RestServices.POST("/listTransactionsUser", transactions);
                     ArrayList<Ticket> listTickets = new ArrayList<>();
                     ArrayList<Product> listProducts = new ArrayList<>();
                     ArrayList<Voucher> listVouchers = new ArrayList<>();
