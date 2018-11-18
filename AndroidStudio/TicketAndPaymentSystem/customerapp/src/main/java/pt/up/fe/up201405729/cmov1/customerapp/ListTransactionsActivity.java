@@ -93,23 +93,38 @@ public class ListTransactionsActivity extends NavigableActivity {
                         });
                     }
 
-                    RecyclerView ticketsRV = findViewById(R.id.ticketsRecyclerView);
-                    GridLayoutManager gridLayoutManagerTickets = new GridLayoutManager(context, 1);
-                    ticketsRV.setLayoutManager(gridLayoutManagerTickets);
-                    TicketsRVAdapter ticketsRVAdapter = new TicketsRVAdapter(listTickets);
-                    ticketsRV.setAdapter(ticketsRVAdapter);
+                    final RecyclerView ticketsRV = findViewById(R.id.ticketsRecyclerView);
+                    final GridLayoutManager gridLayoutManagerTickets = new GridLayoutManager(context, 1);
+                    final TicketsRVAdapter ticketsRVAdapter = new TicketsRVAdapter(listTickets);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ticketsRV.setLayoutManager(gridLayoutManagerTickets);
+                            ticketsRV.setAdapter(ticketsRVAdapter);
+                        }
+                    });
 
-                    RecyclerView productRV = findViewById(R.id.productsRecyclerView);
-                    GridLayoutManager gridLayoutManagerProduct = new GridLayoutManager(context, 1);
-                    productRV.setLayoutManager(gridLayoutManagerProduct);
-                    ProductsRVAdapter productsRVAdapter = new ProductsRVAdapter(listProducts);
-                    productRV.setAdapter(productsRVAdapter);
+                    final RecyclerView productRV = findViewById(R.id.productsRecyclerView);
+                    final GridLayoutManager gridLayoutManagerProduct = new GridLayoutManager(context, 1);
+                    final ProductsRVAdapter productsRVAdapter = new ProductsRVAdapter(listProducts);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            productRV.setLayoutManager(gridLayoutManagerProduct);
+                            productRV.setAdapter(productsRVAdapter);
+                        }
+                    });
 
-                    RecyclerView voucherRV = findViewById(R.id.vouchersRecyclerView);
-                    GridLayoutManager gridLayoutManagerVouchers = new GridLayoutManager(context, 1);
-                    voucherRV.setLayoutManager(gridLayoutManagerVouchers);
-                    VouchersRVAdapter vouchersRVAdapter = new VouchersRVAdapter(listVouchers);
-                    voucherRV.setAdapter(vouchersRVAdapter);
+                    final RecyclerView voucherRV = findViewById(R.id.vouchersRecyclerView);
+                    final GridLayoutManager gridLayoutManagerVouchers = new GridLayoutManager(context, 1);
+                    final VouchersRVAdapter vouchersRVAdapter = new VouchersRVAdapter(listVouchers);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            voucherRV.setLayoutManager(gridLayoutManagerVouchers);
+                            voucherRV.setAdapter(vouchersRVAdapter);
+                        }
+                    });
                 } catch (JSONException e) {
                     e.printStackTrace();
                     final String exceptionMessage = e.getMessage();
