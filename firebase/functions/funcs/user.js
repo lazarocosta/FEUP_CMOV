@@ -408,6 +408,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                             nameProduct: productdoc.data().nameProduct,
                             priceProduct: productdoc.data().priceProduct,
                             quantity: productdoc.data().quantity,
+                            id: productdoc.id
 
                         }
                         productsResult.push(product);
@@ -500,7 +501,8 @@ function addProductUser(userId, listproducts){
         admin.firestore().collection('customer').doc(userId).collection('productsPurchased').add({
             nameProduct:product.nameProduct,
             priceProduct:product.priceProduct,
-            quantity:product.quantity
+            quantity:product.quantity,
+            id:product.id
         })
     })
 }
@@ -539,12 +541,14 @@ function getProducts(listproducts) {
             var quantity = Number(listquantity[i])
             var nameProduct = doc.data().name;
             var priceProduct = doc.data().price;
+            var productIDdoc = doc.id
             priceProducts = priceProducts + priceProduct * quantity;
 
             var purchase = {
                 nameProduct:nameProduct,
                 priceProduct:priceProduct,
-                quantity:quantity
+                quantity:quantity,
+                id: productIDdoc
             }
             productsPurchased.push(purchase);
 

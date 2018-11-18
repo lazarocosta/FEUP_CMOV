@@ -26,7 +26,8 @@ const listProducts = functions.https.onRequest((req, res) => {
             result.forEach(doc=>{
                 var product = {
                     name: doc.data().name,
-                    price:doc.data().price
+                    price:doc.data().price,
+                    id: doc.id
                 }
                 products.push(product)
             })
@@ -51,29 +52,42 @@ const listProducts = functions.https.onRequest((req, res) => {
 const addProducts = functions.https.onRequest((req,res)=>{
     return cors(req,res, () =>{
 
-        admin.firestore().collection('product').add({
+        var product1 ={
+            name:'Coffee',
+            price:1,
+            id:"1"
+        }
+
+        var product2 ={
             name:'Popcorn',
-            price:2
-        }).then(()=>{
-            admin.firestore().collection('product').add({
-                name:'Coffee',
-                price:1
-            }).then(()=>{
-                admin.firestore().collection('product').add({
-                    name:'Sandwich',
-                    price:5
-                }).then(()=>{
-                    admin.firestore().collection('product').add({
-                        name:'Soda drink',
-                        price:4
-                    }).then(()=>{
+            price:2,
+            id:"2"
+        }
+        var product3 ={
+            name:'Sandwich',
+            price:5,
+            id:"3"
+        }
+        var product4 ={
+            name:'Soda drink',
+            price:4,
+            id:"4"
+        }
+
+        admin.firestore().collection('product').doc(product1.id).set(product1)
+        .then(()=>{
+            admin.firestore().collection('product').doc(product2.id).set(product2)
+            .then(()=>{
+                admin.firestore().collection('product').doc(product3.id).set(product3)
+                .then(()=>{
+                    admin.firestore().collection('product').doc(product4.id).set(product4)
+                    .then(()=>{
                         res.status(200).send({ 'data':true});
                         return;
                     }).catch(error =>  {
                         res.status(200).send({ 'data':error});
                         return "An error occurred."
                     });
-                    
                 }).catch(error =>  {
                     res.status(200).send({ 'data':error});
                     return "An error occurred."
