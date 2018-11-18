@@ -39,20 +39,21 @@ public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRV
         ((TextView) holder.linearLayout.findViewById(R.id.selectTicketsShowDate)).setText(t.getDate().getHumanReadableDate());
         ((TextView) holder.linearLayout.findViewById(R.id.selectTicketsRoomPlace)).setText(t.getRoomPlace());
         CheckBox checkBox = holder.linearLayout.findViewById(R.id.selectTicketsCheckBox);
-        checkBox.setActivated(false);
+        checkBox.setChecked(false);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CheckBox c = (CheckBox) v;
                 Ticket selectedTicket = tickets.get(holder.getAdapterPosition());
-                if (v.isActivated()) {
+                if (c.isChecked()) {
                     if (selectedTickets.size() >= 4) {
                         Toast.makeText(context, "Maximum number of tickets reached.", Toast.LENGTH_LONG).show();
-                        v.setActivated(false);
+                        c.setChecked(false);
                     } else {
                         for (Ticket t : selectedTickets) {
                             if (!t.getPerformanceId().equals(selectedTicket.getPerformanceId())) {
                                 Toast.makeText(context, "All tickets must be for the same performance.", Toast.LENGTH_LONG).show();
-                                v.setActivated(false);
+                                c.setChecked(false);
                                 return;
                             }
                         }

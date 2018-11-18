@@ -26,6 +26,7 @@ import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
 
 public class AddVouchersActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
+    private final Context context = this;
     private AddVouchersActivityRVAdapter addVouchersActivityRVAdapter;
     private CheckoutProducts checkoutProducts;
 
@@ -42,38 +43,51 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.continue_string);
 
-        Intent i = getIntent();
-        checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Intent i = getIntent();
+                checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
 
-        Context context = this;
-        RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-        addVouchersRV.setLayoutManager(gridLayoutManager);
-        ArrayList<Voucher> allVouchers = FileManager.readVouchers(context);
-        ArrayList<Voucher> vouchers = new ArrayList<>();
-        for (Voucher v : allVouchers)
-            if (v.getState().equals(Voucher.State.notUsed))
-                vouchers.add(v);
-        addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, context);
-        addVouchersRV.setAdapter(addVouchersActivityRVAdapter);
+                RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+                addVouchersRV.setLayoutManager(gridLayoutManager);
+                ArrayList<Voucher> allVouchers = FileManager.readVouchers(context);
+                ArrayList<Voucher> vouchers = new ArrayList<>();
+                for (Voucher v : allVouchers)
+                    if (v.getState().equals(Voucher.State.notUsed))
+                        vouchers.add(v);
+                addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, context);
+                addVouchersRV.setAdapter(addVouchersActivityRVAdapter);
+            }
+        }).start();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
-        Context context = this;
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
-                if (vouchers.size() > 2)
-                    Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
-                else {
-                    String qrCodeContent = generateQRCodeContent();
-                    updateStoredVouchers();
-                    Intent i = new Intent(context, ShowQRCodeActivity.class);
-                    i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
-                    startActivity(i);
-                    finish();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
+                        if (vouchers.size() <= 2) {
+                            String qrCodeContent = generateQRCodeContent();
+                            updateStoredVouchers();
+                            Intent i = new Intent(context, ShowQRCodeActivity.class);
+                            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+                            startActivity(i);
+                            finish();
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
                 return true;
             default:
                 return false;
@@ -90,7 +104,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         addVouchersActivityRVAdapter = (AddVouchersActivityRVAdapter) savedInstanceState.get(CustomerApp.addVouchersActivityRVAdapterKeyName);
-        ((RecyclerView) findViewById(R.id.selectProductsRV)).setAdapter(addVouchersActivityRVAdapter);
+        ((RecyclerView) findViewById(R.id.addVouchersRV)).setAdapter(addVouchersActivityRVAdapter);
     }
 
     private String generateQRCodeContent() {
@@ -115,6 +129,6 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         for (Voucher v : addVouchersActivityRVAdapter.getVouchers())
             if (!selectedVouchers.contains(v))
                 vouchers.add(v);
-        FileManager.writeVouchers(this, vouchers);
+        FileManager.writeVouchers(context, vouchers);
     }
 }

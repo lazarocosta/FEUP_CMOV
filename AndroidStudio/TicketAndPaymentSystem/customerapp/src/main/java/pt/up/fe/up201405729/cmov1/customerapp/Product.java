@@ -45,4 +45,13 @@ public class Product implements Serializable {
             throw new IllegalArgumentException("Quantity should be zero or higher.");
         this.quantity = quantity;
     }
+
+    public static Product[] getProductsCopy() {
+        Product[] newProducts = new Product[products.length];
+        for (int i = 0; i < products.length; i++) {
+            Product p = products[i];
+            newProducts[i] = new Product(p.getName(), p.getPrice(), p.getQuantity());
+        }
+        return newProducts;
+    }
 }

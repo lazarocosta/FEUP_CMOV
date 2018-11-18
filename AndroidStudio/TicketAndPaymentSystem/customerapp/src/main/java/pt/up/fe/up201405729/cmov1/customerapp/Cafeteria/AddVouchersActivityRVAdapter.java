@@ -41,15 +41,16 @@ public class AddVouchersActivityRVAdapter extends RecyclerView.Adapter<AddVouche
         Voucher v = vouchers.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.voucherProductCode)).setText(v.getProductCode().name());
         CheckBox checkBox = holder.linearLayout.findViewById(R.id.addVouchersCheckBox);
-        checkBox.setActivated(false);
+        checkBox.setChecked(false);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CheckBox c = (CheckBox) v;
                 Voucher selectedVoucher = vouchers.get(holder.getAdapterPosition());
-                if (v.isActivated()) {
+                if (c.isChecked()) {
                     if (selectedVouchers.size() > 2) {
                         Toast.makeText(context, "Maximum number of vouchers reached.", Toast.LENGTH_LONG).show();
-                        v.setActivated(false);
+                        c.setChecked(false);
                     } else
                         selectedVouchers.add(selectedVoucher);
                 } else

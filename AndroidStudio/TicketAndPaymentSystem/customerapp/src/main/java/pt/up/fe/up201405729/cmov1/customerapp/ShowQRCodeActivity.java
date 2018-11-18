@@ -33,12 +33,12 @@ public class ShowQRCodeActivity extends NavigableActivity {
         actionMenuItemView.setText("");
         actionMenuItemView.setEnabled(false);
 
-        Intent i = getIntent();
-        final String qrCodeContent = i.getStringExtra(CustomerApp.qrCodeContentKeyName);
         final Context context = this;
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Intent i = getIntent();
+                String qrCodeContent = i.getStringExtra(CustomerApp.qrCodeContentKeyName);
                 try {
                     final Bitmap bitmap = encodeAsBitmap(qrCodeContent);
                     runOnUiThread(new Runnable() {
