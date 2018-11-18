@@ -106,7 +106,7 @@ const register = functions.https.onRequest((req, res) => {
 
                         })
                 promises.push(p);
-                adduser= true;
+                adduser = true;
             }
             return Promise.all(promises)
         })
@@ -330,7 +330,7 @@ const listTicketsNotUsed = functions.https.onRequest((req, res) => {
         admin.firestore().collection('customer').doc(userId).collection('ticket').get()
         .then(snapshot => {
             snapshot.forEach(ticketdoc => {
-                if(ticketdoc.data().state =="not used") {
+                if(ticketdoc.data().state == "not used") {
                     var ticket = {
                         id: ticketdoc.id,
                         name: ticketdoc.data().name,
@@ -362,7 +362,11 @@ TEST:
 
 const listTransactionsUser = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
+
         const userId = req.body.userId;
+        console.log(userId)
+        body = JSON.parse(req.body.toString())
+        console.log(body)
         var ticketsResult = [];
         var vouchersResult = [];
         var productsResult = [];
@@ -446,7 +450,7 @@ const listVouchersUser = functions.https.onRequest((req, res) => {
         admin.firestore().collection('customer').doc(userId).collection('voucher').get()
         .then(snapshot => {
             snapshot.forEach(voucherdoc => {
-                if(voucherdoc.data().state =="not used") {
+                if(voucherdoc.data().state == "not used") {
                     var voucher = {
                         id: voucherdoc.id,
                         productCode: voucherdoc.data().productCode,
@@ -590,17 +594,17 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
             var used = false;
 
             if(doc.data().state == "not used") {
-                if(doc.data().productCode =="5%discountCafeteria") {
+                if(doc.data().productCode == "5%discountCafeteria") {
                     if(discont !=0.05){
                         discont = 0.05;
                         used = true;
                     }
-                }else if(doc.data().productCode =="freecoffee") {
+                }else if(doc.data().productCode == "freecoffee") {
                     if(numberOfCoffee > freecoffee ){
                         freecoffee++
                         used = true;
                     }
-                }else if(doc.data().productCode =="popcorn") {
+                }else if(doc.data().productCode == "popcorn") {
                     if( numberOfPopcorn > popcorn){ 
                         popcorn++;
                         used = true;
@@ -613,10 +617,10 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
             } 
         })
 
-        obj["discont"]=discont;
-        obj["freecoffee"]=freecoffee;
-        obj["popcorn"]=popcorn;
-        obj["voucherUsed"]=voucherUsed
+        obj["discont"] = discont;
+        obj["freecoffee"] = freecoffee;
+        obj["popcorn"] = popcorn;
+        obj["voucherUsed"] = voucherUsed
         return obj;
     })
     .catch(error=>{
@@ -624,20 +628,16 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
     })
 }
 
-function VerifySignature(userId, data, signature){
+function VerifySignature(userId, dataBytes, signatureBytes){
 
     return admin.firestore().collection('customer').doc(userId).get()
     .then(doc => {
-
-        var modulus;
-        var exponent;
-        modulus = doc.data().publicKey.modulus
-        exponent = doc.data().publicKey.publicExponent
-        var certificate = getPem(modulus, exponent);
-        console.log(certificate)
-        var verify = crypto.createVerify('RSA-SHA256')
-        verify.update(data);
-        return verify.verify(certificate, signature);
+        const modulus = doc.data().publicKey.modulus;
+        const exponent = doc.data().publicKey.publicExponent;
+        const pem = getPem(modulus, exponent);
+        const verify = crypto.createVerify('RSA-SHA256')
+        verify.update(dataBytes);
+        return verify.verify(pem, signatureBytes);
     })
     .catch(error =>  {
         console.log(error)

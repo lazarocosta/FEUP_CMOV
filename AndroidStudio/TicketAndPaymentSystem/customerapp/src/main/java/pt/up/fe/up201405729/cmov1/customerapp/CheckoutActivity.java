@@ -63,6 +63,7 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
                 String uuid = preferences.getString("uuid", null);
 
                 byte[] signedMessage = new byte[0];
+                System.out.println("aqui");
                 try {
                     JSONObject buyTicketsData = new JSONObject();
                     JSONArray jsonPerformances = new JSONArray();
@@ -76,6 +77,8 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
                     }
                     buyTicketsData.put("performances", jsonPerformances);
                     buyTicketsData.put("userId", uuid);
+                    System.out.println(jsonPerformances);
+                    System.out.println(uuid);
                     signedMessage = app.getEncryptionManager().buildSignedMessage(buyTicketsData);
                 } catch (JSONException e) {
                     e.printStackTrace();

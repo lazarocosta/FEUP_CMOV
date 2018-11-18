@@ -36,6 +36,7 @@ public class ListTransactionsActivity extends NavigableActivity {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
 
+        System.out.println(uuid);
         final Context context = this;
         JSONObject transactions = new JSONObject();
         try {
@@ -53,6 +54,7 @@ public class ListTransactionsActivity extends NavigableActivity {
             JSONArray vouchers = data.getJSONArray("vouchers");
             JSONArray tickets = data.getJSONArray("tickets");
             JSONArray products = data.getJSONArray("products");
+            System.out.println(data);
 
             for (int i = 0; i < tickets.length(); i++) {
                 JSONObject jsonObject = tickets.getJSONObject(i);

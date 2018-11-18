@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 public class RestServices {
     // The official production server is https://us-central1-cmov-d52d6.cloudfunctions.net
     // The development server is http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1
-    private static final String databaseUrl = "http://luisbarbosa.ddns.net:5000/cmov-d52d6/us-central1";
+    private static final String databaseUrl = "https://us-central1-cmov-d52d6.cloudfunctions.net";
 
     public static JSONObject GET(String relativeUrl, JSONObject data) {
         return RestTask(relativeUrl, "GET", data.toString().getBytes());
