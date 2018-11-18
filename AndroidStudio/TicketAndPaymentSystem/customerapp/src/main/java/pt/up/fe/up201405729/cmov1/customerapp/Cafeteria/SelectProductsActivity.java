@@ -11,13 +11,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
 import pt.up.fe.up201405729.cmov1.customerapp.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
+import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 
 
 public class SelectProductsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
@@ -44,17 +48,17 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
                 productsRV.setLayoutManager(gridLayoutManager);
                 ArrayList<Product> products = new ArrayList<>();
-                Collections.addAll(products, Product.getProductsCopy());
 
-                /*JSONObject response = RestServices.GET("/listProducts", new JSONObject());
+                JSONObject response = RestServices.GET("/listProducts", new JSONObject());
                 try {
                     if (response.has("data")) {
                         JSONArray arrayProducts = response.getJSONArray("data");
                         for (int i = 0; i < arrayProducts.length(); i++) {
                             JSONObject jsonObject = arrayProducts.getJSONObject(i);
+                            String id = jsonObject.getString("id");
                             String name = jsonObject.getString("name");
                             Double price = jsonObject.getDouble("price");
-                            products.add(new Product(name, price));
+                            products.add(new Product(id, name, price));
                         }
                     } else {
                         final String error = response.getString("error");
@@ -74,7 +78,7 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
                             Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
                         }
                     });
-                }*/
+                }
 
                 selectProductsRVAdapter = new SelectProductsRVAdapter(products);
                 runOnUiThread(new Runnable() {

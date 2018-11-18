@@ -3,20 +3,20 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 import java.io.Serializable;
 
 public class Performance implements Comparable<Performance>, Serializable {
-    private String id;
+    private String uuid;
     private String name;
     private MyDate date;
     private Double price;
 
-    public Performance(String id, String name, MyDate date, Double price) {
-        this.id = id;
+    public Performance(String uuid, String name, MyDate date, Double price) {
+        this.uuid = uuid;
         this.name = name;
         this.date = date;
         this.price = price;
     }
 
-    public String getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
     public String getName() {

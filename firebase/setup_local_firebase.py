@@ -8,6 +8,7 @@ import time
 import threading
 
 def my_call(args_array):
+    print("\nExecuting: " + str(args_array))
     if subprocess.call(args_array) != 0:
         print("An error occurred.")
         sys.exit()
@@ -33,5 +34,7 @@ if __name__ == "__main__":
         threading.Thread(target=my_call, args=([["firebase", "serve", "--only", "functions", "-o", hostname, "-p", "5000"]])).start()
         time.sleep(20)
         os.chdir("..")
+        my_call(["curl", "-X", "POST", "http://" + hostname + ":5000/cmov-d52d6/us-central1/deletePerformances", "--data", "'{}'", "-g", "-H", "\"Content-Type: application/json\""])
         my_call(["curl", "-X", "POST", "http://" + hostname + ":5000/cmov-d52d6/us-central1/addPerformances", "--data", "'{}'", "-g", "-H", "\"Content-Type: application/json\""])
+        my_call(["curl", "-X", "POST", "http://" + hostname + ":5000/cmov-d52d6/us-central1/deleteProducts", "--data", "'{}'", "-g", "-H", "\"Content-Type: application/json\""])
         my_call(["curl", "-X", "POST", "http://" + hostname + ":5000/cmov-d52d6/us-central1/addProducts", "--data", "'{}'", "-g", "-H", "\"Content-Type: application/json\""])

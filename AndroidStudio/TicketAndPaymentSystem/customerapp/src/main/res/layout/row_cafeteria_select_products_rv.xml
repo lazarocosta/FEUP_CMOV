@@ -63,5 +63,4 @@
             android:inputType="numberSigned"
             android:maxLength="2" />
     </LinearLayout>
-
 </LinearLayout>

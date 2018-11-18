@@ -15,4 +15,3 @@
         android:text="@string/voucher"
         android:textStyle="bold" />
 </TableRow>
-

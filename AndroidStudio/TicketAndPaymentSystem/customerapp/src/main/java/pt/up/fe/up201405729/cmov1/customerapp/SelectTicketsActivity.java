@@ -15,7 +15,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
+import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
 
 public class SelectTicketsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;
@@ -87,10 +90,11 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
-        sb.append(uuid);
+        sb.append(uuid).append(qrCodeContentDataTypeDelimiter);
         for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
-            sb.append(qrCodeContentDelimiter).append(t.getUuid());
-        return sb.toString();
+            sb.append(t.getUuid()).append(qrCodeContentDataDelimiter);
+        sb.deleteCharAt(sb.length() - 1);
+        return EncryptionManager.toBase64(sb.toString().getBytes());
     }
 
     private void markSelectedTicketsAsUsed() {

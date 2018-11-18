@@ -22,13 +22,16 @@ import pt.up.fe.up201405729.cmov1.customerapp.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.customerapp.ShowQRCodeActivity;
 import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
+import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
 
 public class AddVouchersActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;
     private AddVouchersActivityRVAdapter addVouchersActivityRVAdapter;
     private CheckoutProducts checkoutProducts;
+    private CustomerApp app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         toolbar.setOnMenuItemClickListener(this);
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.continue_string);
+        this.app = (CustomerApp) getApplicationContext();
 
         new Thread(new Runnable() {
             @Override
@@ -111,16 +115,17 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
-        sb.append(uuid);
+        sb.append(uuid).append(qrCodeContentDataTypeDelimiter);
         for (Product p : checkoutProducts.getProducts()) {
-            sb.append(qrCodeContentDelimiter).append(p.getName());
-            sb.append(qrCodeContentDelimiter).append(p.getQuantity());
+            sb.append(p.getUuid()).append(qrCodeContentDataDelimiter);
+            sb.append(p.getQuantity()).append(qrCodeContentDataDelimiter);
         }
+        int lastIndex = sb.length() - 1;
+        sb.replace(lastIndex, lastIndex, qrCodeContentDataTypeDelimiter);
         for (Voucher v : addVouchersActivityRVAdapter.getSelectedVouchers())
-            sb.append(qrCodeContentDelimiter).append(v.getUuid());
-
-        // TODO: sign data
-        return sb.toString();
+            sb.append(v.getUuid()).append(qrCodeContentDataDelimiter);
+        sb.deleteCharAt(sb.length() - 1);
+        return EncryptionManager.toBase64(app.getEncryptionManager().buildSignedMessage(sb.toString().getBytes()));
     }
 
     private void updateStoredVouchers() {
