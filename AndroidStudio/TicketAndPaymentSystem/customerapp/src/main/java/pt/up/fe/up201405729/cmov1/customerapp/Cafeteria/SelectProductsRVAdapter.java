@@ -1,6 +1,5 @@
 package pt.up.fe.up201405729.cmov1.customerapp.Cafeteria;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -10,11 +9,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.customerapp.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
@@ -22,11 +19,9 @@ import pt.up.fe.up201405729.cmov1.customerapp.StringFormat;
 
 public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProductsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Product> products;
-    private Context context;
 
-    public SelectProductsRVAdapter(ArrayList<Product> products, Context context) {
+    public SelectProductsRVAdapter(ArrayList<Product> products) {
         this.products = products;
-        this.context = context;
     }
 
     @NonNull
@@ -64,7 +59,6 @@ public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProducts
                     products.get(holder.getAdapterPosition()).setQuantity(value);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });

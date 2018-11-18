@@ -68,7 +68,7 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
             }
         }*/
 
-        selectProductsRVAdapter = new SelectProductsRVAdapter(products, context);
+        selectProductsRVAdapter = new SelectProductsRVAdapter(products);
         productsRV.setAdapter(selectProductsRVAdapter);
     }
 
