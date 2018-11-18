@@ -363,10 +363,9 @@ TEST:
 const listTransactionsUser = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const userId = req.body.userId;
-        console.log(userId)
         body = JSON.parse(req.body.toString())
         console.log(body)
+        const userId = body.userId;
         var ticketsResult = [];
         var vouchersResult = [];
         var productsResult = [];
@@ -420,7 +419,7 @@ const listTransactionsUser = functions.https.onRequest((req, res) => {
                     var products = "products";
                     obj[products] = productsResult;
 
-
+                    console.log(obj)
                     res.status(200).send({ 'data':obj});
                     return;
                 })
