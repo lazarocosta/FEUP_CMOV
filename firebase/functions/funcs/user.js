@@ -324,7 +324,9 @@ TEST:
 
 const listTicketsNotUsed = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const userId = req.body.userId;
+        body = JSON.parse(req.body.toString())
+        console.log(body)
+        const userId = body.userId;
         var result = []
 
         admin.firestore().collection('customer').doc(userId).collection('ticket').get()
@@ -443,7 +445,9 @@ TEST:
 */
 const listVouchersUser = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
-        const userId = req.body.userId;
+        body = JSON.parse(req.body.toString())
+        console.log(body)
+        const userId = body.userId;
         var vouchersResult = [];
 
         admin.firestore().collection('customer').doc(userId).collection('voucher').get()
