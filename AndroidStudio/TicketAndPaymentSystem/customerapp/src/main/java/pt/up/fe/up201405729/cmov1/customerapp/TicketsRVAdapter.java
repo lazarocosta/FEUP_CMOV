@@ -29,7 +29,7 @@ public class TicketsRVAdapter extends RecyclerView.Adapter<TicketsRVAdapter.MyVi
         Ticket p = tickets.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.ticketName)).setText(p.getShowName());
         ((TextView) holder.linearLayout.findViewById(R.id.ticketDate)).setText(p.getDate().getHumanReadableDate());
-        ((TextView) holder.linearLayout.findViewById(R.id.ticketPrice)).setText(p.getRoomPlace());
+        ((TextView) holder.linearLayout.findViewById(R.id.ticketPlace)).setText(p.getRoomPlace());
     }
 
     @Override
