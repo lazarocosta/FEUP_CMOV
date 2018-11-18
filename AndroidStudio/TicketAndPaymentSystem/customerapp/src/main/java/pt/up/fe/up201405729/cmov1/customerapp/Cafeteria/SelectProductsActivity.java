@@ -47,7 +47,7 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
         GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
         productsRV.setLayoutManager(gridLayoutManager);
         ArrayList<Product> products = new ArrayList<>();
-        Collections.addAll(products, Product.products);
+        Collections.addAll(products, Product.getProductsCopy());
 
        /* JSONObject response = RestServices.GET("/listProducts",new JSONObject());
         try {
