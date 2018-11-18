@@ -656,7 +656,10 @@ function getparameters(dataString) {
     }
 
     var vouchersString = arraySplit[2]
-    var vouchers = vouchersString.split(">")
+    var vouchers = []
+    if(vouchersString.length != 0){
+        vouchers = vouchersString.split(">")
+    }
 
     if(vouchers.length >2){
         return "It is not allowed to enter more than 2 voucher."
