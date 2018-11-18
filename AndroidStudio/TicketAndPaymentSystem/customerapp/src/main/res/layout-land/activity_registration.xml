@@ -43,7 +43,6 @@
                     android:ems="10"
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="textMultiLine" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -65,8 +64,6 @@
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="number" />
             </LinearLayout>
-
-
         </TableRow>
 
         <TextView
@@ -120,7 +117,6 @@
                     android:ems="10"
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="number" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -142,8 +138,6 @@
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="date" />
             </LinearLayout>
-
         </TableRow>
-
     </TableLayout>
 </LinearLayout>

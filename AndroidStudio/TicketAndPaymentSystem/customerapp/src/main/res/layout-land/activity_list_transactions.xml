@@ -7,13 +7,11 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".CheckoutActivity">
+        tools:context=".ListTransactionsActivity">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -59,7 +57,6 @@
                         android:text="@string/list_transactions_ticket_place"
                         android:textAlignment="textEnd"
                         android:textSize="18sp" />
-
                 </LinearLayout>
 
                 <android.support.v7.widget.RecyclerView
@@ -109,7 +106,6 @@
                         android:layout_weight="1"
                         android:text="@string/list_transactions_product_quantity"
                         android:textAlignment="textEnd" />
-
                 </LinearLayout>
 
                 <android.support.v7.widget.RecyclerView
@@ -136,7 +132,6 @@
                         android:layout_weight="1"
                         android:text="@string/list_transactions_voucher"
                         android:textSize="18sp" />
-
                 </LinearLayout>
 
                 <android.support.v7.widget.RecyclerView
@@ -145,13 +140,8 @@
                     android:layout_height="match_parent"
                     android:layout_marginLeft="5dp"
                     android:layout_weight="1" />
-
-
             </LinearLayout>
-
         </LinearLayout>
-
-
     </LinearLayout>
 
     <android.support.design.widget.NavigationView

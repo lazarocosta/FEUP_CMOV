@@ -40,7 +40,6 @@
                     android:ems="10"
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="textPersonName" />
-
             </TableRow>
 
             <TableRow
@@ -135,9 +134,7 @@
                     android:ems="10"
                     android:imeOptions="flagNoExtractUi"
                     android:inputType="date" />
-
             </TableRow>
-
         </TableLayout>
     </LinearLayout>
 </LinearLayout>
