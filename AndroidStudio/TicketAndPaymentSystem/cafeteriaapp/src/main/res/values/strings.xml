@@ -6,9 +6,9 @@
     <string name="listproduct_price">Price</string>
     <string name="listproduct_quantity">Quantity</string>
     <string name="voucher">voucher</string>
-    <string name="product_quantity">quantity</string>
-    <string name="product_price">price</string>
-    <string name="product_name">name</string>
+    <string name="productQuantity">quantity</string>
+    <string name="productPrice">price</string>
+    <string name="productName">name</string>
 
     <string name="order_number_header">Order Number: </string>
     <string name="order_number">number</string>
