@@ -22,6 +22,7 @@ import java.util.Calendar;
 
 import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 
 public class RegistrationActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;

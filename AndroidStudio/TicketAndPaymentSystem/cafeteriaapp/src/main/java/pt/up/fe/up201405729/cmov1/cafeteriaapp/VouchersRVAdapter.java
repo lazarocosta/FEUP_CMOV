@@ -1,4 +1,4 @@
-package pt.up.fe.up201405729.cmov1.customerapp;
+package pt.up.fe.up201405729.cmov1.cafeteriaapp;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +30,6 @@ public class VouchersRVAdapter extends RecyclerView.Adapter<VouchersRVAdapter.My
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Voucher p = vouchers.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.voucher)).setText(p.getProductCodeString());
-        //((TextView) holder.linearLayout.findViewById(R.id.voucher)).setText("a");
 
     }
 

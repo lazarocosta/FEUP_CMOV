@@ -29,6 +29,8 @@ public class MainActivity extends QRCodeReaderActivity {
             bar.setTitle("Cafeteria");
             bar.hide();
         }
+
+
     }
 
     @Override

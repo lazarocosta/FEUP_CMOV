@@ -1,4 +1,4 @@
-package pt.up.fe.up201405729.cmov1.customerapp;
+package pt.up.fe.up201405729.cmov1.cafeteriaapp;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +16,8 @@ import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Product> products;
 
+
+
     public ProductsRVAdapter(ArrayList<Product> products) {
         this.products = products;
     }
@@ -29,6 +31,9 @@ public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
+
+
+
         Product p = products.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.productName)).setText(p.getName());
         ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsPrice(p.getPrice()));

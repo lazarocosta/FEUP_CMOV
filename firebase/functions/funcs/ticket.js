@@ -429,6 +429,7 @@ function VerifySignature(userId, dataBytes, signatureBytes){
 
     return admin.firestore().collection('customer').doc(userId).get()
     .then(doc => {
+        console.log(doc.data())
         const modulus = doc.data().publicKey.modulus;
         const exponent = doc.data().publicKey.publicExponent;
         const pem = getPem(modulus, exponent);

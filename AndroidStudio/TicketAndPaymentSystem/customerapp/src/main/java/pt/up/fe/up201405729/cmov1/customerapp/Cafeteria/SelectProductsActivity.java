@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
-import pt.up.fe.up201405729.cmov1.customerapp.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 

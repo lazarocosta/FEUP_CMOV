@@ -256,8 +256,8 @@ const payOrder = functions.https.onRequest((req, res) => {
                         var valueSpendkey = "valueSpend";
                         obj[valueSpendkey] = valueSpent;
         
-                        var vouvherKey = 'vouchers'
-                        obj[vouvherKey] = voucherUsed;
+                        obj['vouchers'] = voucherUsed;
+                        obj['productsPurchased'] = productsPurchased
                         addProductUser(userId, productsPurchased)
                         
                         getNumberOrder().then(number=>{
@@ -636,7 +636,7 @@ function VerifySignature(userId, dataBytes, signatureBytes){
 function getparameters(dataString) {
 
     var arraySplit = dataString.split("|");
-    if(arraySplit.length < 3)
+    if(arraySplit.length < 2)
         return "lack of arguments"
 
     var userId = arraySplit[0]
@@ -654,11 +654,10 @@ function getparameters(dataString) {
         }
         products.push(product)
     }
-
-    var vouchersString = arraySplit[2]
     var vouchers = []
-    if(vouchersString.length != 0){
-        vouchers = vouchersString.split(">")
+    if(arraySplit.length==3){
+        var vouchersString = arraySplit[2]
+        vouchers  = vouchersString.split(">")
     }
 
     if(vouchers.length >2){

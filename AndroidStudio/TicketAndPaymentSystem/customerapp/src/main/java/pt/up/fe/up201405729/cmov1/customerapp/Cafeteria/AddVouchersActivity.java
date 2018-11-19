@@ -18,10 +18,10 @@ import java.util.HashSet;
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.FileManager;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
-import pt.up.fe.up201405729.cmov1.customerapp.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.customerapp.ShowQRCodeActivity;
-import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
 
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;

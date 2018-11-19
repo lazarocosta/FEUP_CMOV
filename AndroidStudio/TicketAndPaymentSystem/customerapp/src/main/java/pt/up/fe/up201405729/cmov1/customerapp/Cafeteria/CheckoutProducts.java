@@ -3,7 +3,7 @@ package pt.up.fe.up201405729.cmov1.customerapp.Cafeteria;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import pt.up.fe.up201405729.cmov1.customerapp.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 
 class CheckoutProducts implements Serializable {
     private ArrayList<Product> products;

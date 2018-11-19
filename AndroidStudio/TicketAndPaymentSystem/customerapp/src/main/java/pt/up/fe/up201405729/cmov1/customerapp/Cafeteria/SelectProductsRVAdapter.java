@@ -13,9 +13,9 @@ import android.widget.TextView;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import pt.up.fe.up201405729.cmov1.customerapp.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
-import pt.up.fe.up201405729.cmov1.customerapp.StringFormat;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 
 public class SelectProductsRVAdapter extends RecyclerView.Adapter<SelectProductsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Product> products;

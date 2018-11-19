@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import pt.up.fe.up201405729.cmov1.customerapp.R;
-import pt.up.fe.up201405729.cmov1.customerapp.Voucher;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 
 public class AddVouchersActivityRVAdapter extends RecyclerView.Adapter<AddVouchersActivityRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Voucher> vouchers;

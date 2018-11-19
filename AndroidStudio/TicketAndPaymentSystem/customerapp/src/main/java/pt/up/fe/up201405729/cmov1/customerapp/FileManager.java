@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
+
 public class FileManager {
 
     public static void writeTickets(Context context, ArrayList<Ticket> tickets) {

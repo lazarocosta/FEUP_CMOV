@@ -13,6 +13,8 @@ import android.widget.TextView;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
+
 public class PerformancesRVAdapter extends RecyclerView.Adapter<PerformancesRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Performance> performances;
     private ArrayList<Integer> ticketsQuantities;
