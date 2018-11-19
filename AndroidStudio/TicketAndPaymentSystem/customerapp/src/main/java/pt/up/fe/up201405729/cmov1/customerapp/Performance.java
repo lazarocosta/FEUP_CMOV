@@ -2,6 +2,8 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 
 import java.io.Serializable;
 
+import pt.up.fe.up201405729.cmov1.sharedlibrary.MyDate;
+
 public class Performance implements Comparable<Performance>, Serializable {
     private String uuid;
     private String name;

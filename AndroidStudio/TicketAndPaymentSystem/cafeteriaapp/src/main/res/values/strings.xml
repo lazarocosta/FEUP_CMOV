@@ -9,11 +9,8 @@
     <string name="productQuantity">quantity</string>
     <string name="productPrice">price</string>
     <string name="productName">name</string>
-
-    <string name="order_number_header">Order Number: </string>
+    <string name="order_number_header">Order number: </string>
     <string name="order_number">number</string>
-    <string name="total_price_header">Total Price: </string>
+    <string name="total_price_header">Total price: </string>
     <string name="total_price">price</string>
-
-
 </resources>

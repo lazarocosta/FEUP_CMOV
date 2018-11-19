@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.Objects;
 
+import pt.up.fe.up201405729.cmov1.sharedlibrary.MyDate;
+
 public class Ticket implements Serializable {
     public enum State {used, notUsed}
     private String uuid;

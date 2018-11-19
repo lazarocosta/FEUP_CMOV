@@ -38,10 +38,6 @@ public class VouchersRVAdapter extends RecyclerView.Adapter<VouchersRVAdapter.My
         return vouchers.size();
     }
 
-    public ArrayList<Voucher> getVouchers() {
-        return vouchers;
-    }
-
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout linearLayout;
 

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.MyDate;
 
 public class MainActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;

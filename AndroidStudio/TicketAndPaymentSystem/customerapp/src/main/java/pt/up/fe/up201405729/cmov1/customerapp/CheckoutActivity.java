@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.MyDate;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 
