@@ -26,7 +26,7 @@ const validTickets = functions.https.onRequest((req, res) => {
         const userId = body.userId;
 
         if(!tickets) {
-            res.status(200).send({'error': "Please enter tickets"});
+            res.status(200).send({'error': "Please enter tickets."});
             return;
         }
         if (tickets.length == 0){
@@ -35,7 +35,7 @@ const validTickets = functions.https.onRequest((req, res) => {
         }
 
         if(!userId) {
-            res.status(200).send({ 'error': "Please enter a userId."});
+            res.status(200).send({ 'error': "Please enter a user id."});
             return;
         }
         var listTickets = [];
@@ -47,7 +47,7 @@ const validTickets = functions.https.onRequest((req, res) => {
             listTickets.push(tickets[ticket])
         }
         if(listTickets.length>4){
-            res.status(200).send({ 'error':"Can only validate 4 tickets"});
+            res.status(200).send({ 'error':"Can only validate 4 tickets."});
             return; 
         }
 
@@ -71,7 +71,7 @@ const validTickets = functions.https.onRequest((req, res) => {
                     return;
                 }
                 else {
-                    res.status(200).send({ 'error':"Event already held"});
+                    res.status(200).send({ 'error':"Event already held."});
                     return;
                 }
             })
@@ -113,12 +113,12 @@ const buyTickets = functions.https.onRequest((req, res) => {
         var obj = {}
 
         if(!userId) {
-            res.status(200).send({ 'error': "Please enter a userId."});
+            res.status(200).send({ 'error': "Please enter a user id."});
             return;
         }
 
         if(!performances) {
-            res.status(200).send({ 'error': "Please enter a performances."});
+            res.status(200).send({ 'error': "Please enter performances."});
             return;
         }
         var listperformances=[]
@@ -141,7 +141,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
 
         VerifySignature(userId, dataBytes,signatureBytes).then(result=>{
             if(!result){
-                res.status(200).send({ 'error':"Signature error"});
+                res.status(200).send({ 'error':"Signature error."});
                 return;
             }
         
@@ -163,7 +163,7 @@ const buyTickets = functions.https.onRequest((req, res) => {
             admin.firestore().collection('customer').doc(userId).collection('creditCard').get()
             .then(snapshot =>{
                 if(snapshot.size != 1){
-                    res.status(200).send({ 'error':"Invalid userId"});
+                    res.status(200).send({ 'error':"Invalid user id."});
                     return;
                 }
                 snapshot.forEach(creditCardDoc => { 
@@ -382,12 +382,12 @@ function validTicketsAuxiliary(listTickets, userId){
             }
             else{
                 if(performanceIdGeral!= performanceId){
-                    printError = 'tickets not of the same performance';
+                    printError = 'Tickets not of the same performance.';
                     return;
                 }
             }
             if(state == "used") {
-                printError = 'already validated ticket';
+                printError = 'Already validated ticket.';
                 return; 
             }
             resultTickets.push(ticketdoc.id)

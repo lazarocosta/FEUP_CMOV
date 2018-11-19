@@ -31,7 +31,7 @@ const register = functions.https.onRequest((req, res) => {
         console.log("publicKey", publicKey);
 
         if(!publicKey) {
-            res.status(200).send({ 'error': "Please enter a publicKey."});
+            res.status(200).send({ 'error': "Please enter a public key."});
             return;
         }
 
@@ -41,30 +41,30 @@ const register = functions.https.onRequest((req, res) => {
         }
 
         if(!nif) {
-            res.status(200).send({ 'error': "Please enter a nif."});
+            res.status(200).send({ 'error': "Please enter a NIF."});
             return;
         }
 
         if(!creditCardType) {
-            res.status(200).send({ 'error': "Please enter a creditCardType."});
+            res.status(200).send({ 'error': "Please enter a credit card type."});
             return;
         }
 
         if(!creditCardNumber) {
-            res.status(200).send({ 'error': "Please enter a creditCardNumber."});
+            res.status(200).send({ 'error': "Please enter a credit card number."});
             return;
         }
 
         if(!creditCardValidity) {
-            res.status(200).send({ 'error': "Please enter a creditCardValidity."});
+            res.status(200).send({ 'error': "Please enter a credit card validity."});
             return;
         }
 
         const id = uuidv1();
         const nifValid = parseInt(nif);
         if(isNaN(nifValid)){
-            res.status(200).send({ 'error':"Nif not is a number"});
-            console.error("nif not is a number: ", error);
+            res.status(200).send({ 'error':"NIF is not a number."});
+            console.error("NIF is not a number: ", error);
             return;
         }
 
@@ -88,7 +88,7 @@ const register = functions.https.onRequest((req, res) => {
             if(isNaN(number)|| isNaN(myDate.getMonth())) {
                 adduser= false;
                 admin.firestore().collection('customer').doc(id).delete()
-                errorOccurred ="CreditCardNumber not is number or the validity is not a date";
+                errorOccurred ="Credit card number is not a number or the validity is not a date.";
                 return;
             }
             if(datenow - myDate > 0) {
@@ -178,7 +178,7 @@ const payOrder = functions.https.onRequest((req, res) => {
             console.log(result)
 
             if(!result){
-                res.status(200).send({ 'error':"Signature error"});
+                res.status(200).send({ 'error':"Signature error."});
                 return;
             }
 
@@ -210,7 +210,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                     usersRef.doc(userId).collection('creditCard').get()
                     .then(snapshot => {
                         if(snapshot.size != 1){
-                            res.status(200).send({ 'error':"Credit card not found"});
+                            res.status(200).send({ 'error':"Credit card not found."});
                             return;
                         }
                         const promises = []
@@ -505,7 +505,7 @@ function getProducts(listproducts) {
         var docProduct =  product.docProduct;
         var quantity = product.quantity;
         if(!docProduct || !quantity) {
-            error = "Please enter the doc and quantity of product";
+            error = "Please enter the doc and quantity of product.";
             return;
         }
         listquantity.push(quantity);
@@ -612,7 +612,7 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
         return obj;
     })
     .catch(error=>{
-        return "Invalid voucher";
+        return "Invalid voucher.";
     })
 }
 
