@@ -3,8 +3,8 @@ const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 const uuidv1 = require('uuid/v1');
 const crypto = require('crypto');
-
-
+const base64url = require('base64url')
+const getPem = require('rsa-pem-from-mod-exp');
 
 /**
 Function to register the customer
@@ -142,9 +142,8 @@ TEST:
 const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
-        const buffer = Buffer.from(req.rawBody)
-        const bufferBase64Content = buffer.toString()
-        const bufferBytes = Buffer.from(bufferBase64Content, 'base64');
+        const bufferBase64Content = req.rawBody.toString('base64')
+        const bufferBytes = base64url.toBuffer(bufferBase64Content)
         const dataBytes = bufferBytes.slice(0, -64)
         const signatureBytes = bufferBytes.slice(-64)
         const dataString = dataBytes.toString()
@@ -196,15 +195,15 @@ const payOrder = functions.https.onRequest((req, res) => {
                 valueCoffe = result.valueCoffe;
                 numberOfPopcorn = result.numberOfPopcorn;
                 valuepopCorn = result.valuepopCorn;
+                console.log(result)
 
+                const promises = []
+                return Promise.all(promises);
             })
             .then(snapshot => {
                 getVouchers(listVoucher, userId, numberOfCoffee, numberOfPopcorn).then(result=>{
-                    if(result.discont == undefined && result != null){
-                        res.status(200).send({ 'error':result});
-                        return;  
-                    }
-                    if(result != null){
+                    console.log(result)
+                    if(result != null && typeof(result) !== typeof(String)){
                         discont = result.discont;
                         freecoffee = result.freecoffee;
                         popcorn = result.popcorn;
@@ -226,7 +225,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                         })
                         return Promise.all(promises);
                     })
-                    .then(snapshot => { 
+                    .then(snapshot => {
                         var valueSpent;
                         snapshot.forEach(docreditcard => { 
                             var valueSpentMod100 = docreditcard.data().valueSpentMod100;
@@ -264,10 +263,12 @@ const payOrder = functions.https.onRequest((req, res) => {
                         addProductUser(userId, productsPurchased)
                         
                         getNumberOrder().then(number=>{
+                            console.log("order", result)
                             if(number != null){
                                 var numberKey = "number"; 
                                 obj[numberKey] = number;
-        
+
+                                console.log("result", obj)
                                 res.status(200).send({ 'data':obj});
                                 return;
                             }else {
@@ -568,9 +569,7 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
     var voucherUsed = [];
     var obj = {};
 
-    if(listVouchers.length == 0){
-        return null;
-    }
+ 
 
     const promises = [];
     var usersRef= admin.firestore().collection('customer');
@@ -582,6 +581,7 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
     return Promise.all(promises)
     .then(snapshot=>{
         snapshot.forEach( doc => {
+            console.log(doc.data())
             var used = false;
 
             if(doc.data().state == "not used") {
@@ -607,6 +607,9 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
                 }
             } 
         })
+        if(snapshot.length == 0){
+            return null;
+        }
 
         obj["discont"] = discont;
         obj["freecoffee"] = freecoffee;
@@ -638,16 +641,16 @@ function VerifySignature(userId, dataBytes, signatureBytes){
 
 function getparameters(dataString) {
 
-    var arraySplit = dataString.split("|");
+    var arraySplit = dataString.split("\n");
     if(arraySplit.length < 2)
         return "lack of arguments"
 
     var userId = arraySplit[0]
     var productsString = arraySplit[1]
     var productsIdQty = productsString.split(">")
-    var products = {}
+    var products = []
 
-    for(var i=0; i < productsIdQty.length; i+2){
+    for(var i=0; i < productsIdQty.length; i+=2){
         var id = productsIdQty[i]
         var qty = productsIdQty[i+1]
 
@@ -666,12 +669,11 @@ function getparameters(dataString) {
     if(vouchers.length >2){
         return "It is not allowed to enter more than 2 voucher."
     }
-
+   
     var obj = {}
     obj["userId"] = userId
     obj["vouchers"] = vouchers
     obj["products"] = products
-
     return obj
 }
 
