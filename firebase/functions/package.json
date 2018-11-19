@@ -9,6 +9,7 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
+    "base64url": "^3.0.0",
     "buffer": "^5.2.1",
     "cors": "^2.8.4",
     "firebase-admin": "^6.1.0",
