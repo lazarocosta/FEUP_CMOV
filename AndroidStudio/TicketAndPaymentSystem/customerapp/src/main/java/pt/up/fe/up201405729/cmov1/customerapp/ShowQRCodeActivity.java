@@ -20,7 +20,11 @@ public class ShowQRCodeActivity extends NavigableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_qrcode);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         final Context context = this;
         new Thread(new Runnable() {
             @Override
