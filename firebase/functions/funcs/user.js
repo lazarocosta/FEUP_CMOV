@@ -143,9 +143,12 @@ const payOrder = functions.https.onRequest((req, res) => {
     return  cors(req, res, () => {
 
         const buffer = Buffer.from(req.rawBody)
-        const dataBytes = buffer.slice(0, -64)
-        const signatureBytes = buffer.slice(-64)
+        const bufferBase64Content = buffer.toString()
+        const bufferBytes = Buffer.from(bufferBase64Content, 'base64');
+        const dataBytes = bufferBytes.slice(0, -64)
+        const signatureBytes = bufferBytes.slice(-64)
         const dataString = dataBytes.toString()
+        console.log(dataString)
 
         var data = getparameters(dataString)
         console.log(data)
