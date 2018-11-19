@@ -48,7 +48,7 @@ public class MainActivity extends QRCodeReaderActivity {
                 ticketsIds.put("ticketId" + i, ticketsUuids[i]);
             validationData.put("tickets", ticketsIds);
 
-            JSONObject response = RestServices.GET("/validTickets", validationData);
+            JSONObject response = RestServices.POST("/validTickets", validationData);
             if (response.has("data")) { // The value of "data" should be "true".
                 Toast.makeText(context, "Validation successful.", Toast.LENGTH_LONG).show();
                 Intent i = new Intent(context, QRCodeValidatedActivity.class);
