@@ -17,8 +17,8 @@ import java.util.HashSet;
 
 import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity.qrCodeContentDataDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity.qrCodeContentDataTypeDelimiter;
 
 public class SelectTicketsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;
@@ -38,62 +38,63 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.finish_string);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                allTickets = FileManager.readTickets(context);
-                ArrayList<Ticket> selectableTickets = new ArrayList<>();
-                for (Ticket t : allTickets)
-                    if (t.getState() == Ticket.State.notUsed)
-                        selectableTickets.add(t);
+        allTickets = FileManager.readTickets(context);
+        ArrayList<Ticket> selectableTickets = new ArrayList<>();
+        for (Ticket t : allTickets)
+            if (t.getState() == Ticket.State.notUsed)
+                selectableTickets.add(t);
 
-                RecyclerView selectTicketsRV = findViewById(R.id.selectTicketsRV);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-                selectTicketsRV.setLayoutManager(gridLayoutManager);
-                selectTicketsRVAdapter = new SelectTicketsRVAdapter(selectableTickets, context);
-                selectTicketsRV.setAdapter(selectTicketsRVAdapter);
-            }
-        }).start();
+        RecyclerView selectTicketsRV = findViewById(R.id.selectTicketsRV);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+        selectTicketsRV.setLayoutManager(gridLayoutManager);
+        selectTicketsRVAdapter = new SelectTicketsRVAdapter(selectableTickets, context);
+        selectTicketsRV.setAdapter(selectTicketsRVAdapter);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
-                            String qrCodeContent = generateQRCodeContent();
-                            markSelectedTicketsAsUsed();
-                            Intent i = new Intent(context, ShowQRCodeActivity.class);
-                            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
-                            startActivity(i);
-                            finish();
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "No ticket selected.", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
+                if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
+                    String qrCodeContent = generateQRCodeContent();
+                    markSelectedTicketsAsUsed();
+                    Intent i = new Intent(context, ShowQRCodeActivity.class);
+                    i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+                    startActivity(i);
+                    finish();
+                } else
+                    Toast.makeText(context, "No ticket selected.", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return false;
         }
     }
 
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(CustomerApp.selectTicketsActivityRVAdapterKeyName, selectTicketsRVAdapter);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        selectTicketsRVAdapter = (SelectTicketsRVAdapter) savedInstanceState.get(CustomerApp.selectProductsActivityRVAdapterKeyName);
+        ((RecyclerView) findViewById(R.id.selectTicketsRV)).setAdapter(selectTicketsRVAdapter);
+    }
+
     private String generateQRCodeContent() {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
-        sb.append(uuid).append(qrCodeContentDataTypeDelimiter);
-        for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
-            sb.append(t.getUuid()).append(qrCodeContentDataDelimiter);
-        sb.deleteCharAt(sb.length() - 1);
+        sb.append(uuid);
+        if (selectTicketsRVAdapter.getSelectedTickets().size() > 0) {
+            sb.append(qrCodeContentDataTypeDelimiter);
+            for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
+                sb.append(t.getUuid()).append(qrCodeContentDataDelimiter);
+            sb.deleteCharAt(sb.length() - 1);
+        }
         return KeyStoreManager.toBase64(sb.toString().getBytes());
     }
 

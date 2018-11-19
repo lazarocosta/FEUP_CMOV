@@ -11,10 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRVAdapter.MyViewHolder> {
+public class SelectTicketsRVAdapter extends RecyclerView.Adapter<SelectTicketsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Ticket> tickets;
     private HashSet<Ticket> selectedTickets;
     private Context context;

@@ -18,14 +18,14 @@ import java.util.HashSet;
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.FileManager;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
-import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.customerapp.ShowQRCodeActivity;
-import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity.qrCodeContentDataDelimiter;
+import static pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity.qrCodeContentDataTypeDelimiter;
 
 public class AddVouchersActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
     private final Context context = this;
@@ -47,51 +47,35 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         actionMenuItemView.setText(R.string.continue_string);
         this.app = (CustomerApp) getApplicationContext();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = getIntent();
-                checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
+        Intent i = getIntent();
+        checkoutProducts = (CheckoutProducts) i.getSerializableExtra(CustomerApp.cafeteriaSelectedProductsKeyName);
 
-                RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-                addVouchersRV.setLayoutManager(gridLayoutManager);
-                ArrayList<Voucher> allVouchers = FileManager.readVouchers(context);
-                ArrayList<Voucher> vouchers = new ArrayList<>();
-                for (Voucher v : allVouchers)
-                    if (v.getState().equals(Voucher.State.notUsed))
-                        vouchers.add(v);
-                addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, context);
-                addVouchersRV.setAdapter(addVouchersActivityRVAdapter);
-            }
-        }).start();
+        RecyclerView addVouchersRV = findViewById(R.id.addVouchersRV);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+        addVouchersRV.setLayoutManager(gridLayoutManager);
+        ArrayList<Voucher> allVouchers = FileManager.readVouchers(context);
+        ArrayList<Voucher> vouchers = new ArrayList<>();
+        for (Voucher v : allVouchers)
+            if (v.getState().equals(Voucher.State.notUsed))
+                vouchers.add(v);
+        addVouchersActivityRVAdapter = new AddVouchersActivityRVAdapter(vouchers, context);
+        addVouchersRV.setAdapter(addVouchersActivityRVAdapter);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
-                        if (vouchers.size() <= 2) {
-                            String qrCodeContent = generateQRCodeContent();
-                            updateStoredVouchers();
-                            Intent i = new Intent(context, ShowQRCodeActivity.class);
-                            i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
-                            startActivity(i);
-                            finish();
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
+                HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
+                if (vouchers.size() <= 2) {
+                    String qrCodeContent = generateQRCodeContent();
+                    updateStoredVouchers();
+                    Intent i = new Intent(context, ShowQRCodeActivity.class);
+                    i.putExtra(CustomerApp.qrCodeContentKeyName, qrCodeContent);
+                    startActivity(i);
+                    finish();
+                } else
+                    Toast.makeText(context, "You should select at most two vouchers.", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return false;
@@ -115,16 +99,24 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         StringBuilder sb = new StringBuilder();
-        sb.append(uuid).append(qrCodeContentDataTypeDelimiter);
-        for (Product p : checkoutProducts.getProducts()) {
-            sb.append(p.getUuid()).append(qrCodeContentDataDelimiter);
-            sb.append(p.getQuantity()).append(qrCodeContentDataDelimiter);
+        sb.append(uuid);
+        ArrayList<Product> products = checkoutProducts.getProducts();
+        if (products.size() > 0) {
+            sb.append(qrCodeContentDataTypeDelimiter);
+            for (Product p : products) {
+                sb.append(p.getUuid()).append(qrCodeContentDataDelimiter);
+                sb.append(p.getQuantity()).append(qrCodeContentDataDelimiter);
+            }
+            HashSet<Voucher> vouchers = addVouchersActivityRVAdapter.getSelectedVouchers();
+            if (vouchers.size() <= 0)
+                sb.deleteCharAt(sb.length() - 1);
+            else {
+                sb.replace(sb.length() - 1, sb.length(), qrCodeContentDataTypeDelimiter);
+                for (Voucher v : vouchers)
+                    sb.append(v.getUuid()).append(qrCodeContentDataDelimiter);
+                sb.deleteCharAt(sb.length() - 1);
+            }
         }
-        int lastIndex = sb.length() - 1;
-        sb.replace(lastIndex, lastIndex, qrCodeContentDataTypeDelimiter);
-        for (Voucher v : addVouchersActivityRVAdapter.getSelectedVouchers())
-            sb.append(v.getUuid()).append(qrCodeContentDataDelimiter);
-        sb.deleteCharAt(sb.length() - 1);
         return KeyStoreManager.toBase64(app.getKeyStoreManager().buildSignedMessage(sb.toString().getBytes()));
     }
 

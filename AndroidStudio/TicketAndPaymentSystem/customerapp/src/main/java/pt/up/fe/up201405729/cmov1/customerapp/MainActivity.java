@@ -39,6 +39,10 @@ public class MainActivity extends NavigableActivity implements Toolbar.OnMenuIte
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.buy_string);
 
+        RecyclerView performancesRV = findViewById(R.id.performancesRV);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+        performancesRV.setLayoutManager(gridLayoutManager);
+
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
         if (uuid == null) {
@@ -46,55 +50,29 @@ public class MainActivity extends NavigableActivity implements Toolbar.OnMenuIte
             startActivity(i);
             finish();
         } else {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final RecyclerView performancesRV = findViewById(R.id.performancesRV);
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-                    performancesRV.setLayoutManager(gridLayoutManager);
-                    ArrayList<Performance> performances = new ArrayList<>();
-                    try {
-                        JSONObject response = RestServices.GET("/listTickets", new JSONObject());
-                        if (response.has("data")) {
-                            JSONArray jsonArray = response.getJSONArray("data");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                String id = jsonObject.getString("id");
-                                String name = jsonObject.getString("name");
-                                MyDate date = new MyDate(jsonObject.getString("date"));
-                                Double price = Double.valueOf(jsonObject.getString("price"));
-                                performances.add(new Performance(id, name, date, price));
-                            }
-                            Collections.sort(performances);
-                        } else {
-                            final String error = response.getString("error");
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        final String exceptionMessage = e.getMessage();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
-                            }
-                        });
+            ArrayList<Performance> performances = new ArrayList<>();
+            try {
+                JSONObject response = RestServices.GET("/listTickets", new JSONObject());
+                if (response.has("data")) {
+                    JSONArray jsonArray = response.getJSONArray("data");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String id = jsonObject.getString("id");
+                        String name = jsonObject.getString("name");
+                        MyDate date = new MyDate(jsonObject.getString("date"));
+                        Double price = Double.valueOf(jsonObject.getString("price"));
+                        performances.add(new Performance(id, name, date, price));
                     }
-                    ArrayList<Integer> ticketsQuantities = new ArrayList<>(Collections.nCopies(performances.size(), 0));
-                    performancesRVAdapter = new PerformancesRVAdapter(performances, ticketsQuantities, true);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            performancesRV.setAdapter(performancesRVAdapter);
-                        }
-                    });
-                }
-            }).start();
+                    Collections.sort(performances);
+                } else
+                    Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            ArrayList<Integer> ticketsQuantities = new ArrayList<>(Collections.nCopies(performances.size(), 0));
+            performancesRVAdapter = new PerformancesRVAdapter(performances, ticketsQuantities, true);
+            performancesRV.setAdapter(performancesRVAdapter);
         }
     }
 
@@ -102,36 +80,26 @@ public class MainActivity extends NavigableActivity implements Toolbar.OnMenuIte
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
-                        ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
-                        ArrayList<Performance> desiredPerformances = new ArrayList<>();
-                        ArrayList<Integer> desiredTicketsQuantities = new ArrayList<>();
-                        for (int i = 0; i < allPerformances.size(); i++) {
-                            Integer quantity = ticketsQuantities.get(i);
-                            if (quantity > 0) {
-                                desiredPerformances.add(allPerformances.get(i));
-                                desiredTicketsQuantities.add(quantity);
-                            }
-                        }
-                        if (desiredPerformances.isEmpty()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "You should select at least one performance.", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        } else {
-                            CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
-                            Intent i = new Intent(context, CheckoutActivity.class);
-                            i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
-                            startActivity(i);
-                            finish();
-                        }
+                ArrayList<Performance> allPerformances = performancesRVAdapter.getPerformances();
+                ArrayList<Integer> ticketsQuantities = performancesRVAdapter.getTicketsQuantities();
+                ArrayList<Performance> desiredPerformances = new ArrayList<>();
+                ArrayList<Integer> desiredTicketsQuantities = new ArrayList<>();
+                for (int i = 0; i < allPerformances.size(); i++) {
+                    Integer quantity = ticketsQuantities.get(i);
+                    if (quantity > 0) {
+                        desiredPerformances.add(allPerformances.get(i));
+                        desiredTicketsQuantities.add(quantity);
                     }
-                }).start();
+                }
+                if (desiredPerformances.isEmpty())
+                    Toast.makeText(context, "You should select at least one performance.", Toast.LENGTH_LONG).show();
+                else {
+                    CheckoutData checkoutData = new CheckoutData(desiredPerformances, desiredTicketsQuantities);
+                    Intent i = new Intent(context, CheckoutActivity.class);
+                    i.putExtra(CustomerApp.checkoutDataKeyName, checkoutData);
+                    startActivity(i);
+                    finish();
+                }
                 return true;
             default:
                 return false;

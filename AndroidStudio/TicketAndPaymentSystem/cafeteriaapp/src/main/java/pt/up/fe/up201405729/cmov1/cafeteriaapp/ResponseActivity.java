@@ -33,64 +33,53 @@ public class ResponseActivity extends AppCompatActivity {
             bar.hide();
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = getIntent();
-                String orderStr = i.getStringExtra("Order");
-                ArrayList<Product> listProducts = new ArrayList<>();
-                ArrayList<Voucher> listVouchers = new ArrayList<>();
-                try {
-                    JSONObject response = new JSONObject(orderStr);
-                    if (response.has("data")) {
-                        JSONObject data = response.getJSONObject("data");
-                        JSONArray vouchers = data.getJSONArray("vouchers");
-                        JSONArray products = data.getJSONArray("productsPurchased");
+        Intent i = getIntent();
+        String orderStr = i.getStringExtra("Order");
+        ArrayList<Product> listProducts = new ArrayList<>();
+        ArrayList<Voucher> listVouchers = new ArrayList<>();
+        try {
+            JSONObject response = new JSONObject(orderStr);
+            if (response.has("data")) {
+                JSONObject data = response.getJSONObject("data");
+                JSONArray vouchers = data.getJSONArray("vouchers");
+                JSONArray products = data.getJSONArray("productsPurchased");
 
-                        for (int j = 0; j < products.length(); j++) {
-                            JSONObject jsonObject = products.getJSONObject(j);
-                            String id = jsonObject.getString("id");
-                            String name = jsonObject.getString("nameProduct");
-                            int price = jsonObject.getInt("priceProduct");
-                            int quantity = jsonObject.getInt("quantity");
-                            listProducts.add(new Product(id, name, price, quantity));
-                        }
-
-                        for (int j = 0; j < vouchers.length(); j++) {
-                            JSONObject jsonObject = vouchers.getJSONObject(j);
-                            String productCode = jsonObject.getString("productCode");
-                            String id = jsonObject.getString("id");
-                            String state = jsonObject.getString("state");
-                            listVouchers.add(new Voucher(id, productCode, state));
-                        }
-                    }
-
-                    ((TextView) findViewById(R.id.totalPrice)).setText(response.getString("valueSpend"));
-                    ((TextView) findViewById(R.id.orderNumber)).setText(response.getString("number"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    final String exceptionMessage = e.getMessage();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
-                        }
-                    });
+                for (int j = 0; j < products.length(); j++) {
+                    JSONObject jsonObject = products.getJSONObject(j);
+                    String id = jsonObject.getString("id");
+                    String name = jsonObject.getString("nameProduct");
+                    int price = jsonObject.getInt("priceProduct");
+                    int quantity = jsonObject.getInt("quantity");
+                    listProducts.add(new Product(id, name, price, quantity));
                 }
 
-                RecyclerView productRV = findViewById(R.id.productsRecyclerView);
-                GridLayoutManager gridLayoutManagerProduct = new GridLayoutManager(context, 1);
-                ProductsRVAdapter productsRVAdapter = new ProductsRVAdapter(listProducts);
-                productRV.setLayoutManager(gridLayoutManagerProduct);
-                productRV.setAdapter(productsRVAdapter);
-
-                RecyclerView voucherRV = findViewById(R.id.vouchersRecyclerView);
-                GridLayoutManager gridLayoutManagerVouchers = new GridLayoutManager(context, 1);
-                VouchersRVAdapter vouchersRVAdapter = new VouchersRVAdapter(listVouchers);
-                voucherRV.setLayoutManager(gridLayoutManagerVouchers);
-                voucherRV.setAdapter(vouchersRVAdapter);
+                for (int j = 0; j < vouchers.length(); j++) {
+                    JSONObject jsonObject = vouchers.getJSONObject(j);
+                    String productCode = jsonObject.getString("productCode");
+                    String id = jsonObject.getString("id");
+                    String state = jsonObject.getString("state");
+                    listVouchers.add(new Voucher(id, productCode, state));
+                }
             }
-        }).start();
+
+            ((TextView) findViewById(R.id.totalPrice)).setText(response.getString("valueSpend"));
+            ((TextView) findViewById(R.id.orderNumber)).setText(response.getString("number"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        RecyclerView productRV = findViewById(R.id.productsRecyclerView);
+        GridLayoutManager gridLayoutManagerProduct = new GridLayoutManager(context, 1);
+        ProductsRVAdapter productsRVAdapter = new ProductsRVAdapter(listProducts);
+        productRV.setLayoutManager(gridLayoutManagerProduct);
+        productRV.setAdapter(productsRVAdapter);
+
+        RecyclerView voucherRV = findViewById(R.id.vouchersRecyclerView);
+        GridLayoutManager gridLayoutManagerVouchers = new GridLayoutManager(context, 1);
+        VouchersRVAdapter vouchersRVAdapter = new VouchersRVAdapter(listVouchers);
+        voucherRV.setLayoutManager(gridLayoutManagerVouchers);
+        voucherRV.setAdapter(vouchersRVAdapter);
     }
 
     @Override

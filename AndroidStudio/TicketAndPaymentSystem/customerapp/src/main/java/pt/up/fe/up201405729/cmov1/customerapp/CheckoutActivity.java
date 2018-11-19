@@ -43,35 +43,25 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
         actionMenuItemView.setText(R.string.buy_string);
         this.app = (CustomerApp) getApplicationContext();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = getIntent();
-                CheckoutData checkoutData = (CheckoutData) i.getSerializableExtra(CustomerApp.checkoutDataKeyName);
+        Intent i = getIntent();
+        CheckoutData checkoutData = (CheckoutData) i.getSerializableExtra(CustomerApp.checkoutDataKeyName);
 
-                String totalPrice = StringFormat.formatAsPrice(checkoutData.getTotalPrice());
-                ((TextView) findViewById(R.id.checkoutTotalPriceValueTV)).setText(totalPrice);
+        String totalPrice = StringFormat.formatAsPrice(checkoutData.getTotalPrice());
+        ((TextView) findViewById(R.id.checkoutTotalPriceValueTV)).setText(totalPrice);
 
-                RecyclerView performancesRV = findViewById(R.id.checkoutRecyclerView);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-                performancesRV.setLayoutManager(gridLayoutManager);
-                performancesRVAdapter = new PerformancesRVAdapter(checkoutData.getPerformances(), checkoutData.getTicketsQuantities(), false);
-                performancesRV.setAdapter(performancesRVAdapter);
-            }
-        }).start();
+        RecyclerView performancesRV = findViewById(R.id.checkoutRecyclerView);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+        performancesRV.setLayoutManager(gridLayoutManager);
+        performancesRVAdapter = new PerformancesRVAdapter(checkoutData.getPerformances(), checkoutData.getTicketsQuantities(), false);
+        performancesRV.setAdapter(performancesRVAdapter);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        performCheckout();
-                        goToMainActivity();
-                    }
-                }).start();
+                performCheckout();
+                goToMainActivity();
                 return true;
             default:
                 return false;
@@ -127,24 +117,11 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
                 }
                 FileManager.writeVouchers(context, vouchers);
                 FileManager.writeTickets(context, tickets);
-            } else {
-                final String error = response.getString("error");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, error, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+            } else
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
         } catch (JSONException e) {
             e.printStackTrace();
-            final String exceptionMessage = e.getMessage();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
-                }
-            });
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

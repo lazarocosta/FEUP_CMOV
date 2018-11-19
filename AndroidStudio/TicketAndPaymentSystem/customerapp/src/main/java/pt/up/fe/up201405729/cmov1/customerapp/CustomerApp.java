@@ -13,6 +13,7 @@ public class CustomerApp extends Application {
     public static final String selectProductsActivityRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.cafeteria.selectProductsActivityRVAdapter";
     public static final String cafeteriaSelectedProductsKeyName = "pt.up.fe.up201405729.cmov1.customerapp.cafeteria.cafeteriaSelectedProductsKeyName";
     public static final String addVouchersActivityRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.cafeteria.addVouchersActivityRVAdapterKeyName";
+    public static final String selectTicketsActivityRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.selectTicketsActivityRVAdapterKeyName";
     public static final String vouchersFilename = "pt.up.fe.up201405729.cmov1.customerapp.vouchersFile";
     public static final String ticketsFilename = "pt.up.fe.up201405729.cmov1.customerapp.ticketsFile";
     private KeyStoreManager keyStoreManager;

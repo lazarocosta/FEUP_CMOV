@@ -19,9 +19,9 @@ import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.customerapp.CustomerApp;
 import pt.up.fe.up201405729.cmov1.customerapp.NavigableActivity;
-import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 
 
 public class SelectProductsActivity extends NavigableActivity implements Toolbar.OnMenuItemClickListener {
@@ -41,85 +41,52 @@ public class SelectProductsActivity extends NavigableActivity implements Toolbar
         ActionMenuItemView actionMenuItemView = findViewById(R.id.toolbar_button);
         actionMenuItemView.setText(R.string.buy_string);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final RecyclerView productsRV = findViewById(R.id.selectProductsRV);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
-                productsRV.setLayoutManager(gridLayoutManager);
-                ArrayList<Product> products = new ArrayList<>();
+        RecyclerView productsRV = findViewById(R.id.selectProductsRV);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 1);
+        productsRV.setLayoutManager(gridLayoutManager);
+        ArrayList<Product> products = new ArrayList<>();
 
-                JSONObject response = RestServices.GET("/listProducts", new JSONObject());
-                try {
-                    if (response.has("data")) {
-                        JSONArray arrayProducts = response.getJSONArray("data");
-                        for (int i = 0; i < arrayProducts.length(); i++) {
-                            JSONObject jsonObject = arrayProducts.getJSONObject(i);
-                            String id = jsonObject.getString("id");
-                            String name = jsonObject.getString("name");
-                            Double price = jsonObject.getDouble("price");
-                            products.add(new Product(id, name, price));
-                        }
-                    } else {
-                        final String error = response.getString("error");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context, error, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    final String exceptionMessage = e.getMessage();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
-                        }
-                    });
+        JSONObject response = RestServices.GET("/listProducts", new JSONObject());
+        try {
+            if (response.has("data")) {
+                JSONArray arrayProducts = response.getJSONArray("data");
+                for (int i = 0; i < arrayProducts.length(); i++) {
+                    JSONObject jsonObject = arrayProducts.getJSONObject(i);
+                    String id = jsonObject.getString("id");
+                    String name = jsonObject.getString("name");
+                    Double price = jsonObject.getDouble("price");
+                    products.add(new Product(id, name, price));
                 }
+            } else
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
-                selectProductsRVAdapter = new SelectProductsRVAdapter(products);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        productsRV.setAdapter(selectProductsRVAdapter);
-                    }
-                });
-            }
-        }).start();
+        selectProductsRVAdapter = new SelectProductsRVAdapter(products);
+        productsRV.setAdapter(selectProductsRVAdapter);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<Product> allProducts = selectProductsRVAdapter.getProducts();
-                        ArrayList<Product> desiredProducts = new ArrayList<>();
-                        for (int i = 0; i < allProducts.size(); i++) {
-                            Product p = allProducts.get(i);
-                            if (p.getQuantity() > 0)
-                                desiredProducts.add(p);
-                        }
-                        if (desiredProducts.isEmpty()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, "You should select at least one product.", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        } else {
-                            Intent i = new Intent(context, AddVouchersActivity.class);
-                            i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, new CheckoutProducts(desiredProducts));
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-                }).start();
+                ArrayList<Product> allProducts = selectProductsRVAdapter.getProducts();
+                ArrayList<Product> desiredProducts = new ArrayList<>();
+                for (int i = 0; i < allProducts.size(); i++) {
+                    Product p = allProducts.get(i);
+                    if (p.getQuantity() > 0)
+                        desiredProducts.add(p);
+                }
+                if (desiredProducts.isEmpty())
+                    Toast.makeText(context, "You should select at least one product.", Toast.LENGTH_LONG).show();
+                else {
+                    Intent i = new Intent(context, AddVouchersActivity.class);
+                    i.putExtra(CustomerApp.cafeteriaSelectedProductsKeyName, new CheckoutProducts(desiredProducts));
+                    startActivity(i);
+                    finish();
+                }
                 return true;
             default:
                 return false;

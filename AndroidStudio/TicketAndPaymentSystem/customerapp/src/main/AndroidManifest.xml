@@ -21,10 +21,14 @@
         <activity android:name=".CheckoutActivity" />
         <activity android:name=".ShowQRCodeActivity" />
         <activity android:name=".ListTransactionsActivity" />
-        <activity android:name=".SelectTicketsActivity" />
+        <activity
+            android:name=".SelectTicketsActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".NavigableActivity" />
         <activity android:name=".Cafeteria.SelectProductsActivity" />
-        <activity android:name=".Cafeteria.AddVouchersActivity" />
+        <activity
+            android:name=".Cafeteria.AddVouchersActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -20,8 +20,8 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
-import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 
 public class RegistrationActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
@@ -80,13 +80,8 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.toolbar_button:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        performRegistration();
-                        goToMainActivity();
-                    }
-                }).start();
+                performRegistration();
+                goToMainActivity();
                 return true;
             default:
                 return false;
@@ -112,25 +107,12 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
             SharedPreferences.Editor editor = sharedPreferences.edit();
             if (response.has("data"))
                 editor.putString("uuid", response.getString("data"));
-            else {
-                final String error = response.getString("error");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, error, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+            else
+                Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
             editor.apply();
         } catch (JSONException e) {
             e.printStackTrace();
-            final String exceptionMessage = e.getMessage();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, exceptionMessage, Toast.LENGTH_LONG).show();
-                }
-            });
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
