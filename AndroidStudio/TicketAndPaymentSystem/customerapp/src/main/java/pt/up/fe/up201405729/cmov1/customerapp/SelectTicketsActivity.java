@@ -70,20 +70,6 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         }
     }
 
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(CustomerApp.selectTicketsActivityRVAdapterKeyName, selectTicketsRVAdapter);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        selectTicketsRVAdapter = (SelectTicketsRVAdapter) savedInstanceState.get(CustomerApp.selectProductsActivityRVAdapterKeyName);
-        ((RecyclerView) findViewById(R.id.selectTicketsRV)).setAdapter(selectTicketsRVAdapter);
-    }
-
     private String generateQRCodeContent() {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);

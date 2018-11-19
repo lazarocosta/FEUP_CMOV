@@ -82,19 +82,6 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(CustomerApp.addVouchersActivityRVAdapterKeyName, addVouchersActivityRVAdapter);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        addVouchersActivityRVAdapter = (AddVouchersActivityRVAdapter) savedInstanceState.get(CustomerApp.addVouchersActivityRVAdapterKeyName);
-        ((RecyclerView) findViewById(R.id.addVouchersRV)).setAdapter(addVouchersActivityRVAdapter);
-    }
-
     private String generateQRCodeContent() {
         SharedPreferences preferences = getSharedPreferences(CustomerApp.sharedPreferencesKeyName, Context.MODE_PRIVATE);
         String uuid = preferences.getString("uuid", null);
