@@ -9,11 +9,12 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity;
 
 public class MainActivity extends QRCodeReaderActivity {
+    private final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,6 @@ public class MainActivity extends QRCodeReaderActivity {
 
     @Override
     protected void processQRCode(String base64Contents) {
-        final Context context = this;
         byte[] signedBytes = KeyStoreManager.fromBase64ToByteArray(base64Contents);
         try {
             JSONObject response = RestServices.POST("/payOrder", signedBytes);
@@ -39,12 +39,18 @@ public class MainActivity extends QRCodeReaderActivity {
                 i.putExtra("Order", response.toString());
                 startActivity(i);
                 finish();
-            } else
+            } else {
                 Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+                goToMainActivity();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+            goToMainActivity();
         }
+    }
+
+    private void goToMainActivity() {
         Intent i = new Intent(context, MainActivity.class);
         startActivity(i);
         finish();

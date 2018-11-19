@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -42,6 +41,7 @@ public abstract class NavigableActivity extends AppCompatActivity {
                 else if (!myActivity.equals(selectedActivity)) {
                     Intent i = new Intent(context, selectedActivity);
                     startActivity(i);
+                    finish();
                 }
                 return true;
             }

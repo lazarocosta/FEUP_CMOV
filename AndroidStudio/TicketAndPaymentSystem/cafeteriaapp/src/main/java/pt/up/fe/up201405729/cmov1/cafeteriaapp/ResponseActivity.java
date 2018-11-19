@@ -20,6 +20,7 @@ import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 
 public class ResponseActivity extends AppCompatActivity {
+    private final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,6 @@ public class ResponseActivity extends AppCompatActivity {
             bar.hide();
         }
 
-        final Context context = this;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -91,5 +91,12 @@ public class ResponseActivity extends AppCompatActivity {
                 voucherRV.setAdapter(vouchersRVAdapter);
             }
         }).start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(context, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 }

@@ -16,8 +16,6 @@ import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.MyViewHolder> implements Serializable {
     private ArrayList<Product> products;
 
-
-
     public ProductsRVAdapter(ArrayList<Product> products) {
         this.products = products;
     }
@@ -31,9 +29,6 @@ public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-
-
-
         Product p = products.get(position);
         ((TextView) holder.linearLayout.findViewById(R.id.productName)).setText(p.getName());
         ((TextView) holder.linearLayout.findViewById(R.id.productPrice)).setText(StringFormat.formatAsPrice(p.getPrice()));
@@ -43,10 +38,6 @@ public class ProductsRVAdapter extends RecyclerView.Adapter<ProductsRVAdapter.My
     @Override
     public int getItemCount() {
         return products.size();
-    }
-
-    public ArrayList<Product> getProducts() {
-        return products;
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {

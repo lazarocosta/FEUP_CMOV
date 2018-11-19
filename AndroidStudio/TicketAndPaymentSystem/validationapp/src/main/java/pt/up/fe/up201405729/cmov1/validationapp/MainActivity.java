@@ -16,6 +16,7 @@ import pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity;
 
 public class MainActivity extends QRCodeReaderActivity {
     private static final int numExpectedDataTypes = 2;
+    private final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,6 @@ public class MainActivity extends QRCodeReaderActivity {
 
     @Override
     protected void processQRCode(String base64Contents) {
-        final Context context = this;
         String contents = KeyStoreManager.fromBase64ToString(base64Contents);
         String[] dataTypes = contents.split(qrCodeContentDataTypeDelimiter);
         if (dataTypes.length != numExpectedDataTypes) {
@@ -54,12 +54,18 @@ public class MainActivity extends QRCodeReaderActivity {
                 Intent i = new Intent(context, QRCodeValidatedActivity.class);
                 startActivity(i);
                 finish();
-            } else
+            } else {
                 Toast.makeText(context, response.getString("error"), Toast.LENGTH_LONG).show();
+                goToMainActivity();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+            goToMainActivity();
         }
+    }
+
+    private void goToMainActivity() {
         Intent i = new Intent(context, MainActivity.class);
         startActivity(i);
         finish();
