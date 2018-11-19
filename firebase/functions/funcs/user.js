@@ -202,7 +202,7 @@ const payOrder = functions.https.onRequest((req, res) => {
             })
             .then(snapshot => {
                 getVouchers(listVoucher, userId, numberOfCoffee, numberOfPopcorn).then(result=>{
-                    console.log(result)
+                    console.log('get vouchers', result)
                     if(result != null && typeof(result) !== typeof(String)){
                         discont = result.discont;
                         freecoffee = result.freecoffee;
@@ -231,6 +231,7 @@ const payOrder = functions.https.onRequest((req, res) => {
                             var valueSpentMod100 = docreditcard.data().valueSpentMod100;
                             var voucher = (valueSpentMod100 + priceProducts)/100;
                             valueSpent = priceProducts*(1-discont) - valueCoffe*freecoffee - valuepopCorn*popcorn;
+                            console.log('value Spend', valueSpent)
             
                                 if(valueSpent > 0 ){
                                     usersRef.doc(userId).collection('creditCard').doc(creditCardUser).update({
@@ -250,14 +251,13 @@ const payOrder = functions.https.onRequest((req, res) => {
                         })
         
                         voucherUsed.forEach(voucherId => {
-                            usersRef.doc(userId).collection('voucher').doc(voucherId).update({
+                            console.log('importa', voucherId)
+                            usersRef.doc(userId).collection('voucher').doc(voucherId.id).update({
                                 state: 'used',
                             },{merge:true})
                         }) 
         
-                        var valueSpendkey = "valueSpend";
-                        obj[valueSpendkey] = valueSpent;
-        
+                        obj['valueSpend'] = valueSpent;
                         obj['vouchers'] = voucherUsed;
                         obj['productsPurchased'] = productsPurchased
                         addProductUser(userId, productsPurchased)
@@ -537,12 +537,12 @@ function getProducts(listproducts) {
             }
             productsPurchased.push(purchase);
 
-            if(nameProduct == 'coffee') {
+            if(nameProduct == 'Coffee') {
                 numberOfCoffee = numberOfCoffee + quantity;
                 valueCoffe = priceProduct;
             }
 
-            if(nameProduct == 'popcorn') {
+            if(nameProduct == 'Popcorn') {
                 numberOfPopcorn = numberOfPopcorn + quantity;
                 valuepopCorn = priceProduct;
             }
@@ -568,8 +568,6 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
     var popcorn=0;
     var voucherUsed = [];
     var obj = {};
-
- 
 
     const promises = [];
     var usersRef= admin.firestore().collection('customer');
@@ -603,7 +601,12 @@ function getVouchers(listVouchers, userId, numberOfCoffee, numberOfPopcorn) {
                 }
 
                 if (used){
-                    voucherUsed.push(doc.id)
+                    var vUsed = {
+                        productCode:doc.data().productCode,
+                        id:doc.id,
+                        state:'used'
+                    }
+                    voucherUsed.push(vUsed)
                 }
             } 
         })
