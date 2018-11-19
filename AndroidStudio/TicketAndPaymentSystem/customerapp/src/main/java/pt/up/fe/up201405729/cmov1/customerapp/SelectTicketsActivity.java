@@ -15,7 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
@@ -94,7 +94,7 @@ public class SelectTicketsActivity extends NavigableActivity implements Toolbar.
         for (Ticket t : selectTicketsRVAdapter.getSelectedTickets())
             sb.append(t.getUuid()).append(qrCodeContentDataDelimiter);
         sb.deleteCharAt(sb.length() - 1);
-        return EncryptionManager.toBase64(sb.toString().getBytes());
+        return KeyStoreManager.toBase64(sb.toString().getBytes());
     }
 
     private void markSelectedTicketsAsUsed() {

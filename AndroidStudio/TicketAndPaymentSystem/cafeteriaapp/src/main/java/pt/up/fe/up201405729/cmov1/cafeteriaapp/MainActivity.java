@@ -9,7 +9,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity;
 
@@ -30,7 +30,7 @@ public class MainActivity extends QRCodeReaderActivity {
     @Override
     protected void processQRCode(String base64Contents) {
         final Context context = this;
-        byte[] signedBytes = EncryptionManager.fromBase64ToByteArray(base64Contents);
+        byte[] signedBytes = KeyStoreManager.fromBase64ToByteArray(base64Contents);
         try {
             JSONObject response = RestServices.POST("/payOrder", signedBytes);
             if (response.has("data")) { // The value of "data" should be "true".

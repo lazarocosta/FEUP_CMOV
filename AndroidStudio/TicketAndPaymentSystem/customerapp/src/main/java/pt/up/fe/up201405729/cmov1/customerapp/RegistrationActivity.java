@@ -20,7 +20,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 
@@ -97,9 +97,9 @@ public class RegistrationActivity extends AppCompatActivity implements Toolbar.O
         JSONObject registrationData = new JSONObject();
         try {
             JSONObject rsaPublicKeyJSONObject = new JSONObject();
-            EncryptionManager encryptionManager = app.getEncryptionManager();
-            rsaPublicKeyJSONObject.put("modulus", encryptionManager.getPublicKeyModulus());
-            rsaPublicKeyJSONObject.put("publicExponent", encryptionManager.getPublicKeyExponent());
+            KeyStoreManager keyStoreManager = app.getKeyStoreManager();
+            rsaPublicKeyJSONObject.put("modulus", keyStoreManager.getPublicKeyModulus());
+            rsaPublicKeyJSONObject.put("publicExponent", keyStoreManager.getPublicKeyExponent());
             registrationData.put("publicKey", rsaPublicKeyJSONObject);
             registrationData.put("name", ((EditText) findViewById(R.id.registrationNameET)).getText().toString());
             registrationData.put("nif", ((EditText) findViewById(R.id.registrationNifET)).getText().toString());

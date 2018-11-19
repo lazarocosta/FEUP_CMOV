@@ -9,12 +9,10 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 import pt.up.fe.up201405729.cmov1.restservices.RestServices;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.QRCodeReaderActivity;
 
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
-import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
 
 public class MainActivity extends QRCodeReaderActivity {
     private static final int numExpectedDataTypes = 2;
@@ -34,7 +32,7 @@ public class MainActivity extends QRCodeReaderActivity {
     @Override
     protected void processQRCode(String base64Contents) {
         final Context context = this;
-        String contents = EncryptionManager.fromBase64ToString(base64Contents);
+        String contents = KeyStoreManager.fromBase64ToString(base64Contents);
         String[] dataTypes = contents.split(qrCodeContentDataTypeDelimiter);
         if (dataTypes.length != numExpectedDataTypes) {
             Toast.makeText(context, "Invalid QR code.", Toast.LENGTH_LONG).show();

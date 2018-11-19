@@ -97,7 +97,7 @@ public class CheckoutActivity extends NavigableActivity implements Toolbar.OnMen
             }
             buyTicketsData.put("performances", jsonPerformances);
             buyTicketsData.put("userId", uuid);
-            byte[] signedMessage = app.getEncryptionManager().buildSignedMessage(buyTicketsData.toString().getBytes());
+            byte[] signedMessage = app.getKeyStoreManager().buildSignedMessage(buyTicketsData.toString().getBytes());
 
             JSONObject response = RestServices.POST("/buyTickets", signedMessage);
             if (response.has("data")) {

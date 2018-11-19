@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
 public abstract class QRCodeReaderActivity extends AppCompatActivity {
+    protected static final String qrCodeContentDataDelimiter = ">";
+    protected static final String qrCodeContentDataTypeDelimiter = "\n";
     private static final int requestCode = 0;
 
     @Override

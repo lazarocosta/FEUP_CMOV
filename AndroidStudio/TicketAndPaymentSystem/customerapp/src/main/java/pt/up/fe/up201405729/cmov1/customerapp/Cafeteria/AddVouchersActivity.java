@@ -22,7 +22,7 @@ import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
 import pt.up.fe.up201405729.cmov1.customerapp.R;
 import pt.up.fe.up201405729.cmov1.customerapp.ShowQRCodeActivity;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataDelimiter;
 import static pt.up.fe.up201405729.cmov1.sharedlibrary.Shared.qrCodeContentDataTypeDelimiter;
@@ -125,7 +125,7 @@ public class AddVouchersActivity extends NavigableActivity implements Toolbar.On
         for (Voucher v : addVouchersActivityRVAdapter.getSelectedVouchers())
             sb.append(v.getUuid()).append(qrCodeContentDataDelimiter);
         sb.deleteCharAt(sb.length() - 1);
-        return EncryptionManager.toBase64(app.getEncryptionManager().buildSignedMessage(sb.toString().getBytes()));
+        return KeyStoreManager.toBase64(app.getKeyStoreManager().buildSignedMessage(sb.toString().getBytes()));
     }
 
     private void updateStoredVouchers() {

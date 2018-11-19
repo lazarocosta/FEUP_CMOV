@@ -1,4 +1,4 @@
-package pt.up.fe.up201405729.cmov1.restservices;
+package pt.up.fe.up201405729.cmov1.sharedlibrary;
 
 /*
 Based on:
@@ -11,8 +11,6 @@ import android.security.KeyPairGeneratorSpec;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,9 +37,9 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
-public class EncryptionManager {
+public class KeyStoreManager {
     private static final String ANDROID_KEYSTORE = "AndroidKeyStore";
-    private static final String keyAlias = "pt.up.fe.up201405729.cmov1.restservices.EncryptionManager";
+    private static final String keyAlias = "pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager";
     private static final int KEY_SIZE = 512;
     private static final String KEY_ALGORITHM = "RSA";
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
@@ -53,7 +51,7 @@ public class EncryptionManager {
     private KeyStore keyStore;
     private Context context;
 
-    public EncryptionManager(Context context) {
+    public KeyStoreManager(Context context) {
         this.context = context;
         try {
             this.keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);

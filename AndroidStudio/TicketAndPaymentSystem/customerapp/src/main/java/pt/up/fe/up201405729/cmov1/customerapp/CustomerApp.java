@@ -3,7 +3,7 @@ package pt.up.fe.up201405729.cmov1.customerapp;
 import android.app.Application;
 import android.content.Context;
 
-import pt.up.fe.up201405729.cmov1.restservices.EncryptionManager;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.KeyStoreManager;
 
 public class CustomerApp extends Application {
     public static final String sharedPreferencesKeyName = "pt.up.fe.up201405729.cmov1.customerapp.prefs";
@@ -15,16 +15,16 @@ public class CustomerApp extends Application {
     public static final String addVouchersActivityRVAdapterKeyName = "pt.up.fe.up201405729.cmov1.customerapp.cafeteria.addVouchersActivityRVAdapterKeyName";
     public static final String vouchersFilename = "pt.up.fe.up201405729.cmov1.customerapp.vouchersFile";
     public static final String ticketsFilename = "pt.up.fe.up201405729.cmov1.customerapp.ticketsFile";
-    private EncryptionManager encryptionManager;
+    private KeyStoreManager keyStoreManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Context context = this;
-        encryptionManager = new EncryptionManager(context);
+        keyStoreManager = new KeyStoreManager(context);
     }
 
-    public EncryptionManager getEncryptionManager() {
-        return encryptionManager;
+    public KeyStoreManager getKeyStoreManager() {
+        return keyStoreManager;
     }
 }
