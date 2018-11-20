@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import pt.up.fe.up201405729.cmov1.sharedlibrary.Product;
+import pt.up.fe.up201405729.cmov1.sharedlibrary.StringFormat;
 import pt.up.fe.up201405729.cmov1.sharedlibrary.Voucher;
 
 public class ResponseActivity extends AppCompatActivity {
@@ -60,10 +61,12 @@ public class ResponseActivity extends AppCompatActivity {
                     String state = jsonObject.getString("state");
                     listVouchers.add(new Voucher(id, productCode, state));
                 }
-            }
 
-            ((TextView) findViewById(R.id.totalPrice)).setText(response.getString("valueSpend"));
-            ((TextView) findViewById(R.id.orderNumber)).setText(response.getString("number"));
+                String orderNumber = " " + StringFormat.formatAsPrice(data.getDouble("valueSpend"));
+                String totalPrice = " " + data.getString("number");
+                ((TextView) findViewById(R.id.totalPrice)).setText(orderNumber);
+                ((TextView) findViewById(R.id.orderNumber)).setText(totalPrice);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
