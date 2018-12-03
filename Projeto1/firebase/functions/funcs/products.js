@@ -13,6 +13,8 @@ Teste:
 
     curl -X POST http://localhost:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
 
+    curl -X POST http://10.227.152.214:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
+
     curl -X POST http://192.168.1.65:5000/cmov-d52d6/us-central1/listProducts --data '{}' -g -H "Content-Type: application/json"
     
     curl -X POST https://us-central1-cmov-d52d6.cloudfunctions.net/listProducts --data ' {}' -g -H "Content-Type: application/json"
