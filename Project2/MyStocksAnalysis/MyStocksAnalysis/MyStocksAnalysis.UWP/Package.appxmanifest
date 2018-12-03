@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="9ba927ad-6e17-4f56-a816-a9e1d526a891"
-    Publisher="CN=adbbf459-e1e6-45a7-aa0f-ae6a98e520bc"
+    Name="4fe10894-f69c-4bec-9f9d-15dbc23ee2a3"
+    Publisher="CN=46fde7f1-b581-4083-8937-9d955cc5362d"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>MyStocksAnalysis.UWP</DisplayName>
-    <PublisherDisplayName>adbbf459-e1e6-45a7-aa0f-ae6a98e520bc</PublisherDisplayName>
+    <PublisherDisplayName>46fde7f1-b581-4083-8937-9d955cc5362d</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

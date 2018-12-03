@@ -5,12 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
-namespace MyStocksAnalysis
-{
-    public partial class MainPage : ContentPage
-    {
-        public MainPage()
-        {
+namespace MyStocksAnalysis {
+    public partial class MainPage : ContentPage {
+        public MainPage() {
             InitializeComponent();
         }
     }

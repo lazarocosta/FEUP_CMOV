@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{58431070-39D0-4A60-BA22-FA02AE31A185}</ProjectGuid>
+    <ProjectGuid>{5CFF3751-82AE-49CE-A31A-CD4D938472C7}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MyStocksAnalysis.UWP</RootNamespace>
     <AssemblyName>MyStocksAnalysis.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
@@ -148,7 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyStocksAnalysis\MyStocksAnalysis.csproj">
-      <Project>{464B6880-D92B-40C2-9424-18BB945F5447}</Project>
+      <Project>{2452E793-FAAC-46ED-B74E-C01F9D7F6E0C}</Project>
       <Name>MyStocksAnalysis</Name>
     </ProjectReference>
   </ItemGroup>
