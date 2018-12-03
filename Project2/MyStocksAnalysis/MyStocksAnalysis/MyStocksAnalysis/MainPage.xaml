@@ -5,10 +5,56 @@
              x:Class="MyStocksAnalysis.MainPage">
 
     <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
+        <ListView ItemsSource="">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <FlexLayout>
+                        <Image Source="Demo image path" />
+                        <Label Text="Demo label" />
+                    </FlexLayout>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Apple" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="IBM" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Hewlett Packard" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Microsoft" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Oracle" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Google" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Facebook" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Twitter" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="Intel" />
+        </FlexLayout>
+        <FlexLayout>
+            <Image Source="" />
+            <Label Text="AMD" />
+        </FlexLayout>
     </StackLayout>
 
 </ContentPage>
