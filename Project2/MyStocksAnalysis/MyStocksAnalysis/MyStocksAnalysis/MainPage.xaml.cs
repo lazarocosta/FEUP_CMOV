@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using System.Collections;
 
 namespace MyStocksAnalysis {
     public partial class MainPage : ContentPage {
@@ -11,9 +12,12 @@ namespace MyStocksAnalysis {
             InitializeComponent();
         }
 
-        private void Button_Clicked(object sender, EventArgs e)
+        private  void Button_Clicked(object sender, EventArgs e)
         {
-            DisplayAlert("title", "message", "OK");
+            // to show OtherPage and be able to go back
+            ArrayList companies = new ArrayList();
+            companies.Add("Hello");
+            Navigation.PushAsync(new Checkout(companies));
         }
     }
 }
