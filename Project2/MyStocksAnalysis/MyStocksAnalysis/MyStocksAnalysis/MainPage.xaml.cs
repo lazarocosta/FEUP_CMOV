@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace MyStocksAnalysis {
     public partial class MainPage : ContentPage {
-        private static List<string> companies = new List<string>() {
+        readonly private static List<string> companies = new List<string>() {
             "AMD",
             "Apple",
             "Facebook",
@@ -25,8 +25,8 @@ namespace MyStocksAnalysis {
 
         public MainPage() {
             this.itemsSelected = new List<string>();
-            InitializeContent();
             InitializeComponent();
+            InitializeContent();
         }
 
         private void InitializeContent() {

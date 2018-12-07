@@ -16,8 +16,8 @@ namespace MyStocksAnalysis {
             if (companies.Count < 1 || companies.Count > 2)
                 throw new ArgumentException("Invalid number of companies.");
             this.companies = companies;
-            InitializeContent();
             InitializeComponent();
+            InitializeContent();
             Slider_ValueChanged(this, new ValueChangedEventArgs(0, 0));
         }
 
