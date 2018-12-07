@@ -29,15 +29,19 @@ namespace MyStocksAnalysis {
             CompaniesSource.ItemSelected += (object sender, SelectedItemChangedEventArgs e) =>
             {
                 var item = e.SelectedItem;
-                this.itemsSelected.Add(item.ToString());
+                string itemString = item.ToString();
 
-                DisplayAlert("ItemSelected", this.itemsSelected.Contains(item.ToString()).ToString(), "OK");
+                if(this.itemsSelected.Contains(itemString))
+                    this.itemsSelected.Remove(itemString);
+                else
+                    this.itemsSelected.Add(itemString);
+
+                DisplayAlert("ItemSelected", this.itemsSelected.Contains(itemString).ToString(), "OK");
             };
         }
 
         private void ShowGraph_Clicked(object sender, EventArgs e)
         {
-
             Navigation.PushAsync(new Checkout(this.itemsSelected));
         }
     }

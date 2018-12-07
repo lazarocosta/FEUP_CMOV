@@ -6,14 +6,18 @@
 
     <StackLayout>
         <Label Text="Number of days 7" x:Name="label"></Label>
-            <Slider x:Name="slider"
+        <Slider x:Name="slider"
                 Minimum="0" 
                 Maximum="23"
                 Value="0"
-                ValueChanged="Slider_ValueChanged"
-                >
+                ValueChanged="Slider_ValueChanged">
         </Slider>
-
+        <Button  HorizontalOptions="End" 
+                 VerticalOptions="End" 
+                 Text="Show Graph" 
+                 Clicked="ShowGraph_Clicked"
+                 x:Name="showGraph">
+        </Button>
     </StackLayout>
 
 </ContentPage>
