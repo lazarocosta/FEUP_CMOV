@@ -16,8 +16,8 @@ namespace MyStocksAnalysis
             InitializeComponent();
             this.ConvertCompanies(companies);
             this.GenerateDate(days);
-            //var apirest = new ApiRest(companiesInitials.ElementAt(0), date);
-            //apirest.GetService();
+            var apirest = new ApiRest(companiesInitials.ElementAt(0), date);
+            apirest.GetService();
         }
 
         private void ConvertCompanies(List<string> companies)
