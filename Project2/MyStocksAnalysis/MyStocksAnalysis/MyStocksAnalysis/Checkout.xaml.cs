@@ -9,8 +9,8 @@ using System.Collections;
 namespace MyStocksAnalysis
 {
     public partial class Checkout : ContentPage{
-        ArrayList companies;
-        public Checkout(ArrayList companies){
+        List<string> companies;
+        public Checkout(List<string> companies){
             this.companies = companies;
             InitializeComponent();
         }

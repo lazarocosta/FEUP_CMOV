@@ -3,30 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MyStocksAnalysis"
              x:Class="MyStocksAnalysis.MainPage">
-
-    <StackLayout>
-        <ListView>
-            <ListView.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>AMD</x:String>
-                    <x:String>Apple</x:String>
-                    <x:String>Facebook</x:String>
-                    <x:String>Google</x:String>
-                    <x:String>Hewlett Packard</x:String>
-                    <x:String>IBM</x:String>
-                    <x:String>Intel</x:String>
-                    <x:String>Microsoft</x:String>
-                    <x:String>Oracle</x:String>
-                    <x:String>Twitter</x:String>
-                </x:Array>
-            </ListView.ItemsSource>
-        </ListView>
-        <Button  HorizontalOptions="End" 
+        <StackLayout>
+            <ListView x:Name="CompaniesSource"
+                  HorizontalOptions="FillAndExpand"
+                  VerticalOptions="FillAndExpand"
+                 ></ListView>
+            <Button  HorizontalOptions="End" 
                  VerticalOptions="End" 
                  Text="Show Graph" 
-                 Clicked="Button_Clicked" 
+                 Clicked="ShowGraph_Clicked"
                  x:Name="showGraph">
-        </Button>
-    </StackLayout>
-
+            </Button>
+        </StackLayout>
 </ContentPage>
