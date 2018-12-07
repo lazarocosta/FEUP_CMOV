@@ -81,14 +81,14 @@ namespace MyStocksAnalysis {
                 Minimum = -10,
                 Maximum = 10
             });
-            BoxPlotSeries boxPlotSeries = new BoxPlotSeries();
             LineSeries lineSeries = new LineSeries();
             lineSeries.Points.Add(new DataPoint(0, 0));
             lineSeries.Points.Add(new DataPoint(2, 2));
+            lineSeries.Points.Add(new DataPoint(20, 2));
             ScatterSeries scatterSeries = new ScatterSeries();
             scatterSeries.Points.Add(new ScatterPoint(0, 0));
-            scatterSeries.Points.Add(new ScatterPoint(3, 3));
-            plotModel.Series.Add(boxPlotSeries);
+            scatterSeries.Points.Add(new ScatterPoint(2, 2));
+            scatterSeries.Points.Add(new ScatterPoint(20, 2));
             plotModel.Series.Add(lineSeries);
             plotModel.Series.Add(scatterSeries);
             plotView.Model = plotModel;
