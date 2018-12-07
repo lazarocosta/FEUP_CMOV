@@ -2,11 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MyStocksAnalysis"
+             xmlns:oxy="clr-namespace:OxyPlot.Xamarin.Forms;assembly=OxyPlot.Xamarin.Forms"
              x:Class="MyStocksAnalysis.Graph">
-
-    <StackLayout>
-
-
-    </StackLayout>
-
+    <AbsoluteLayout>
+        <oxy:PlotView x:Name="plotView"
+                      AbsoluteLayout.LayoutBounds="20,0,.9,.9"
+                      AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional" />
+    </AbsoluteLayout>
 </ContentPage>
