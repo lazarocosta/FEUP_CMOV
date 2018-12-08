@@ -7,7 +7,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace MyStocksAnalysis {
-    class ApiRest {
+    class RestApi {
         readonly private bool DEBUG_MODE = true;
         readonly private string URLtemplate = "https://marketdata.websol.barchart.com/getHistory.json?apikey={0}&symbol={1}&type=daily&startDate={2}";
         readonly private string apiKey = "a60d02d93ff31be9627f14a80906e7bd";
@@ -17,7 +17,7 @@ namespace MyStocksAnalysis {
         readonly private static string responseTemplateStr = "{ \"status\": { \"code\": 200, \"message\": \"Success.\" }, \"results\": [ { \"symbol\": \"IBM\", \"timestamp\": \"2018-12-07T00:00:00-05:00\", \"tradingDay\": \"2018-12-07\", \"open\": 123.9, \"high\": 124.05, \"low\": 118.87, \"close\": 119.34, \"volume\": 6947081, \"openInterest\": null } ] }";
         readonly public static object responseTemplate = JsonConvert.DeserializeObject(responseTemplateStr);
 
-        public ApiRest(string symbol, string date) {
+        public RestApi(string symbol, string date) {
             DateTime dateTime = new DateTime();
             if (!DateTime.TryParseExact(date, acceptedDateFormats, new CultureInfo("en-US"), DateTimeStyles.None, out dateTime))
                 throw new ArgumentException("Invalid date format.");

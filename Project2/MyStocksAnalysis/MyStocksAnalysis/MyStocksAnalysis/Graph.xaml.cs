@@ -18,8 +18,8 @@ namespace MyStocksAnalysis {
             InitializeComponent();
             ConvertCompanies(companies);
             GenerateDate(days);
-            var apirest = new ApiRest(companiesInitials.ElementAt(0), date);
-            apirest.POST();
+            RestApi restApi = new RestApi(companiesInitials.ElementAt(0), date);
+            restApi.POST();
             DrawGraphic();
         }
 
