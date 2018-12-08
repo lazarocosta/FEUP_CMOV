@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MyStocksAnalysis {
     class RestApi {
@@ -33,8 +34,7 @@ namespace MyStocksAnalysis {
             httpWebRequest.Method = "POST";
             HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (StreamReader streamReader = new StreamReader(httpWebResponse.GetResponseStream())) {
-                string response = streamReader.ReadToEnd();
-                return JsonConvert.DeserializeObject(response);
+                return JsonConvert.DeserializeObject(streamReader.ReadToEnd());
             }
         }
     }

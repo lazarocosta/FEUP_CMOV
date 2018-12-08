@@ -19,7 +19,8 @@ namespace MyStocksAnalysis {
             ConvertCompanies(companies);
             GenerateDate(days);
             RestApi restApi = new RestApi(companiesInitials.ElementAt(0), date);
-            restApi.POST();
+            var result = restApi.POST();
+            Console.WriteLine(result);
             DrawGraphic();
         }
 

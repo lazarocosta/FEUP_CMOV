@@ -16,7 +16,7 @@ namespace MyStocksAnalysis {
             if (companies.Count < 1 || companies.Count > 2)
                 throw new ArgumentException("Invalid number of companies.");
             this.companies = companies;
-            InitializeComponent();
+            this.days = 7;
             InitializeContent();
             Slider_ValueChanged(this, new ValueChangedEventArgs(0, 0));
         }
@@ -33,6 +33,8 @@ namespace MyStocksAnalysis {
                 Intent = TableIntent.Data
             };
             label = new Label();
+            label.HorizontalTextAlignment = TextAlignment.Center;
+            label.VerticalTextAlignment = TextAlignment.Center;
             Slider slider = new Slider(min: 0, max: 23, val: 0);
             slider.ValueChanged += Slider_ValueChanged;
             Button button = new Button {
