@@ -19,7 +19,7 @@ namespace MyStocksAnalysis {
             ConvertCompanies(companies);
             GenerateDate(days);
             var apirest = new ApiRest(companiesInitials.ElementAt(0), date);
-            apirest.GetService();
+            apirest.POST();
             DrawGraphic();
         }
 
@@ -68,7 +68,7 @@ namespace MyStocksAnalysis {
             this.date = Convert.ToDateTime(datenow).Subtract(TimeSpan.FromDays(days)).ToString("yyyyMMdd");
         }
 
-        // Based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
+        // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
         private void DrawGraphic() {
             plotModel = new PlotModel { Title = "Plot model" };
             plotModel.Axes.Add(new LinearAxis {
