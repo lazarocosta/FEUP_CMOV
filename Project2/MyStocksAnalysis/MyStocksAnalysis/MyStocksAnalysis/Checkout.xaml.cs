@@ -23,19 +23,34 @@ namespace MyStocksAnalysis {
         }
 
         private void InitializeContent() {
-            List<Cell> cells = new List<Cell>();
-            foreach (string c in this.companies) {
-                TextCell textCell = new TextCell { Text = c };
-                cells.Add(textCell);
+            List<ViewCell> viewCells = new List<ViewCell>();
+            foreach (string companyName in this.companies) {
+                Image i = new Image {
+                    Source = App.companies[companyName],
+                    Aspect = Aspect.AspectFill
+                };
+                Label l = new Label {
+                    Text = companyName,
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    VerticalOptions = LayoutOptions.CenterAndExpand,
+                    FontSize = 22
+                };
+                StackLayout stackLayout = new StackLayout {
+                    Orientation = StackOrientation.Horizontal,
+                    HeightRequest = 30,
+                    Children = { i, l }
+                };
+                viewCells.Add(new ViewCell() { View = stackLayout });
             }
-            TableSection tableSection = new TableSection { cells };
+            TableSection tableSection = new TableSection { viewCells };
             TableView tableView = new TableView {
-                Root = new TableRoot("Companies") { tableSection },
+                Root = new TableRoot { tableSection },
                 Intent = TableIntent.Data
             };
-            label = new Label();
-            label.HorizontalTextAlignment = TextAlignment.Center;
-            label.VerticalTextAlignment = TextAlignment.Center;
+            label = new Label {
+                HorizontalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.Center
+            };
             Slider slider = new Slider(min: 0, max: 23, val: 0);
             slider.ValueChanged += Slider_ValueChanged;
             Button button = new Button {

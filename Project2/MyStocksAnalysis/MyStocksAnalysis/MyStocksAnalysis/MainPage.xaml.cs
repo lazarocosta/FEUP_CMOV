@@ -8,18 +8,7 @@ using System.Collections;
 
 namespace MyStocksAnalysis {
     public partial class MainPage : ContentPage {
-        readonly private static List<string> companies = new List<string>() {
-            "AMD",
-            "Apple",
-            "Facebook",
-            "Google",
-            "Hewlett Packard",
-            "IBM",
-            "Intel",
-            "Microsoft",
-            "Oracle",
-            "Twitter"
-        };
+        readonly private static string switchId = "switchId";
         private List<string> itemsSelected;
         private Button button;
 
@@ -30,15 +19,33 @@ namespace MyStocksAnalysis {
         }
 
         private void InitializeContent() {
-            List<Cell> cells = new List<Cell>();
-            foreach (string c in companies) {
-                SwitchCell switchCell = new SwitchCell { Text = c };
-                switchCell.OnChanged += SwitchCellOnChangedHandler;
-                cells.Add(switchCell);
+            List<ViewCell> viewCells = new List<ViewCell>();
+            foreach (KeyValuePair<string, string> pair in App.companies) {
+                string companyName = pair.Key;
+                string companyImage = pair.Value;
+                Image i = new Image {
+                    Source = companyImage,
+                    Aspect = Aspect.AspectFill
+                };
+                Label l = new Label {
+                    Text = companyName,
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    VerticalOptions = LayoutOptions.CenterAndExpand,
+                    FontSize = 22
+                };
+                Switch s = new Switch();
+                s.Toggled += SwitchToggledHandler;
+                s.Resources.Add(switchId, companyName);
+                StackLayout stackLayout = new StackLayout {
+                    Orientation = StackOrientation.Horizontal,
+                    HeightRequest = 30,
+                    Children = { i, l, s }
+                };
+                viewCells.Add(new ViewCell() { View = stackLayout });
             }
-            TableSection tableSection = new TableSection { cells };
+            TableSection tableSection = new TableSection { viewCells };
             TableView tableView = new TableView {
-                Root = new TableRoot("Companies") { tableSection },
+                Root = new TableRoot { tableSection },
                 Intent = TableIntent.Form
             };
             button = new Button {
@@ -54,16 +61,18 @@ namespace MyStocksAnalysis {
             };
         }
 
-        private void SwitchCellOnChangedHandler(object sender, ToggledEventArgs e) {
-            SwitchCell switchCell = (SwitchCell)sender;
-            string itemString = switchCell.Text;
+        private void SwitchToggledHandler(object sender, ToggledEventArgs e) {
+            Switch s = (Switch)sender;
+            string companyName = (string)s.Resources[switchId];
             if (e.Value) {
-                if (this.itemsSelected.Count >= 2)
+                this.itemsSelected.Add(companyName);
+                if (this.itemsSelected.Count > 2) {
                     DisplayAlert("Too many options", "You can only select one or two options.", "OK");
-                this.itemsSelected.Add(itemString);
+                    s.IsToggled = false;    // Re-calls this handler.
+                }
             }
             else
-                this.itemsSelected.Remove(itemString);
+                this.itemsSelected.Remove(companyName);
             if (this.itemsSelected.Count >= 1 && this.itemsSelected.Count <= 2)
                 button.IsEnabled = true;
             else
