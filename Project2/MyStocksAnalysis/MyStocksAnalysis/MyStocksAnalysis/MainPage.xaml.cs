@@ -25,6 +25,7 @@ namespace MyStocksAnalysis {
 
         public MainPage() {
             this.itemsSelected = new List<string>();
+            Title = "Companies list";
             InitializeContent();
         }
 

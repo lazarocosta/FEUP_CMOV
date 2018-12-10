@@ -16,6 +16,7 @@ namespace MyStocksAnalysis {
 
         public Graph(List<string> companies, double days) {
             InitializeComponent();
+            Title = "Graph";
             ConvertCompanies(companies);
             GenerateDate(days);
             RestApi restApi = new RestApi(companiesInitials.ElementAt(0), date);
