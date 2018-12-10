@@ -51,7 +51,11 @@ namespace MyStocksAnalysis {
                 HorizontalTextAlignment = TextAlignment.Center,
                 VerticalTextAlignment = TextAlignment.Center
             };
-            Slider slider = new Slider(min: 0, max: 23, val: 0);
+            Slider slider = new Slider(min: 0, max: 23, val: 0) {
+                ThumbColor = Color.DarkCyan,
+                MinimumTrackColor = Color.Gray,
+                MaximumTrackColor = Color.Black
+            };
             slider.ValueChanged += Slider_ValueChanged;
             Button button = new Button {
                 Text = "Show graph"
