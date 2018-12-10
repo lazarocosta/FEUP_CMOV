@@ -60,7 +60,7 @@ namespace MyStocksAnalysis {
                         this.companiesSymbols.Add("IBM");
                         break;
                     default:
-                        break;
+                        throw new ArgumentException("Invalid company.");
                 }
             }
         }
