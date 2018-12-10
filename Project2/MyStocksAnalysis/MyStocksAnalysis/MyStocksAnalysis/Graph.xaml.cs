@@ -11,7 +11,6 @@ using OxyPlot.Axes;
 namespace MyStocksAnalysis {
     public partial class Graph : ContentPage {
         private List<string> companiesSymbols;
-        private string date;
         public PlotModel plotModel;
 
         public Graph(List<string> companies, int maxRecords) {
@@ -19,9 +18,8 @@ namespace MyStocksAnalysis {
             Title = "Graph";
             ConvertCompanies(companies);
             RestApi restApi = new RestApi(companiesSymbols.ElementAt(0), maxRecords);
-            Response result = restApi.POST();
-            Console.WriteLine(result);
-            DrawGraphic();
+            Response response = restApi.POST();
+            DrawGraphic(response);
         }
 
         private void ConvertCompanies(List<string> companies) {
@@ -65,26 +63,37 @@ namespace MyStocksAnalysis {
         }
 
         // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
-        private void DrawGraphic() {
+        private void DrawGraphic(Response response) {
+            double minClose = Double.MaxValue;
+            double maxClose = Double.MinValue;
+            foreach (Response.Result result in response.results) {
+                double close = result.close;
+                if (minClose > close)
+                    minClose = close;
+                if (maxClose < close)
+                    maxClose = close;
+            }
+            int numResults = response.results.Count;
             plotModel = new PlotModel { Title = "Plot model" };
             plotModel.Axes.Add(new LinearAxis {
                 Position = AxisPosition.Bottom,
-                Minimum = -20,
-                Maximum = 80
+                Minimum = 0,
+                Maximum = numResults + 1
             });
             plotModel.Axes.Add(new LinearAxis {
                 Position = AxisPosition.Left,
-                Minimum = -10,
-                Maximum = 10
+                Minimum = minClose,
+                Maximum = maxClose
             });
             LineSeries lineSeries = new LineSeries();
-            lineSeries.Points.Add(new DataPoint(0, 0));
-            lineSeries.Points.Add(new DataPoint(2, 2));
-            lineSeries.Points.Add(new DataPoint(20, 2));
             ScatterSeries scatterSeries = new ScatterSeries();
-            scatterSeries.Points.Add(new ScatterPoint(0, 0));
-            scatterSeries.Points.Add(new ScatterPoint(2, 2));
-            scatterSeries.Points.Add(new ScatterPoint(20, 2));
+            for (int i = 0; i < numResults; i++) {
+                Response.Result result = response.results[i];
+                int x = i + 1;
+                double y = result.close;
+                lineSeries.Points.Add(new DataPoint(x, y));
+                scatterSeries.Points.Add(new ScatterPoint(x, y));
+            }
             plotModel.Series.Add(lineSeries);
             plotModel.Series.Add(scatterSeries);
             plotView.Model = plotModel;
