@@ -20,6 +20,19 @@ namespace MyStocksAnalysis {
             { "Oracle", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
             { "Twitter", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" }
         };
+        readonly public static Dictionary<string, string> companiesSymbols = new Dictionary<string, string>
+        {
+            { "AMD", "AMD" },
+            { "Apple", "AAPL" },
+            { "Facebook", "FB" },
+            { "Google", "GOOG" },
+            { "Hewlett Packard", "HPQ" },
+            { "IBM", "IBM" },
+            { "Intel", "INTC" },
+            { "Microsoft", "MSFT" },
+            { "Oracle", "ORCL" },
+            { "Twitter", "TWTR" }
+        };
 
         public App() {
             InitializeComponent();

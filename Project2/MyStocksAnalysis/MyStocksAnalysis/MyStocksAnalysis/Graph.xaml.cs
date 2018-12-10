@@ -10,65 +10,23 @@ using OxyPlot.Axes;
 
 namespace MyStocksAnalysis {
     public partial class Graph : ContentPage {
-        private List<string> companiesSymbols;
-        public PlotModel plotModel;
+        private PlotModel plotModel;
 
         public Graph(List<string> companies, int maxRecords) {
             InitializeComponent();
             Title = "Graph";
-            ConvertCompanies(companies);
-            List<Response> responses = new List<Response>();
-            foreach(string companySymbol in this.companiesSymbols)
-                responses.Add(RestApi.POST(companySymbol, maxRecords));
+            Dictionary<string, Response> responses = new Dictionary<string, Response>();
+            foreach(string companyName in companies)
+                responses.Add(companyName, RestApi.POST(App.companiesSymbols[companyName], maxRecords));
             DrawGraphic(responses);
         }
 
-        private void ConvertCompanies(List<string> companies) {
-            this.companiesSymbols = new List<string>();
-            for (int i = 0; i < companies.Count; i++) {
-                switch (companies.ElementAt(i)) {
-                    case "AMD":
-                        this.companiesSymbols.Add("AMD");
-                        break;
-                    case "Apple":
-                        this.companiesSymbols.Add("AAPL");
-                        break;
-                    case "Facebook":
-                        this.companiesSymbols.Add("FB");
-                        break;
-                    case "Twitter":
-                        this.companiesSymbols.Add("TWTR");
-                        break;
-                    case "Oracle":
-                        this.companiesSymbols.Add("ORCL");
-                        break;
-                    case "Microsoft":
-                        this.companiesSymbols.Add("MSFT");
-                        break;
-                    case "Google":
-                        this.companiesSymbols.Add("GOOG");
-                        break;
-                    case "Hewlett Packard":
-                        this.companiesSymbols.Add("HPQ");
-                        break;
-                    case "Intel":
-                        this.companiesSymbols.Add("INTC");
-                        break;
-                    case "IBM":
-                        this.companiesSymbols.Add("IBM");
-                        break;
-                    default:
-                        throw new ArgumentException("Invalid company.");
-                }
-            }
-        }
-
         // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
-        private void DrawGraphic(List<Response> responses) {
-            double minClose = Double.MaxValue;
-            double maxClose = Double.MinValue;
+        private void DrawGraphic(Dictionary<string, Response> responses) {
+            double minClose = double.MaxValue;
+            double maxClose = double.MinValue;
             int maxNumResults = int.MinValue;
-            foreach (Response response in responses) {
+            foreach (Response response in responses.Values) {
                 foreach (Response.Result result in response.results) {
                     double close = result.close;
                     if (minClose > close)
@@ -80,7 +38,7 @@ namespace MyStocksAnalysis {
                 if (maxNumResults < numResults)
                     maxNumResults = numResults;
             }
-            plotModel = new PlotModel { Title = "Plot model" };
+            plotModel = new PlotModel { Title = "Quotes on close" };
             plotModel.Axes.Add(new LinearAxis {
                 Position = AxisPosition.Bottom,
                 Minimum = 0,
@@ -91,8 +49,12 @@ namespace MyStocksAnalysis {
                 Minimum = minClose,
                 Maximum = maxClose
             });
-            foreach (Response response in responses) {
-                LineSeries lineSeries = new LineSeries();
+            foreach (KeyValuePair<string, Response> pair in responses) {
+                string companyName = pair.Key;
+                Response response = pair.Value;
+                LineSeries lineSeries = new LineSeries {
+                    Title = companyName
+                };
                 ScatterSeries scatterSeries = new ScatterSeries();
                 int numResults = response.results.Count;
                 for (int i = 0; i < numResults; i++) {
