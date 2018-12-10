@@ -32,7 +32,7 @@ namespace MyStocksAnalysis {
                     Text = companyName,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.CenterAndExpand,
-                    FontSize = 22
+                    FontSize = 18
                 };
                 Switch s = new Switch();
                 s.Toggled += SwitchToggledHandler;
