@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MyStocksAnalysis {
     class RestApi {
-        readonly private static bool DEBUG_MODE = true;
+        readonly private static bool DEBUG_MODE = false;
         readonly private static string URLtemplate = "https://marketdata.websol.barchart.com/getHistory.json?apikey={0}&symbol={1}&type=daily&startDate={2}&maxRecords={3}";
         readonly private static string apiKey = "a60d02d93ff31be9627f14a80906e7bd";
         readonly private static string[] acceptedDateFormats = { "yyyyMMdd" };
