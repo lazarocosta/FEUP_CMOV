@@ -6,8 +6,26 @@ namespace MyStocksAnalysis
 {
     public class Response
     {
-        public IList<string> Status { get; set; }
-        public IList<Result> Results { get; set; }
+        private string jsonResponse;
+        public ResponseStatus Status { get; }
+        public List<Result> Results { get; }
+
+        public Response(string jsonResponse)
+        {
+            this.jsonResponse = jsonResponse;
+            // TODO: parsing
+        }
+
+        override public string ToString()
+        {
+            return this.jsonResponse;
+        }
+
+        public class ResponseStatus
+        {
+            public int code { get; set; }
+            public string message { get; set; }
+        }
 
         public class Result
         {

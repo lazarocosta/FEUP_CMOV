@@ -14,13 +14,12 @@ namespace MyStocksAnalysis {
         private string date;
         public PlotModel plotModel;
 
-        public Graph(List<string> companies, double days) {
+        public Graph(List<string> companies, int maxRecords) {
             InitializeComponent();
             Title = "Graph";
             ConvertCompanies(companies);
-            GenerateDate(days);
-            RestApi restApi = new RestApi(companiesSymbols.ElementAt(0), date);
-            var result = restApi.POST();
+            RestApi restApi = new RestApi(companiesSymbols.ElementAt(0), maxRecords);
+            Response result = restApi.POST();
             Console.WriteLine(result);
             DrawGraphic();
         }
@@ -63,11 +62,6 @@ namespace MyStocksAnalysis {
                         throw new ArgumentException("Invalid company.");
                 }
             }
-        }
-
-        private void GenerateDate(double days) {
-            DateTime datenow = DateTime.Now;
-            this.date = Convert.ToDateTime(datenow).Subtract(TimeSpan.FromDays(days)).ToString("yyyyMMdd");
         }
 
         // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms

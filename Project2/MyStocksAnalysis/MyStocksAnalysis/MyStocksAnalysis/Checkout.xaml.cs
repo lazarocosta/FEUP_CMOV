@@ -10,7 +10,7 @@ namespace MyStocksAnalysis {
     public partial class Checkout : ContentPage {
         private List<string> companies;
         private Label label;
-        private double days;
+        private int maxRecords;
 
         public Checkout(List<string> companies) {
             if (companies.Count < 1 || companies.Count > 2)
@@ -69,14 +69,14 @@ namespace MyStocksAnalysis {
 
         private void Slider_ValueChanged(object sender, ValueChangedEventArgs e) {
             double value = e.NewValue + 7;
-            this.days = Math.Floor(value);
-            label.Text = "Number of days: " + this.days;
+            this.maxRecords = (int)Math.Floor(value);
+            label.Text = "Number of records: " + this.maxRecords;
         }
         // to go back one step on the navigation stack
         // Navigation.PopAsync();
 
         private void Button_Clicked(object sender, EventArgs e) {
-            Navigation.PushAsync(new Graph(this.companies, this.days));
+            Navigation.PushAsync(new Graph(this.companies, this.maxRecords));
         }
     }
 }
