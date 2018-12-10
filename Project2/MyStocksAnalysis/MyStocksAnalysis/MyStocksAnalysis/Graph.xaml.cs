@@ -17,8 +17,7 @@ namespace MyStocksAnalysis {
             InitializeComponent();
             Title = "Graph";
             ConvertCompanies(companies);
-            RestApi restApi = new RestApi(companiesSymbols.ElementAt(0), maxRecords);
-            Response response = restApi.POST();
+            Response response = RestApi.POST(companiesSymbols.ElementAt(0), maxRecords);
             DrawGraphic(response);
         }
 
