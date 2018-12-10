@@ -10,7 +10,7 @@ using OxyPlot.Axes;
 
 namespace MyStocksAnalysis {
     public partial class Graph : ContentPage {
-        private List<string> companiesInitials;
+        private List<string> companiesSymbols;
         private string date;
         public PlotModel plotModel;
 
@@ -19,45 +19,45 @@ namespace MyStocksAnalysis {
             Title = "Graph";
             ConvertCompanies(companies);
             GenerateDate(days);
-            RestApi restApi = new RestApi(companiesInitials.ElementAt(0), date);
+            RestApi restApi = new RestApi(companiesSymbols.ElementAt(0), date);
             var result = restApi.POST();
             Console.WriteLine(result);
             DrawGraphic();
         }
 
         private void ConvertCompanies(List<string> companies) {
-            this.companiesInitials = new List<string>();
+            this.companiesSymbols = new List<string>();
             for (int i = 0; i < companies.Count; i++) {
                 switch (companies.ElementAt(i)) {
                     case "AMD":
-                        this.companiesInitials.Add("AMD");
+                        this.companiesSymbols.Add("AMD");
                         break;
                     case "Apple":
-                        this.companiesInitials.Add("AAPL");
+                        this.companiesSymbols.Add("AAPL");
                         break;
                     case "Facebook":
-                        this.companiesInitials.Add("FB");
+                        this.companiesSymbols.Add("FB");
                         break;
                     case "Twitter":
-                        this.companiesInitials.Add("TWTR");
+                        this.companiesSymbols.Add("TWTR");
                         break;
                     case "Oracle":
-                        this.companiesInitials.Add("ORCL");
+                        this.companiesSymbols.Add("ORCL");
                         break;
                     case "Microsoft":
-                        this.companiesInitials.Add("MSFT");
+                        this.companiesSymbols.Add("MSFT");
                         break;
                     case "Google":
-                        this.companiesInitials.Add("GOOG");
+                        this.companiesSymbols.Add("GOOG");
                         break;
                     case "Hewlett Packard":
-                        this.companiesInitials.Add("HPQ");
+                        this.companiesSymbols.Add("HPQ");
                         break;
                     case "Intel":
-                        this.companiesInitials.Add("INTC");
+                        this.companiesSymbols.Add("INTC");
                         break;
                     case "IBM":
-                        this.companiesInitials.Add("IBM");
+                        this.companiesSymbols.Add("IBM");
                         break;
                     default:
                         break;
