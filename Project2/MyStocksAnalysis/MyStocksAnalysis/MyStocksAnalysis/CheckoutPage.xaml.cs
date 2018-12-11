@@ -17,7 +17,7 @@ namespace MyStocksAnalysis {
                 throw new ArgumentException("Invalid number of companies.");
             this.companies = companies;
             InitializeComponent();
-            Title = "Select days";
+            Title = "Select parameters";
             InitializeContent();
             Slider_ValueChanged(this, new ValueChangedEventArgs(0, 0));
         }
