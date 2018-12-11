@@ -80,7 +80,12 @@ namespace MyStocksAnalysis {
         // Navigation.PopAsync();
 
         private void Button_Clicked(object sender, EventArgs e) {
-            Navigation.PushAsync(new Graph(this.companies, this.maxRecords));
+            try {
+                Navigation.PushAsync(new Graph(this.companies, this.maxRecords));
+            }
+            catch (System.Net.WebException) {
+                DisplayAlert("No Internet?", "Connection to server failed.", "OK");
+            }
         }
     }
 }
