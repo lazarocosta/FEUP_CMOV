@@ -59,7 +59,7 @@ namespace MyStocksAnalysis {
             };
             slider.ValueChanged += Slider_ValueChanged;
             Button button = new Button {
-                Text = "Show graph"
+                Text = "Show chart"
             };
             button.Clicked += Button_Clicked;
             Content = new StackLayout {
