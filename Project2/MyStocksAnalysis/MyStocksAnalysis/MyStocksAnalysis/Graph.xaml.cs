@@ -55,7 +55,9 @@ namespace MyStocksAnalysis {
                 LineSeries lineSeries = new LineSeries {
                     Title = companyName
                 };
-                ScatterSeries scatterSeries = new ScatterSeries();
+                ScatterSeries scatterSeries = new ScatterSeries {
+                    MarkerType = MarkerType.Circle
+                };
                 int numResults = response.results.Count;
                 for (int i = 0; i < numResults; i++) {
                     Response.Result result = response.results[i];
