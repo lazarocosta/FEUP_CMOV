@@ -40,11 +40,13 @@ namespace MyStocksAnalysis {
             }
             plotModel = new PlotModel { Title = "Quotes on close" };
             plotModel.Axes.Add(new LinearAxis {
+                Title = "Record number",
                 Position = AxisPosition.Bottom,
                 Minimum = 0,
                 Maximum = maxNumResults + 1
             });
             plotModel.Axes.Add(new LinearAxis {
+                Title = "Quote on close",
                 Position = AxisPosition.Left,
                 Minimum = minClose,
                 Maximum = maxClose
