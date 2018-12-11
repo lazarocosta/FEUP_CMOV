@@ -81,7 +81,7 @@ namespace MyStocksAnalysis {
         }
 
         private void Button_Clicked(object sender, EventArgs e) {
-            Navigation.PushAsync(new Checkout(this.itemsSelected));
+            Navigation.PushAsync(new CheckoutPage(this.itemsSelected));
         }
     }
 }

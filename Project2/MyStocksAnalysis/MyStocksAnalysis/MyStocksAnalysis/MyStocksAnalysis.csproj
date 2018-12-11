@@ -16,11 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Graph.xaml.cs">
-      <DependentUpon>Graph.xaml</DependentUpon>
+    <Compile Update="ChartPage.xaml.cs">
+      <DependentUpon>ChartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Checkout.xaml.cs">
-      <DependentUpon>Checkout.xaml</DependentUpon>
+    <Compile Update="CheckoutPage.xaml.cs">
+      <DependentUpon>CheckoutPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

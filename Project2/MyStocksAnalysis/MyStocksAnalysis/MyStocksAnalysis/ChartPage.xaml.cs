@@ -9,20 +9,20 @@ using OxyPlot.Series;
 using OxyPlot.Axes;
 
 namespace MyStocksAnalysis {
-    public partial class Graph : ContentPage {
+    public partial class ChartPage : ContentPage {
         private PlotModel plotModel;
 
-        public Graph(SortedSet<string> companies, int maxRecords) {
+        public ChartPage(SortedSet<string> companies, int maxRecords) {
             InitializeComponent();
-            Title = "Graph";
+            Title = "Chart";
             Dictionary<string, Response> responses = new Dictionary<string, Response>();
             foreach(string companyName in companies)
                 responses.Add(companyName, RestApi.POST(App.companiesSymbols[companyName], maxRecords));
-            DrawGraphic(responses);
+            DrawChart(responses);
         }
 
         // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
-        private void DrawGraphic(Dictionary<string, Response> responses) {
+        private void DrawChart(Dictionary<string, Response> responses) {
             double minClose = double.MaxValue;
             double maxClose = double.MinValue;
             int maxNumResults = int.MinValue;

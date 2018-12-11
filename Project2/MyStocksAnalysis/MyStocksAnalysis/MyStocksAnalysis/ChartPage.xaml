@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MyStocksAnalysis"
              xmlns:oxy="clr-namespace:OxyPlot.Xamarin.Forms;assembly=OxyPlot.Xamarin.Forms"
-             x:Class="MyStocksAnalysis.Graph">
+             x:Class="MyStocksAnalysis.ChartPage">
     <AbsoluteLayout>
         <oxy:PlotView x:Name="plotView"
                       AbsoluteLayout.LayoutBounds="20,0,.9,.9"

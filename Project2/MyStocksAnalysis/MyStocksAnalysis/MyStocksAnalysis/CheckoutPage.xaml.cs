@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Collections;
 
 namespace MyStocksAnalysis {
-    public partial class Checkout : ContentPage {
+    public partial class CheckoutPage : ContentPage {
         private SortedSet<string> companies;
         private Label label;
         private int maxRecords;
 
-        public Checkout(SortedSet<string> companies) {
+        public CheckoutPage(SortedSet<string> companies) {
             if (companies.Count < 1 || companies.Count > 2)
                 throw new ArgumentException("Invalid number of companies.");
             this.companies = companies;
@@ -81,7 +81,7 @@ namespace MyStocksAnalysis {
 
         private void Button_Clicked(object sender, EventArgs e) {
             try {
-                Navigation.PushAsync(new Graph(this.companies, this.maxRecords));
+                Navigation.PushAsync(new ChartPage(this.companies, this.maxRecords));
             }
             catch (System.Net.WebException) {
                 DisplayAlert("No Internet?", "Connection to server failed.", "OK");
