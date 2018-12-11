@@ -21,12 +21,14 @@ namespace MyStocksAnalysis {
 
         private void InitializeContent() {
             List<ViewCell> viewCells = new List<ViewCell>();
-            foreach (KeyValuePair<string, string> pair in App.companies) {
+            foreach (KeyValuePair<string, ImageSource> pair in App.companiesImages) {
                 string companyName = pair.Key;
-                string companyImage = pair.Value;
+                ImageSource companyImage = pair.Value;
+               
                 Image i = new Image {
                     Source = companyImage,
-                    Aspect = Aspect.AspectFill
+                    Aspect = Aspect.AspectFit,
+                    WidthRequest = 100
                 };
                 Label l = new Label {
                     Text = companyName,

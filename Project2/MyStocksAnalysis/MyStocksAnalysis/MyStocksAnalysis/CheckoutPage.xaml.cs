@@ -26,8 +26,9 @@ namespace MyStocksAnalysis {
             List<ViewCell> viewCells = new List<ViewCell>();
             foreach (string companyName in this.companies) {
                 Image i = new Image {
-                    Source = App.companies[companyName],
-                    Aspect = Aspect.AspectFill
+                    Source = App.companiesImages[companyName],
+                    Aspect = Aspect.AspectFit,
+                    WidthRequest = 100
                 };
                 Label l = new Label {
                     Text = companyName,

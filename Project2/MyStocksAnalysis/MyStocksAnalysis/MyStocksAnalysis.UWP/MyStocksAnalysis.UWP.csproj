@@ -130,6 +130,16 @@
     <Content Include="Assets\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Images\AMD_logo.jpg" />
+    <Content Include="Images\Apple_logo.jpg" />
+    <Content Include="Images\Facebook_logo.jpg" />
+    <Content Include="Images\Google_logo.jpg" />
+    <Content Include="Images\Hewlett_Packard_logo.jpg" />
+    <Content Include="Images\IBM_logo.jpg" />
+    <Content Include="Images\Intel_logo.jpg" />
+    <Content Include="Images\Microsoft_logo.jpg" />
+    <Content Include="Images\Oracle_logo.jpg" />
+    <Content Include="Images\Twitter_logo.jpg" />
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +165,7 @@
       <Name>MyStocksAnalysis</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

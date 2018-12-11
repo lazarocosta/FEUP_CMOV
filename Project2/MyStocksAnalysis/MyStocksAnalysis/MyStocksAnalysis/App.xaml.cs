@@ -6,22 +6,19 @@ using Xamarin.Forms.Xaml;
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace MyStocksAnalysis {
     public partial class App : Application {
-        readonly public static SortedDictionary<string, string> companies = new SortedDictionary<string, string>
-        {
-            // These images are tagged for reuse.
-            { "AMD", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Apple", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Facebook", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Google", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Hewlett Packard", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "IBM", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Intel", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Microsoft", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Oracle", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" },
-            { "Twitter", "https://farm9.staticflickr.com/8692/16980768497_421e5dba93_o_d.jpg" }
-        };
-        readonly public static SortedDictionary<string, string> companiesSymbols = new SortedDictionary<string, string>
-        {
+        /* These images are tagged for reuse.
+         * https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg
+         * https://upload.wikimedia.org/wikipedia/commons/7/7c/Facebook_New_Logo_%282015%29.svg
+         * https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg
+         * https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/c/c9/Intel-logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg
+         * https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_twitter_wordmark_1000.png */
+        readonly public static SortedDictionary<string, ImageSource> companiesImages = new SortedDictionary<string, ImageSource>();
+        readonly public static SortedDictionary<string, string> companiesSymbols = new SortedDictionary<string, string> {
             { "AMD", "AMD" },
             { "Apple", "AAPL" },
             { "Facebook", "FB" },
@@ -48,7 +45,7 @@ namespace MyStocksAnalysis {
 
         public App() {
             InitializeComponent();
-
+            InitializeCompaniesImages();
             MainPage = new NavigationPage(new MainPage());
         }
 
@@ -62,6 +59,20 @@ namespace MyStocksAnalysis {
 
         protected override void OnResume() {
             // Handle when your app resumes
+        }
+
+        private void InitializeCompaniesImages() {
+            foreach (string companyName in companiesSymbols.Keys) {
+                string filepath;
+                 if (Device.RuntimePlatform == Device.Android)
+                     filepath = companyName + "_logo.jpg";
+                 else if (Device.RuntimePlatform == Device.UWP)
+                     filepath = "Images/" + companyName + "_logo.jpg";
+                 else
+                     throw new Exception("Platform not supported: " + Device.RuntimePlatform);
+                filepath = filepath.Replace(" ", "_");
+                companiesImages[companyName] = ImageSource.FromFile(filepath);
+            }
         }
     }
 }
