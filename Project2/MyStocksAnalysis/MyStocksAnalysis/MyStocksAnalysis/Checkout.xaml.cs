@@ -8,11 +8,11 @@ using System.Collections;
 
 namespace MyStocksAnalysis {
     public partial class Checkout : ContentPage {
-        private List<string> companies;
+        private SortedSet<string> companies;
         private Label label;
         private int maxRecords;
 
-        public Checkout(List<string> companies) {
+        public Checkout(SortedSet<string> companies) {
             if (companies.Count < 1 || companies.Count > 2)
                 throw new ArgumentException("Invalid number of companies.");
             this.companies = companies;

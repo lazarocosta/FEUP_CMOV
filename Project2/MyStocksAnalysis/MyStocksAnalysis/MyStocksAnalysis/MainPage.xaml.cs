@@ -9,11 +9,11 @@ using System.Collections;
 namespace MyStocksAnalysis {
     public partial class MainPage : ContentPage {
         readonly private static string switchId = "switchId";
-        private List<string> itemsSelected;
+        private SortedSet<string> itemsSelected;
         private Button button;
 
         public MainPage() {
-            this.itemsSelected = new List<string>();
+            this.itemsSelected = new SortedSet<string>();
             InitializeComponent();
             Title = "Companies list";
             InitializeContent();

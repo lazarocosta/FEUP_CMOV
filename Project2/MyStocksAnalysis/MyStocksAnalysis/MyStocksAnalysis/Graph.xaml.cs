@@ -12,7 +12,7 @@ namespace MyStocksAnalysis {
     public partial class Graph : ContentPage {
         private PlotModel plotModel;
 
-        public Graph(List<string> companies, int maxRecords) {
+        public Graph(SortedSet<string> companies, int maxRecords) {
             InitializeComponent();
             Title = "Graph";
             Dictionary<string, Response> responses = new Dictionary<string, Response>();
