@@ -78,8 +78,6 @@ namespace MyStocksAnalysis {
             this.maxRecords = (int)Math.Floor(value);
             label.Text = "Number of records: " + this.maxRecords;
         }
-        // to go back one step on the navigation stack
-        // Navigation.PopAsync();
 
         private void Button_Clicked(object sender, EventArgs e) {
             try {
