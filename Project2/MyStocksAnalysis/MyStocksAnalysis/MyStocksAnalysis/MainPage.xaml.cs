@@ -60,7 +60,8 @@ namespace MyStocksAnalysis {
                 Children = {
                     tableView,
                     button
-                }
+                },
+                Padding = new Thickness(4)
             };
         }
 

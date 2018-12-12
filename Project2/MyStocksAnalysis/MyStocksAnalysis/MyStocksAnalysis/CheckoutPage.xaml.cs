@@ -68,7 +68,8 @@ namespace MyStocksAnalysis {
                     label,
                     slider,
                     button
-                }
+                },
+                Padding = new Thickness(4)
             };
         }
 
