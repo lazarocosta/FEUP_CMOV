@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace MyStocksAnalysis {
     public partial class MainPage : ContentPage {
-        readonly private static string switchId = "switchId";
+        readonly private static string switchIdKey = "switchIdKey";
         private SortedSet<string> itemsSelected;
         private Button button;
 
@@ -38,7 +38,7 @@ namespace MyStocksAnalysis {
                 };
                 Switch s = new Switch();
                 s.Toggled += SwitchToggledHandler;
-                s.Resources.Add(switchId, companyName);
+                s.Resources.Add(switchIdKey, companyName);
                 StackLayout stackLayout = new StackLayout {
                     Orientation = StackOrientation.Horizontal,
                     HeightRequest = 30,
@@ -67,7 +67,7 @@ namespace MyStocksAnalysis {
 
         private void SwitchToggledHandler(object sender, ToggledEventArgs e) {
             Switch s = (Switch)sender;
-            string companyName = (string)s.Resources[switchId];
+            string companyName = (string)s.Resources[switchIdKey];
             if (e.Value) {
                 this.itemsSelected.Add(companyName);
                 if (this.itemsSelected.Count > 2) {
@@ -84,7 +84,7 @@ namespace MyStocksAnalysis {
         }
 
         private void Button_Clicked(object sender, EventArgs e) {
-            Navigation.PushAsync(new CheckoutPage(this.itemsSelected));
+            Navigation.PushAsync(new ChartPage(this.itemsSelected));
         }
     }
 }

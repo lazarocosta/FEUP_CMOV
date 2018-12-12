@@ -3,10 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MyStocksAnalysis"
              xmlns:oxy="clr-namespace:OxyPlot.Xamarin.Forms;assembly=OxyPlot.Xamarin.Forms"
-             x:Class="MyStocksAnalysis.ChartPage">
-    <AbsoluteLayout>
-        <oxy:PlotView x:Name="plotView"
+             x:Class="MyStocksAnalysis.ChartPage"
+             Title="Chart">
+    <Grid Padding="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <AbsoluteLayout Grid.Row="0">
+            <oxy:PlotView x:Name="plotView"
                       AbsoluteLayout.LayoutBounds="20,0,.9,.9"
                       AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional" />
-    </AbsoluteLayout>
+        </AbsoluteLayout>
+        <StackLayout Grid.Row="1">
+            <Label x:Name="label"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center" />
+            <Slider x:Name="slider"
+                Minimum="0"
+                Maximum="23"
+                Value="0"
+                ThumbColor="DarkCyan"
+                MinimumTrackColor="Gray"
+                MaximumTrackColor="Black"
+                ValueChanged="Slider_ValueChanged" />
+            <Button x:Name="button"
+                Text="Show chart"
+                Clicked="Button_Clicked" />
+        </StackLayout>
+    </Grid>
 </ContentPage>

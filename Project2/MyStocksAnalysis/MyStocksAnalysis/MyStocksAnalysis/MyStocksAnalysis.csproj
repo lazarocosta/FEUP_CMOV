@@ -19,8 +19,5 @@
     <Compile Update="ChartPage.xaml.cs">
       <DependentUpon>ChartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="CheckoutPage.xaml.cs">
-      <DependentUpon>CheckoutPage.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

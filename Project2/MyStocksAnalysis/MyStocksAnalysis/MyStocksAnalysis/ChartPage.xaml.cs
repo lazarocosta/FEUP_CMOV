@@ -10,19 +10,19 @@ using OxyPlot.Axes;
 
 namespace MyStocksAnalysis {
     public partial class ChartPage : ContentPage {
-        private PlotModel plotModel;
+        private SortedSet<string> companies;
+        private int maxRecords;
 
-        public ChartPage(SortedSet<string> companies, int maxRecords) {
+        public ChartPage(SortedSet<string> companies) {
+            this.companies = companies;
             InitializeComponent();
-            Title = "Chart";
-            Dictionary<string, Response> responses = new Dictionary<string, Response>();
-            foreach(string companyName in companies)
-                responses.Add(companyName, RestApi.POST(App.companiesSymbols[companyName], maxRecords));
-            DrawChart(responses);
+            Slider_ValueChanged(this, new ValueChangedEventArgs(0, 0));
+            DrawChart(new Dictionary<string, Response>());
         }
 
         // Partially based on https://www.codeproject.com/Articles/1167724/Using-OxyPlot-with-Xamarin-Forms
         private void DrawChart(Dictionary<string, Response> responses) {
+            bool emptyResponses = responses.Count <= 0;
             double minClose = double.MaxValue;
             double maxClose = double.MinValue;
             int maxNumResults = int.MinValue;
@@ -38,18 +38,18 @@ namespace MyStocksAnalysis {
                 if (maxNumResults < numResults)
                     maxNumResults = numResults;
             }
-            plotModel = new PlotModel { Title = "Quotes on close" };
+            PlotModel plotModel = new PlotModel { Title = "Quotes on close" };
             plotModel.Axes.Add(new LinearAxis {
                 Title = "Record number",
                 Position = AxisPosition.Bottom,
-                Minimum = 1,
-                Maximum = maxNumResults
+                Minimum = emptyResponses ? 0 : 1,
+                Maximum = emptyResponses ? 1: maxNumResults
             });
             plotModel.Axes.Add(new LinearAxis {
                 Title = "Quote on close",
                 Position = AxisPosition.Left,
-                Minimum = minClose,
-                Maximum = maxClose
+                Minimum = emptyResponses ? 0 : minClose,
+                Maximum = emptyResponses ? 1 : maxClose
             });
             foreach (KeyValuePair<string, Response> pair in responses) {
                 string companyName = pair.Key;
@@ -72,6 +72,24 @@ namespace MyStocksAnalysis {
                 plotModel.Series.Add(scatterSeries);
             }
             plotView.Model = plotModel;
+        }
+
+        private void Slider_ValueChanged(object sender, ValueChangedEventArgs e) {
+            double value = e.NewValue + 7;
+            this.maxRecords = (int)Math.Floor(value);
+            label.Text = "Number of records: " + this.maxRecords;
+        }
+
+        private void Button_Clicked(object sender, EventArgs e) {
+            try {
+                Dictionary<string, Response> responses = new Dictionary<string, Response>();
+                foreach (string companyName in companies)
+                    responses.Add(companyName, RestApi.POST(App.companiesSymbols[companyName], maxRecords));
+                DrawChart(responses);
+            }
+            catch (System.Net.WebException) {
+                DisplayAlert("No Internet?", "Connection to server failed.", "OK");
+            }
         }
     }
 }
