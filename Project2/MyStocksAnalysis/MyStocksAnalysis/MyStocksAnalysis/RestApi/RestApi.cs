@@ -19,6 +19,7 @@ namespace MyStocksAnalysis {
             WebRequest httpWebRequest = HttpWebRequest.Create(string.Format(URLtemplate, apiKey, symbol, date, maxRecords));
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
+            httpWebRequest.Timeout = 3000;
             HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (StreamReader streamReader = new StreamReader(httpWebResponse.GetResponseStream())) {
                 return new Response(streamReader.ReadToEnd());
