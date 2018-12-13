@@ -12,21 +12,24 @@
         </Grid.RowDefinitions>
         <AbsoluteLayout Grid.Row="0">
             <oxy:PlotView x:Name="plotView"
-                      AbsoluteLayout.LayoutBounds="20,0,.9,.9"
+                      AbsoluteLayout.LayoutBounds="0,0,1,1"
                       AbsoluteLayout.LayoutFlags="WidthProportional,HeightProportional" />
         </AbsoluteLayout>
-        <StackLayout Grid.Row="1">
-            <Label x:Name="label"
-               HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Center" />
-            <Slider x:Name="slider"
-                Minimum="0"
-                Maximum="23"
-                Value="0"
-                ThumbColor="DarkCyan"
-                MinimumTrackColor="Gray"
-                MaximumTrackColor="Black"
-                ValueChanged="Slider_ValueChanged" />
+        <StackLayout Grid.Row="1"
+                     Orientation="Horizontal">
+            <StackLayout HorizontalOptions="FillAndExpand">
+                <Label x:Name="label"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center" />
+                <Slider x:Name="slider"
+                    Minimum="0"
+                    Maximum="23"
+                    Value="0"
+                    ThumbColor="DarkCyan"
+                    MinimumTrackColor="Gray"
+                    MaximumTrackColor="Black"
+                    ValueChanged="Slider_ValueChanged" />
+            </StackLayout>
             <Button x:Name="button"
                 Text="Show chart"
                 Clicked="Button_Clicked" />

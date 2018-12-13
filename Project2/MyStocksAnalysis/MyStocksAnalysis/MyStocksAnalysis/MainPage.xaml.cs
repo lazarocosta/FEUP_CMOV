@@ -24,7 +24,6 @@ namespace MyStocksAnalysis {
             foreach (KeyValuePair<string, ImageSource> pair in App.companiesImages) {
                 string companyName = pair.Key;
                 ImageSource companyImage = pair.Value;
-               
                 Image i = new Image {
                     Source = companyImage,
                     Aspect = Aspect.AspectFit,
@@ -39,9 +38,14 @@ namespace MyStocksAnalysis {
                 Switch s = new Switch();
                 s.Toggled += SwitchToggledHandler;
                 s.Resources.Add(switchIdKey, companyName);
+                double leftThickness = 0;
+                double topThickness = 2;
+                double rightThickness = Device.RuntimePlatform == Device.UWP ? 20 : 0;  // Space for UWP's scrollbar.
+                double bottomThickness = 2;
                 StackLayout stackLayout = new StackLayout {
                     Orientation = StackOrientation.Horizontal,
                     HeightRequest = 30,
+                    Padding = new Thickness(leftThickness, topThickness, rightThickness, bottomThickness),
                     Children = { i, l, s }
                 };
                 viewCells.Add(new ViewCell() { View = stackLayout });
