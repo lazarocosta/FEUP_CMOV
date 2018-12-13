@@ -16,7 +16,7 @@ namespace MyStocksAnalysis {
          * https://upload.wikimedia.org/wikipedia/commons/c/c9/Intel-logo.svg
          * https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg
          * https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg
-         * https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_twitter_wordmark_1000.png */
+         * https://pixabay.com/pt/twitter-tweet-p%C3%A1ssaro-twitter-312464/ */
         readonly public static SortedDictionary<string, ImageSource> companiesImages = new SortedDictionary<string, ImageSource>();
         readonly public static SortedDictionary<string, string> companiesSymbols = new SortedDictionary<string, string> {
             { "AMD", "AMD" },
