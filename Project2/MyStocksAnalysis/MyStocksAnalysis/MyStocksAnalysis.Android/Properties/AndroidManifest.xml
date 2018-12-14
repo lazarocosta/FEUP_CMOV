@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.companyname">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="26" />
-    <application android:label="MyStocksAnalysis.Android"></application>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="pt.up.fe.up201405729.cmov2.mystocksanalysis" android:installLocation="auto">
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="26" />
+	<application android:label="My Stocks Analysis"></application>
 </manifest>
