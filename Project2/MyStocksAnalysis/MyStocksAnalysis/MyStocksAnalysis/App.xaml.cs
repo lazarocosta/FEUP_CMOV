@@ -7,6 +7,7 @@ using Xamarin.Forms.Xaml;
 namespace MyStocksAnalysis {
     public partial class App : Application {
         /* These images are tagged for reuse.
+         * https://pixabay.com/pt/bolsa-de-valores-preg%C3%A3o-neg%C3%B3cios-680583/ -> App icon
          * https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg
          * https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg
          * https://upload.wikimedia.org/wikipedia/commons/7/7c/Facebook_New_Logo_%282015%29.svg
